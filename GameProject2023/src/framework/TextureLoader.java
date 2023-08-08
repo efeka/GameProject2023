@@ -19,8 +19,9 @@ public class TextureLoader {
 	private TextureLoader() {
 		try {
 			playerSheet = loadSheet("player_sheet_48x48.png");
-			blockSheet = loadSheet("block_sheet_32x32.png");
+			blockSheet = loadSheet("block_sheet_16x16.png");
 		} catch(IOException e) {
+			System.err.println("Failed to load a sprite sheet file.");
 			e.printStackTrace();
 		}
 		
@@ -33,24 +34,24 @@ public class TextureLoader {
 		return instance;
 	}
 	
-	private void loadTextures() {
-		missingSprite = blockSheet.getSubimage(397, 166, 32, 32);
-		
-		stoneSprites = new BufferedImage[13];
-		for (int i = 0; i < stoneSprites.length; i++)
-			stoneSprites[i] = blockSheet.getSubimage(1 + i * 33, 1, 32, 32);
-		
-		playerSprites = new BufferedImage[9];
-		playerSprites[0] = playerSheet.getSubimage(1, 1, 48, 48);
-		for (int i = 1; i < playerSprites.length; i++)
-			playerSprites[i] = playerSheet.getSubimage(1 + i * 48, 1, 48, 48);
-	}
-	
 	// Load the image file with the given file name to use as a sprite sheet.
 	private BufferedImage loadSheet(String filename) throws IOException {
 		BufferedImage image = null;
 		image = ImageIO.read(getClass().getResource("/resources/" + filename));
 		return image;
+	}
+	
+	private void loadTextures() {
+		missingSprite = blockSheet.getSubimage(208, 0, 16, 16);
+		
+		stoneSprites = new BufferedImage[13];
+		for (int i = 0; i < stoneSprites.length; i++)
+			stoneSprites[i] = blockSheet.getSubimage(i * 16, 0, 16, 16);
+		
+		playerSprites = new BufferedImage[9];
+		playerSprites[0] = playerSheet.getSubimage(1, 1, 48, 48);
+		for (int i = 1; i < playerSprites.length; i++)
+			playerSprites[i] = playerSheet.getSubimage(1 + i * 48, 1, 48, 48);
 	}
 	
 }

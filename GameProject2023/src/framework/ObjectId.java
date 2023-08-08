@@ -11,7 +11,8 @@ public class ObjectId {
 	public enum Name {
 		Player(1),
 		GrassBlock(2),
-		BasicEnemy(3);
+		StoneTileBlock(3),
+		BasicEnemy(4);
 		
 		private int value;
 

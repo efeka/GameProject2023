@@ -5,6 +5,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
+import framework.ObjectHandler;
+import framework.ObjectId;
+import game_objects.StoneTileBlock;
+import general_object_types.TileBlock;
+
 @SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
 
@@ -13,12 +18,26 @@ public class Game extends Canvas implements Runnable {
 	
 	private GameWindow window;
 	
+	private ObjectHandler objectHandler;
+	
 	/**
 	 * The Game class is responsible for setting up and running the game, serving as the entry point of the application.
 	 */
 	public Game() {
 		requestFocus();
 		window = new GameWindow(this);
+		
+		objectHandler = new ObjectHandler();
+		// TODO temporary, for debug
+		objectHandler.addObject(new StoneTileBlock(300, 300, 32, 32,
+				ObjectId.Name.StoneTileBlock, TileBlock.Orientation.OuterTopLeft),
+				ObjectHandler.MIDDLE_LAYER);
+		for (int i = 1; i < 16; i++) {
+			TileBlock.Orientation orientation = i != 15 ? TileBlock.Orientation.OuterTop : TileBlock.Orientation.OuterTopRight;
+			objectHandler.addObject(new StoneTileBlock(300 + i * 32, 300, 32, 32,
+					ObjectId.Name.StoneTileBlock, orientation),
+					ObjectHandler.MIDDLE_LAYER);
+		}
 		
 		start();
 	}
@@ -72,7 +91,7 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	private void update() {
-		
+		objectHandler.updateObjects();
 	}
 	
 	private void render() {
@@ -90,7 +109,8 @@ public class Game extends Canvas implements Runnable {
 		g.fillRect(0, 0, window.getWidth(), window.getHeight());
 		
 		// g2d.translate(cam.getX(), cam.getY());
-
+		
+		objectHandler.renderObjects(g);
 		
 		// g2d.translate(cam.getX(), -cam.getY());
 
