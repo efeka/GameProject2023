@@ -5,10 +5,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
+import javax.swing.SwingConstants;
+
 import framework.ObjectHandler;
 import framework.ObjectId;
 import game_objects.StoneTileBlock;
 import general_object_types.TileBlock;
+import general_object_types.TileOrientation;
 
 @SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
@@ -30,15 +33,15 @@ public class Game extends Canvas implements Runnable {
 		objectHandler = new ObjectHandler();
 		// TODO temporary, for debug
 		objectHandler.addObject(new StoneTileBlock(300, 300, 32, 32,
-				ObjectId.Name.StoneTileBlock, TileBlock.Orientation.OuterTopLeft),
+				ObjectId.Name.StoneTileBlock, TileOrientation.OuterTopLeft),
 				ObjectHandler.MIDDLE_LAYER);
 		for (int i = 1; i < 16; i++) {
-			TileBlock.Orientation orientation = i != 15 ? TileBlock.Orientation.OuterTop : TileBlock.Orientation.OuterTopRight;
+			TileOrientation orientation = i != 15 ? TileOrientation.OuterTop : TileOrientation.OuterTopRight;
 			objectHandler.addObject(new StoneTileBlock(300 + i * 32, 300, 32, 32,
 					ObjectId.Name.StoneTileBlock, orientation),
 					ObjectHandler.MIDDLE_LAYER);
 		}
-		
+
 		start();
 	}
 	
