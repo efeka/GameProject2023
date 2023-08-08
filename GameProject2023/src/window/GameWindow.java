@@ -12,6 +12,7 @@ public class GameWindow extends JFrame {
 	public GameWindow(Game game) {
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Game Project 2023");
 		
 		add(game);
 		

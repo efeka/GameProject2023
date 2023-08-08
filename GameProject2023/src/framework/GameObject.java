@@ -10,10 +10,10 @@ import java.awt.image.BufferedImage;
  */
 public abstract class GameObject {
 	
-	private int x, y;
-	private int width, height;
-	private ObjectId objectId;
-	private BufferedImage texture;
+	protected int x, y;
+	protected int width, height;
+	protected ObjectId objectId;
+	protected BufferedImage texture;
 	
 	public GameObject(int x, int y, int width, int height, ObjectId objectId) {
 		this.x = x;
@@ -33,58 +33,21 @@ public abstract class GameObject {
 	 * @param g the graphics object to draw into.
 	 */
 	public abstract void render(Graphics g);
-	
-	/**
-	 * Get an image which represents this game object.
-	 * This is for coupling objects with textures, which is used in the Level Designer program.
-	 * This image does not have to exactly match how the object is rendered into the game.
-	 * @return image representing this object.
-	 */
-	public abstract BufferedImage getTexture();
 
 	public Rectangle getBounds() {
 		return new Rectangle((int) x, (int) y, width, height);
 	}
-
-	// Getters and setters
-	public int getX() {
-		return x;
+	
+	/**
+	 * Returns an image which represents this game object.
+	 * This is for coupling GameObjects with textures, which is used in the Level Designer program.
+	 * This image does not always have to exactly match how the object is rendered into the game.
+	 * @return image representing this object.
+	 */
+	public BufferedImage getTexture() {
+		if (texture == null)
+			texture = TextureLoader.getInstance().missingSprite;
+		return texture;
 	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public ObjectId getObjectId() {
-		return objectId;
-	}
-
-	public void setObjectId(ObjectId objectId) {
-		this.objectId = objectId;
-	}
-
+	
 }
