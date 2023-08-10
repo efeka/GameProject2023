@@ -18,7 +18,7 @@ public class TextureLoader {
 	
 	private TextureLoader() {
 		try {
-			playerSheet = loadSheet("player_sheet_48x48.png");
+			playerSheet = loadSheet("player_sheet_32x32.png");
 			blockSheet = loadSheet("block_sheet_16x16.png");
 		} catch(IOException e) {
 			System.err.println("Failed to load a sprite sheet file.");
@@ -49,9 +49,9 @@ public class TextureLoader {
 			stoneSprites[i] = blockSheet.getSubimage(i * 16, 0, 16, 16);
 		
 		playerSprites = new BufferedImage[9];
-		playerSprites[0] = playerSheet.getSubimage(1, 1, 48, 48);
+		playerSprites[0] = playerSheet.getSubimage(1, 1, 32, 32);
 		for (int i = 1; i < playerSprites.length; i++)
-			playerSprites[i] = playerSheet.getSubimage(1 + i * 48, 1, 48, 48);
+			playerSprites[i] = playerSheet.getSubimage(1 + i * 33, 34, 32, 32);
 	}
 	
 }

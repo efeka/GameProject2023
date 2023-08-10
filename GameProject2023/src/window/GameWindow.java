@@ -9,12 +9,13 @@ public class GameWindow extends JFrame {
 	 *
 	 * @param main reference to the Game class, used to set up the JFrame with a Canvas.
 	 */
-	public GameWindow(Game game) {
+	public GameWindow(Game game, KeyInput keyInput) {
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Game Project 2023");
 		
 		add(game);
+		addKeyListener(keyInput);
 		
 		setVisible(true);
 	}

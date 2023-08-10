@@ -10,12 +10,12 @@ import java.awt.image.BufferedImage;
  */
 public abstract class GameObject {
 	
-	protected int x, y;
+	protected float x, y;
 	protected int width, height;
 	protected ObjectId objectId;
 	protected BufferedImage texture;
 	
-	public GameObject(int x, int y, int width, int height, ObjectId objectId) {
+	public GameObject(float x, float y, int width, int height, ObjectId objectId) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -26,7 +26,7 @@ public abstract class GameObject {
 	/**
 	 * Update this game object's current state depending on its behaviour.
 	 */
-	public abstract void update();
+	public abstract void tick();
 	
 	/**
 	 * Draw the object onto the screen.
@@ -48,6 +48,27 @@ public abstract class GameObject {
 		if (texture == null)
 			texture = TextureLoader.getInstance().missingSprite;
 		return texture;
+	}
+	
+	// Getters & Setters
+	public float getX() {
+		return x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public ObjectId getObjectId() {
+		return objectId;
 	}
 	
 }

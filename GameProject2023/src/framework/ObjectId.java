@@ -32,12 +32,20 @@ public class ObjectId {
 	    }
 	}
 	
-	public Category category;
-	public Name name;
+	private Category category;
+	private Name name;
 	
 	public ObjectId(Category category, Name name) {
 		this.category = category;
 		this.name = name;
+	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public Name getName() {
+		return name;
 	}
 	
 }

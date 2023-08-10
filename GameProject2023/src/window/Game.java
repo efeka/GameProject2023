@@ -9,6 +9,7 @@ import javax.swing.SwingConstants;
 
 import framework.ObjectHandler;
 import framework.ObjectId;
+import game_objects.Player;
 import game_objects.StoneTileBlock;
 import general_object_types.TileBlock;
 import general_object_types.TileOrientation;
@@ -28,19 +29,25 @@ public class Game extends Canvas implements Runnable {
 	 */
 	public Game() {
 		requestFocus();
-		window = new GameWindow(this);
+		KeyInput keyInput = new KeyInput();
+		window = new GameWindow(this, keyInput);
 		
 		objectHandler = new ObjectHandler();
+		
 		// TODO temporary, for debug
-		objectHandler.addObject(new StoneTileBlock(300, 300, 32, 32,
+		int x = 450;
+		int y = 600;
+		int blocks = 20;
+		objectHandler.addObject(new StoneTileBlock(x, y, 32, 32,
 				ObjectId.Name.StoneTileBlock, TileOrientation.OuterTopLeft),
 				ObjectHandler.MIDDLE_LAYER);
-		for (int i = 1; i < 16; i++) {
-			TileOrientation orientation = i != 15 ? TileOrientation.OuterTop : TileOrientation.OuterTopRight;
-			objectHandler.addObject(new StoneTileBlock(300 + i * 32, 300, 32, 32,
+		for (int i = 1; i < blocks; i++) {
+			TileOrientation orientation = i != blocks - 1 ? TileOrientation.OuterTop : TileOrientation.OuterTopRight;
+			objectHandler.addObject(new StoneTileBlock(x + i * 32, y, 32, 32,
 					ObjectId.Name.StoneTileBlock, orientation),
 					ObjectHandler.MIDDLE_LAYER);
 		}
+		objectHandler.addObject(new Player(x, y - 80, 64, 64, objectHandler, keyInput), ObjectHandler.MIDDLE_LAYER);
 
 		start();
 	}
@@ -60,9 +67,9 @@ public class Game extends Canvas implements Runnable {
 		}
 	}
 	
-	// This is where the game loop is handled.
+	// Handle the game loop and keep track of frames per second.
 	// Objects are updated and rendered in here.
-	// TODO Limit frame rate
+	// TODO: Limit frame rate
 	@Override
 	public void run() {
 		this.requestFocus();
@@ -108,7 +115,8 @@ public class Game extends Canvas implements Runnable {
 		// Graphics2D g2d = (Graphics2D) g;
 		
 		// Draw background
-		g.setColor(new Color(25, 51, 45));
+		g.setColor(new Color(60, 20, 20));
+		//g.setColor(new Color(25, 51, 45));
 		g.fillRect(0, 0, window.getWidth(), window.getHeight());
 		
 		// g2d.translate(cam.getX(), cam.getY());

@@ -29,13 +29,13 @@ public class ObjectHandler {
 	 */
 	public void updateObjects() {
 		for (int i = 0; i < middleLayer.size(); i++) 
-			middleLayer.get(i).update();
+			middleLayer.get(i).tick();
 		for (int i = 0; i < bottomLayer.size(); i++) 
-			bottomLayer.get(i).update();
+			bottomLayer.get(i).tick();
 		for (int i = 0; i < topLayer.size(); i++) 
-			topLayer.get(i).update();
+			topLayer.get(i).tick();
 		for (int i = 0; i < menuLayer.size(); i++) 
-			menuLayer.get(i).update();
+			menuLayer.get(i).tick();
 	}
 
 	/**

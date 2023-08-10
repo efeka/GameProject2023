@@ -19,11 +19,11 @@ public class StoneTileBlock extends TileBlock {
 	}
 
 	@Override
-	public void update() {}
+	public void tick() {}
 
 	@Override
 	public void render(Graphics g) {
-		g.drawImage(getTexture(), x, y, width, height, null);
+		g.drawImage(texture, (int) x, (int) y, width, height, null);
 	}
 
 }
