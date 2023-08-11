@@ -28,9 +28,9 @@ public class Game extends Canvas implements Runnable {
 	 * The Game class is responsible for setting up and running the game, serving as the entry point of the application.
 	 */
 	public Game() {
-		requestFocus();
 		KeyInput keyInput = new KeyInput();
-		window = new GameWindow(this, keyInput);
+		addKeyListener(keyInput);
+		window = new GameWindow(this);
 		
 		objectHandler = new ObjectHandler();
 		
@@ -49,6 +49,7 @@ public class Game extends Canvas implements Runnable {
 		}
 		objectHandler.addObject(new Player(x, y - 80, 64, 64, objectHandler, keyInput), ObjectHandler.MIDDLE_LAYER);
 
+		requestFocus();
 		start();
 	}
 	
