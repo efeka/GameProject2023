@@ -65,6 +65,15 @@ public class Game extends Canvas implements Runnable {
 		objectHandler.addObject(new StoneTileBlock(x + 32 * 14, y - 32 * 3, 32, 32,
 				ObjectId.Name.StoneTileBlock, TileOrientation.OuterTop),
 				ObjectHandler.MIDDLE_LAYER);
+		objectHandler.addObject(new DiagonalStoneTileBlock(x + 32 * 17, y - 32, 32, 32,
+				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopRight),
+				ObjectHandler.MIDDLE_LAYER);
+		objectHandler.addObject(new DiagonalStoneTileBlock(x + 32 * 16, y - 32 * 2, 32, 32,
+				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopRight),
+				ObjectHandler.MIDDLE_LAYER);
+		objectHandler.addObject(new DiagonalStoneTileBlock(x + 32 * 15, y - 32 * 3, 32, 32,
+				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopRight),
+				ObjectHandler.MIDDLE_LAYER);
 		
 		requestFocus();
 		start();

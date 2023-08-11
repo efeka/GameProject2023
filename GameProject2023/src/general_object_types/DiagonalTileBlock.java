@@ -1,5 +1,7 @@
 package general_object_types;
 
+import java.awt.geom.Line2D;
+
 import framework.GameObject;
 import framework.ObjectId;
 import framework.ObjectId.Name;
@@ -41,4 +43,7 @@ public abstract class DiagonalTileBlock extends GameObject {
 		}
 	}
 	
+	public DiagonalDirection getDiagonalDirection() {
+		return diagonalDirection;
+	}
 }
