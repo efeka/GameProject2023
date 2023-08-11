@@ -9,6 +9,7 @@ import javax.swing.SwingConstants;
 
 import framework.ObjectHandler;
 import framework.ObjectId;
+import game_objects.DiagonalStoneTileBlock;
 import game_objects.Player;
 import game_objects.StoneTileBlock;
 import general_object_types.TileBlock;
@@ -48,7 +49,23 @@ public class Game extends Canvas implements Runnable {
 					ObjectHandler.MIDDLE_LAYER);
 		}
 		objectHandler.addObject(new Player(x, y - 80, 64, 64, objectHandler, keyInput), ObjectHandler.MIDDLE_LAYER);
-
+		
+		objectHandler.addObject(new DiagonalStoneTileBlock(x + 32 * 10, y - 32, 32, 32,
+				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopLeft),
+				ObjectHandler.MIDDLE_LAYER);
+		objectHandler.addObject(new DiagonalStoneTileBlock(x + 32 * 11, y - 32 * 2, 32, 32,
+				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopLeft),
+				ObjectHandler.MIDDLE_LAYER);
+		objectHandler.addObject(new DiagonalStoneTileBlock(x + 32 * 12, y - 32 * 3, 32, 32,
+				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopLeft),
+				ObjectHandler.MIDDLE_LAYER);
+		objectHandler.addObject(new StoneTileBlock(x + 32 * 13, y - 32 * 3, 32, 32,
+				ObjectId.Name.StoneTileBlock, TileOrientation.OuterTop),
+				ObjectHandler.MIDDLE_LAYER);
+		objectHandler.addObject(new StoneTileBlock(x + 32 * 14, y - 32 * 3, 32, 32,
+				ObjectId.Name.StoneTileBlock, TileOrientation.OuterTop),
+				ObjectHandler.MIDDLE_LAYER);
+		
 		requestFocus();
 		start();
 	}

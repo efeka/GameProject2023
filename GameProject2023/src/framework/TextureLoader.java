@@ -15,6 +15,7 @@ public class TextureLoader {
 	public BufferedImage missingSprite;
 	public BufferedImage[] playerSprites;
 	public BufferedImage[] stoneSprites;
+	public BufferedImage[] diagonalStoneSprites;
 	
 	private TextureLoader() {
 		try {
@@ -52,6 +53,10 @@ public class TextureLoader {
 		playerSprites[0] = playerSheet.getSubimage(1, 1, 32, 32);
 		for (int i = 1; i < playerSprites.length; i++)
 			playerSprites[i] = playerSheet.getSubimage(1 + i * 33, 34, 32, 32);
+		
+		diagonalStoneSprites = new BufferedImage[4];
+		for (int i = 0; i < diagonalStoneSprites.length; i++)
+			diagonalStoneSprites[i] = blockSheet.getSubimage(i * 16, 32, 16, 16);
 	}
 	
 }

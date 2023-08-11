@@ -5,6 +5,7 @@ public class ObjectId {
 	public enum Category {
 		Player,
 		Block,
+		DiagonalBlock,
 		Enemy,
 	}
 	
@@ -12,7 +13,8 @@ public class ObjectId {
 		Player(1),
 		GrassBlock(2),
 		StoneTileBlock(3),
-		BasicEnemy(4);
+		DiagonalStoneBlock(4),
+		BasicEnemy(5);
 		
 		private int value;
 
