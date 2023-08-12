@@ -38,7 +38,7 @@ public class TextureLoader {
 	// Load the image file with the given file name to use as a sprite sheet.
 	private BufferedImage loadSheet(String filename) throws IOException {
 		BufferedImage image = null;
-		image = ImageIO.read(getClass().getResource("/resources/" + filename));
+		image = ImageIO.read(getClass().getResource("/" + filename));
 		return image;
 	}
 	
