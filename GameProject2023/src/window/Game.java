@@ -3,16 +3,14 @@ package window;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Window;
 import java.awt.image.BufferStrategy;
-
-import javax.swing.SwingConstants;
 
 import framework.ObjectHandler;
 import framework.ObjectId;
 import game_objects.DiagonalStoneTileBlock;
 import game_objects.Player;
 import game_objects.StoneTileBlock;
-import general_object_types.TileBlock;
 import general_object_types.TileOrientation;
 
 @SuppressWarnings("serial")
@@ -21,9 +19,12 @@ public class Game extends Canvas implements Runnable {
 	private Thread thread;
 	public static boolean running = false;
 	
-	private GameWindow window;
+	private Window window;
 	
 	private ObjectHandler objectHandler;
+	
+	private final int MAX_FPS = 120;
+	private final int MAX_UPS = 200;
 	
 	/**
 	 * The Game class is responsible for setting up and running the game, serving as the entry point of the application.
@@ -94,38 +95,82 @@ public class Game extends Canvas implements Runnable {
 		}
 	}
 	
-	// Handle the game loop and keep track of frames per second.
-	// Objects are updated and rendered in here.
-	// TODO: Limit frame rate
+	// The game loop which handles updating and rendering the entire game,
+	// while keeping track of and limiting the updates and frames per second.
 	@Override
 	public void run() {
-		this.requestFocus();
-		long lastTime = System.nanoTime();
-		double amountOfTicks = 60.0;
-		double ns = 1_000_000_000 / amountOfTicks;
-		double delta = 0;
-		long timer = System.currentTimeMillis();
-		int frames = 0;
-		
-		while(running) {
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
-			while(delta >= 1) {
-				update();
-				delta--;
-			}
-			render();
-			
-			frames++;
+		final double timePerFrame = 1_000_000_000.0 / MAX_FPS;
+		final double timePerUpdate = 1_000_000_000.0 / MAX_UPS;
 
-			if (System.currentTimeMillis() - timer > 1000) {
-				timer += 1000;
-				System.out.println("FPS: " + frames);
-				frames = 0;
+		int frames = 0;
+		int updates = 0;
+		double deltaUpdates = 0;
+		double deltaFrames = 0;		
+		
+		long lastCheck = 0;
+		long previousTime = System.nanoTime();				
+		
+		while (true) {
+			long currentTime = System.nanoTime();
+			
+			deltaUpdates += (currentTime - previousTime) / timePerUpdate;
+			deltaFrames += (currentTime - previousTime) / timePerFrame;
+			previousTime = currentTime;
+			
+			// Update the game
+			if (deltaUpdates >= 1) {
+				update();
+				updates++;
+				deltaUpdates--;
+			}
+			
+			// Render the game
+			if (deltaFrames >= 1) {
+				render();
+				frames++;
+				deltaFrames--;
+			}
+			
+			if (System.currentTimeMillis() - lastCheck >= 1000) {
+				lastCheck = System.currentTimeMillis();
+				System.out.println("FPS: " + frames + " | UPS:" + updates);
+				frames = updates = 0;
 			}
 		}
 	}
+	
+	// Handle the game loop and keep track of frames per second.
+	// Objects are updated and rendered in here.
+	// TODO: Limit frame rate
+//	@Override
+//	public void run() {
+//		this.requestFocus();
+//		long lastTime = System.nanoTime();
+//		double amountOfTicks = 60.0;
+//		double ns = 1_000_000_000 / amountOfTicks;
+//		double delta = 0;
+//		long timer = System.currentTimeMillis();
+//		int frames = 0;
+//		
+//		while(running) {
+//			long now = System.nanoTime();
+//			delta += (now - lastTime) / ns;
+//			lastTime = now;
+//			while(delta >= 1) {
+//				update();
+//				delta--;
+//			}
+//			render();
+//			
+//			frames++;
+//
+//			if (System.currentTimeMillis() - timer > 1000) {
+//				timer += 1000;
+//				System.out.println("FPS: " + frames);
+//				frames = 0;
+//			}
+//		}
+//	}
 	
 	private void update() {
 		objectHandler.updateObjects();
