@@ -20,8 +20,8 @@ public class Player extends Creature {
 	private ObjectHandler objectHandler;
 	private KeyInput keyInput;
 
-	private float runningSpeed = 5f;
-	private float jumpingSpeed = -12f;
+	private float runningSpeed = 3f;
+	private float jumpingSpeed = -8f;
 
 	public Player(int x, int y, int width, int height, ObjectHandler objectHandler, KeyInput keyInput) {
 		super(x, y, width, height, new ObjectId(Category.Player, Name.Player));

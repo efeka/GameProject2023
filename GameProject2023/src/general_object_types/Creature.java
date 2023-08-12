@@ -16,6 +16,7 @@ public abstract class Creature extends GameObject {
 		super(x, y, width, height, objectId);
 		
 		falling = true;
+		jumping = false;
 	}
 
 }

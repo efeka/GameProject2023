@@ -40,7 +40,7 @@ public class ObjectHandler {
 
 	/**
 	 * Renders all objects in the game.
-	 * This should be called in every frame of the game loop.
+	 * This should be called in every update of the game loop.
 	 * @param g graphics object to use for rendering
 	 */
 	public void renderObjects(Graphics g) {

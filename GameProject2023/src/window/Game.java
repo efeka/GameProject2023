@@ -24,7 +24,7 @@ public class Game extends Canvas implements Runnable {
 	private ObjectHandler objectHandler;
 	
 	private final int MAX_FPS = 120;
-	private final int MAX_UPS = 200;
+	private final int MAX_UPS = 120;
 	
 	/**
 	 * The Game class is responsible for setting up and running the game, serving as the entry point of the application.
@@ -139,39 +139,6 @@ public class Game extends Canvas implements Runnable {
 		}
 	}
 	
-	// Handle the game loop and keep track of frames per second.
-	// Objects are updated and rendered in here.
-	// TODO: Limit frame rate
-//	@Override
-//	public void run() {
-//		this.requestFocus();
-//		long lastTime = System.nanoTime();
-//		double amountOfTicks = 60.0;
-//		double ns = 1_000_000_000 / amountOfTicks;
-//		double delta = 0;
-//		long timer = System.currentTimeMillis();
-//		int frames = 0;
-//		
-//		while(running) {
-//			long now = System.nanoTime();
-//			delta += (now - lastTime) / ns;
-//			lastTime = now;
-//			while(delta >= 1) {
-//				update();
-//				delta--;
-//			}
-//			render();
-//			
-//			frames++;
-//
-//			if (System.currentTimeMillis() - timer > 1000) {
-//				timer += 1000;
-//				System.out.println("FPS: " + frames);
-//				frames = 0;
-//			}
-//		}
-//	}
-	
 	private void update() {
 		objectHandler.updateObjects();
 	}
@@ -184,18 +151,13 @@ public class Game extends Canvas implements Runnable {
 		}
 		
 		Graphics g = bs.getDrawGraphics();
-		// Graphics2D g2d = (Graphics2D) g;
-		
+
 		// Draw background
-		g.setColor(new Color(60, 20, 20));
-		//g.setColor(new Color(25, 51, 45));
+		g.setColor(new Color(25, 51, 45));
 		g.fillRect(0, 0, window.getWidth(), window.getHeight());
 		
-		// g2d.translate(cam.getX(), cam.getY());
-		
+		// Render game objects
 		objectHandler.renderObjects(g);
-		
-		// g2d.translate(cam.getX(), -cam.getY());
 
 		g.dispose();
 		bs.show();
