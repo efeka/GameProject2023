@@ -1,6 +1,6 @@
 package general_object_types;
 
-import java.awt.geom.Line2D;
+import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import framework.GameObject;
 import framework.ObjectId;
@@ -22,8 +22,8 @@ public abstract class DiagonalTileBlock extends GameObject {
 	}
 	protected DiagonalDirection diagonalDirection;
 	
-	public DiagonalTileBlock(float x, float y, int width, int height, Name objectName, TileOrientation orientation) {
-		super(x, y, width, height, new ObjectId(ObjectId.Category.DiagonalBlock, objectName));
+	public DiagonalTileBlock(float x, float y, Name objectName, TileOrientation orientation) {
+		super(x, y, TILE_SIZE, TILE_SIZE, new ObjectId(ObjectId.Category.DiagonalBlock, objectName));
 		
 		switch (orientation) {
 		case OuterTopLeft:

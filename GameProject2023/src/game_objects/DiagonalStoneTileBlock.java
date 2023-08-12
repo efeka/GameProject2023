@@ -9,9 +9,9 @@ import general_object_types.TileOrientation;
 
 public class DiagonalStoneTileBlock extends DiagonalTileBlock {
 
-	public DiagonalStoneTileBlock(float x, float y, int width, int height, Name objectName,
+	public DiagonalStoneTileBlock(float x, float y, Name objectName,
 			TileOrientation orientation) {
-		super(x, y, width, height, objectName, orientation);
+		super(x, y, objectName, orientation);
 		
 		TextureLoader textureLoader = TextureLoader.getInstance();
 		switch (diagonalDirection) {

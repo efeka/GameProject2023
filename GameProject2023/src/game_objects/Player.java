@@ -1,5 +1,8 @@
 package game_objects;
 
+import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
+import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,8 +26,8 @@ public class Player extends Creature {
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = -8f;
 
-	public Player(int x, int y, int width, int height, ObjectHandler objectHandler, KeyInput keyInput) {
-		super(x, y, width, height, new ObjectId(Category.Player, Name.Player));
+	public Player(int x, int y, ObjectHandler objectHandler, KeyInput keyInput) {
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 
@@ -50,7 +53,7 @@ public class Player extends Creature {
 	@Override
 	public void render(Graphics g) {
 		g.drawImage(texture, (int) x, (int) y, width, height, null);
-		
+
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(Color.WHITE);
 		g2d.draw(getBottomBounds());
@@ -76,7 +79,6 @@ public class Player extends Creature {
 		}
 	}
 
-	// TODO Handle collision with other game objects
 	private void handleCollision() {
 		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
 			// Collision with Blocks
@@ -122,13 +124,13 @@ public class Player extends Creature {
 			velY = 0;
 		}
 	}
-	
+
 	// TODO currently only works for the topleft diagonal
 	private void checkDiagonalBlockCollision(GameObject other) {
 		DiagonalTileBlock otherObj = (DiagonalTileBlock) other;
 		Rectangle otherBounds = otherObj.getBounds();
 		Rectangle bottomBounds = getBottomBounds();
-		
+
 		// Bottom collision
 		if (bottomBounds.intersects(otherBounds)) {
 			int bottomBoundsCollisionX = bottomBounds.x + bottomBounds.width;
@@ -136,19 +138,47 @@ public class Player extends Creature {
 
 			if (bottomBoundsCollisionX > otherBounds.x + otherBounds.width)
 				return;
-			
+
 			// Output of f(x) = x function, where x is the collision point
 			int diagonalDistance = bottomBoundsCollisionX - otherBounds.x;
 			int diagonalCollisionY = otherBounds.y + otherBounds.height - diagonalDistance;
 			int heightDiff = diagonalCollisionY - bottomBoundsCollisionY;
-			y += heightDiff;
 			
+			y += heightDiff - 10;
+
 			velY = 0;
 			falling = false;
 			jumping = false;
 		}
 		else
 			falling = true;
+		
+//		DiagonalTileBlock otherObj = (DiagonalTileBlock) other;
+//		Rectangle otherBounds = otherObj.getBounds();
+//		Rectangle bottomBounds = getBottomBounds();
+//
+//		// Bottom collision
+//		if (bottomBounds.intersects(otherBounds)) {
+//			int bottomBoundsCollisionX = bottomBounds.x + bottomBounds.width;
+//			int bottomBoundsCollisionY = bottomBounds.y + bottomBounds.height;
+//
+//			if (bottomBoundsCollisionX > otherBounds.x + otherBounds.width)
+//				return;
+//
+//			// Output of f(x) = x function, where x is the collision point
+//			int diagonalDistance = bottomBoundsCollisionX - otherBounds.x;
+//			int diagonalCollisionY = otherBounds.y + otherBounds.height - diagonalDistance;
+//			int heightDiff = diagonalCollisionY - bottomBoundsCollisionY;
+//			
+//			if (bottomBoundsCollisionY > diagonalCollisionY)
+//				y += heightDiff;
+//
+//			velY = 0;
+//			falling = false;
+//			jumping = false;
+//		}
+//		else
+//			falling = true;
 	}
 
 	// TODO Make sure collision is consistent in different game resolutions

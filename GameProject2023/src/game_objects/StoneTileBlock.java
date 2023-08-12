@@ -10,8 +10,8 @@ import general_object_types.TileOrientation;
 
 public class StoneTileBlock extends TileBlock {
 
-	public StoneTileBlock(int x, int y, int width, int height, Name objectName, TileOrientation orientation) {
-		super(x, y, width, height, objectName, orientation);
+	public StoneTileBlock(int x, int y, Name objectName, TileOrientation orientation) {
+		super(x, y, objectName, orientation);
 		
 		TextureLoader textureLoader = TextureLoader.getInstance();
 		BufferedImage[] tileSet = textureLoader.stoneSprites;
