@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import framework.GameObject;
 import framework.ObjectHandler;
@@ -16,6 +17,7 @@ import framework.ObjectId.Name;
 import framework.TextureLoader;
 import general_object_types.Creature;
 import general_object_types.DiagonalTileBlock;
+import window.Animation;
 import window.KeyInput;
 
 public class Player extends Creature {
@@ -26,12 +28,17 @@ public class Player extends Creature {
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = -8f;
 
+	private Animation idleRightAnimation;
+	private Animation idleLeftAnimation;
+	private Animation runningRightAnimation;
+	private Animation runningLeftAnimation;
+	
 	public Player(int x, int y, ObjectHandler objectHandler, KeyInput keyInput) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 
-		texture = TextureLoader.getInstance().playerSprites[0];
+		setupAnimations();
 	}
 
 	@Override
@@ -48,19 +55,22 @@ public class Player extends Creature {
 
 		handleMovement();
 		handleCollision();
+		
+		runAnimations();
 	}
 
 	@Override
 	public void render(Graphics g) {
-		g.drawImage(texture, (int) x, (int) y, width, height, null);
-
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(Color.WHITE);
-		g2d.draw(getBottomBounds());
+		drawAnimations(g);
 	}
 
 	// Use the keyboard inputs of the user to move the player
 	private void handleMovement() {
+		if (velX > 0)
+			direction = 1;
+		else if (velX < 0)
+			direction = -1;
+		
 		// Horizontal movement
 		boolean rightPressed = keyInput.isMoveRightKeyPressed();
 		boolean leftPressed = keyInput.isMoveLeftKeyPressed();
@@ -201,6 +211,65 @@ public class Player extends Creature {
 		float height = this.height / 5f;
 		float yOffset = 4 * this.height / 5f;
 		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
+	}
+	
+	private void setupAnimations() {
+		BufferedImage[] sprites = TextureLoader.getInstance().playerSprites;
+		texture = sprites[0];
+		
+		final int idleDelay = 8;
+		final int runDelay = 10;
+		
+		idleRightAnimation = new Animation(idleDelay, sprites[0], sprites[1], sprites[2], sprites[3],
+				sprites[4], sprites[5], sprites[6], sprites[7], sprites[8], sprites[9]);
+		idleLeftAnimation = new Animation(idleDelay, sprites[10], sprites[11], sprites[12], sprites[13],
+				sprites[14], sprites[15], sprites[16], sprites[17], sprites[18], sprites[19]);
+		runningRightAnimation = new Animation(runDelay, sprites[20], sprites[21], sprites[22], sprites[23],
+				sprites[24], sprites[25], sprites[26], sprites[27]);
+		runningLeftAnimation = new Animation(runDelay, sprites[28], sprites[29], sprites[30], sprites[31],
+				sprites[32], sprites[33], sprites[34], sprites[35]);
+	}
+	
+	private void runAnimations() {
+		// Looking right
+		if (direction == 1) {
+			// Not moving
+			if (velX == 0)
+				idleRightAnimation.runAnimation();
+			// Moving right
+			else
+				runningRightAnimation.runAnimation();
+		}
+		// Looking left
+		else if (direction == -1) {
+			// Not moving
+			if (velX == 0)
+				idleLeftAnimation.runAnimation();
+			// Moving left
+			else
+				runningLeftAnimation.runAnimation();
+		}
+	}
+	
+	private void drawAnimations(Graphics g) {
+		// Looking right
+		if (direction == 1) {
+			// Not moving
+			if (velX == 0)
+				idleRightAnimation.drawAnimation(g, (int) x, (int) y, width, height);
+			// Moving right
+			else
+				runningRightAnimation.drawAnimation(g, (int) x, (int) y, width, height);
+		}
+		// Looking left
+		else if (direction == -1) {
+			// Not moving
+			if (velX == 0)
+				idleLeftAnimation.drawAnimation(g, (int) x, (int) y, width, height);
+			// Moving left
+			else
+				runningLeftAnimation.drawAnimation(g, (int) x, (int) y, width, height);
+		}
 	}
 
 }

@@ -11,6 +11,8 @@ public abstract class Creature extends GameObject {
 	
 	protected float velX, velY;
 	protected boolean falling, jumping;
+	// 1 for right, -1 for left
+	protected int direction = 1;
 	
 	public Creature(int x, int y, int width, int height, ObjectId objectId) {
 		super(x, y, width, height, objectId);

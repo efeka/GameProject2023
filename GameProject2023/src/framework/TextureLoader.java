@@ -49,10 +49,15 @@ public class TextureLoader {
 		for (int i = 0; i < stoneSprites.length; i++)
 			stoneSprites[i] = blockSheet.getSubimage(i * 16, 0, 16, 16);
 		
-		playerSprites = new BufferedImage[9];
-		playerSprites[0] = playerSheet.getSubimage(1, 1, 32, 32);
-		for (int i = 1; i < playerSprites.length; i++)
-			playerSprites[i] = playerSheet.getSubimage(1 + i * 33, 34, 32, 32);
+		playerSprites = new BufferedImage[36];
+		for (int i = 0; i < 10; i++)
+			playerSprites[i] = playerSheet.getSubimage(1 + i * 33, 1, 32, 32);
+		for (int i = 10; i < 20; i++)
+			playerSprites[i] = playerSheet.getSubimage(1 + (i - 10) * 33, 34, 32, 32);
+		for (int i = 20; i < 28; i++)
+			playerSprites[i] = playerSheet.getSubimage(1 + (i - 20) * 33, 67, 32, 32);
+		for (int i = 28; i < 36; i++)
+			playerSprites[i] = playerSheet.getSubimage(1 + (i - 28) * 33, 100, 32, 32);
 		
 		diagonalStoneSprites = new BufferedImage[4];
 		for (int i = 0; i < diagonalStoneSprites.length; i++)
