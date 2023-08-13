@@ -3,9 +3,9 @@ package game_objects;
 import java.awt.Graphics;
 
 import framework.ObjectId.Name;
+import object_templates.DiagonalTileBlock;
+import object_templates.TileOrientation;
 import framework.TextureLoader;
-import general_object_types.DiagonalTileBlock;
-import general_object_types.TileOrientation;
 
 public class DiagonalStoneTileBlock extends DiagonalTileBlock {
 

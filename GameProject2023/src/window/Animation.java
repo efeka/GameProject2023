@@ -28,6 +28,8 @@ public class Animation {
 		 images = new BufferedImage[frameCount];
 		 for (int i = 0; i < frameCount; i++)
 			 images[i] = args[i];
+		 
+		 currentImage = images[0];
 	}
 	
 	/**

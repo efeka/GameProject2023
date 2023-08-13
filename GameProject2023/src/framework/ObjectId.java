@@ -7,6 +7,7 @@ public class ObjectId {
 		Block,
 		DiagonalBlock,
 		Enemy,
+		Menu,
 	}
 	
 	public enum Name {
@@ -14,7 +15,8 @@ public class ObjectId {
 		GrassBlock(2),
 		StoneTileBlock(3),
 		DiagonalStoneBlock(4),
-		BasicEnemy(5);
+		BasicEnemy(5),
+		HUD(6);
 		
 		private int value;
 

@@ -1,5 +1,7 @@
 package window;
 
+import static framework.GameConstants.ScaleConstants.TILE_SIZE;
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,7 +14,8 @@ import framework.ObjectId;
 import game_objects.DiagonalStoneTileBlock;
 import game_objects.Player;
 import game_objects.StoneTileBlock;
-import general_object_types.TileOrientation;
+import object_templates.PlayerData;
+import object_templates.TileOrientation;
 
 @SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
@@ -36,6 +39,9 @@ public class Game extends Canvas implements Runnable {
 		window = new GameWindow(this);
 		
 		objectHandler = new ObjectHandler();
+		PlayerData playerData = new PlayerData(100, 70);
+		HUD hud = new HUD(10, 10, TILE_SIZE * 3, TILE_SIZE / 2, playerData);
+		objectHandler.addObject(hud, ObjectHandler.MENU_LAYER);
 		
 		// TODO temporary, for debug
 		int x = 200;
@@ -51,7 +57,7 @@ public class Game extends Canvas implements Runnable {
 					ObjectId.Name.StoneTileBlock, orientation),
 					ObjectHandler.MIDDLE_LAYER);
 		}
-		objectHandler.addObject(new Player(x, y - 80, objectHandler, keyInput), ObjectHandler.MIDDLE_LAYER);
+		objectHandler.addObject(new Player(x, y - 80, playerData, objectHandler, keyInput), ObjectHandler.MIDDLE_LAYER);
 		
 		objectHandler.addObject(new DiagonalStoneTileBlock(x + blockSize * 10, y - blockSize,
 				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopLeft),

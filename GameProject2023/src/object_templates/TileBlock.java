@@ -1,4 +1,4 @@
-package general_object_types;
+package object_templates;
 
 import framework.GameObject;
 import framework.ObjectId;

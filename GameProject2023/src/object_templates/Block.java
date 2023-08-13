@@ -1,4 +1,4 @@
-package general_object_types;
+package object_templates;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 

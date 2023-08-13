@@ -4,9 +4,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import framework.ObjectId.Name;
+import object_templates.TileBlock;
+import object_templates.TileOrientation;
 import framework.TextureLoader;
-import general_object_types.TileBlock;
-import general_object_types.TileOrientation;
 
 public class StoneTileBlock extends TileBlock {
 
