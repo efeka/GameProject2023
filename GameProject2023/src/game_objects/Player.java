@@ -40,7 +40,12 @@ public class Player extends Creature {
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 		
+		texture = TextureLoader.getInstance().playerSprites[0];
 		setupAnimations();
+	}
+	
+	public Player() {
+		texture = TextureLoader.getInstance().playerSprites[0];
 	}
 
 	@Override
@@ -192,7 +197,6 @@ public class Player extends Creature {
 	
 	private void setupAnimations() {
 		BufferedImage[] sprites = TextureLoader.getInstance().playerSprites;
-		texture = sprites[0];
 		
 		final int idleDelay = 8;
 		final int runDelay = 10;

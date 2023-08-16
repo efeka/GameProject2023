@@ -43,7 +43,6 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				System.out.println("a");
 				levelGrid.resizeGrid(getWidth(), getHeight());
 				repaint();
 			}

@@ -7,6 +7,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -20,8 +22,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
+import framework.GameObject;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
+import game_objects.Player;
+import game_objects.StoneTileBlock;
+import object_templates.TileOrientation;
 
 public class OptionsPanel extends JPanel {
 
@@ -108,26 +114,34 @@ public class OptionsPanel extends JPanel {
 		Name[] enumValues = Name.values();
 		JButton[] buttons = new JButton[enumValues.length];
 
-		int buttonSize = (getWidth() - 30) / 3;
+		int columnCount = 4;
+		int buttonSize = (getWidth() - 10) / columnCount;
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		for (int i = 0; i < enumValues.length; i++) {
-			Name objectName = enumValues[i];
-			BufferedImage objectImage = getImageByObjectName(objectName);
-			
-			buttons[i] = new JButton(); 
-			buttons[i] = new JButton(new ImageIcon(objectImage));
-			buttons[i].setPreferredSize(new Dimension(buttonSize, buttonSize));
-			buttons[i].addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if (optionSelectionListener != null)
-						optionSelectionListener.onGameObjectSelected(objectImage, objectName);
-				}
-			});
+		    Name objectName = enumValues[i];
+		    if (objectName == Name.Menu)
+		        continue;
 
-			gbc.gridx = i % 3;
-			gbc.gridy = i / 3;
-			centerPanel.add(buttons[i], gbc);
+		    // Get objects image by Name
+		    BufferedImage objectImage = getImageByObjectName(objectName);
+
+		    ImageIcon scaledIcon = new ImageIcon(objectImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH));
+		    buttons[i] = new JButton(scaledIcon);
+		    buttons[i].setPreferredSize(new Dimension(buttonSize, buttonSize));
+		    buttons[i].setMargin(new Insets(0, 0, 0, 0));
+		    
+		    buttons[i].addActionListener(new ActionListener() {
+		        public void actionPerformed(ActionEvent e) {
+		            if (optionSelectionListener != null)
+		                optionSelectionListener.onGameObjectSelected(objectImage, objectName);
+		        }
+		    });
+
+		    gbc.gridx = (i - 1) % columnCount;
+		    gbc.gridy = (i - 1) / columnCount;
+		    gbc.anchor = GridBagConstraints.CENTER;
+		    centerPanel.add(buttons[i], gbc);
 		}
 
 		JScrollPane scrollPane = new JScrollPane(centerPanel);
@@ -139,16 +153,67 @@ public class OptionsPanel extends JPanel {
 	}
 	
 	private BufferedImage getImageByObjectName(Name objectName) {
-		BufferedImage image = null;
-		TextureLoader textureLoader = TextureLoader.getInstance();
-
+		GameObject gameObject = null;
+		
 		switch (objectName) {
-		default:
-			image = textureLoader.missingSprite;
+		case Player:
+			gameObject = new Player();
+			break;
+		// Menus should not be available in the Level Designer
+		case Menu:
+			break;
+		case DiagonalStoneBlock:
+			break;
+		case StoneTileBlock_Center:
+			gameObject = new StoneTileBlock(TileOrientation.Center);
+			break;
+		case StoneTileBlock_InnerBottomLeft:
+			gameObject = new StoneTileBlock(TileOrientation.InnerBottomLeft);
+			break;
+		case StoneTileBlock_InnerBottomRight:
+			gameObject = new StoneTileBlock(TileOrientation.InnerBottomRight);
+			break;
+		case StoneTileBlock_InnerTopLeft:
+			gameObject = new StoneTileBlock(TileOrientation.InnerTopLeft);
+			break;
+		case StoneTileBlock_InnerTopRight:
+			gameObject = new StoneTileBlock(TileOrientation.InnerTopRight);
+			break;
+		case StoneTileBlock_OuterBottom:
+			gameObject = new StoneTileBlock(TileOrientation.OuterBottom);
+			break;
+		case StoneTileBlock_OuterBottomLeft:
+			gameObject = new StoneTileBlock(TileOrientation.OuterBottomLeft);
+			break;
+		case StoneTileBlock_OuterBottomRight:
+			gameObject = new StoneTileBlock(TileOrientation.OuterBottomRight);
+			break;
+		case StoneTileBlock_OuterLeft:
+			gameObject = new StoneTileBlock(TileOrientation.OuterLeft);
+			break;
+		case StoneTileBlock_OuterRight:
+			gameObject = new StoneTileBlock(TileOrientation.OuterRight);
+			break;
+		case StoneTileBlock_OuterTop:
+			gameObject = new StoneTileBlock(TileOrientation.OuterTop);
+			break;
+		case StoneTileBlock_OuterTopLeft:
+			gameObject = new StoneTileBlock(TileOrientation.OuterTopLeft);
+			break;
+		case StoneTileBlock_OuterTopRight:
+			gameObject = new StoneTileBlock(TileOrientation.OuterTopRight);
 			break;
 		}
 		
-		return image;
+		BufferedImage texture;
+		if (gameObject == null)
+			texture = TextureLoader.getInstance().missingSprite;
+		else {
+			texture = gameObject.getTexture();
+			gameObject = null;
+		}
+		
+		return texture;
 	}
 	
 	public void setOptionSelectionListener(OptionSelectionListener listener) {

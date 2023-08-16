@@ -13,9 +13,14 @@ public class StoneTileBlock extends TileBlock {
 	public StoneTileBlock(int x, int y, Name objectName, TileOrientation orientation) {
 		super(x, y, objectName, orientation);
 		
-		TextureLoader textureLoader = TextureLoader.getInstance();
-		BufferedImage[] tileSet = textureLoader.stoneSprites;
-		texture = tileSet[orientation.getValue()];
+		BufferedImage[] tileSet = TextureLoader.getInstance().stoneSprites;
+		texture = getImageByOrientation(tileSet, orientation);
+	}
+	
+	public StoneTileBlock(TileOrientation orientation) {
+		super(orientation);
+		BufferedImage[] tileSet = TextureLoader.getInstance().stoneSprites;
+		texture = getImageByOrientation(tileSet, orientation);
 	}
 
 	@Override

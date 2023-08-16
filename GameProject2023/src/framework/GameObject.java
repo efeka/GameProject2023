@@ -22,6 +22,8 @@ public abstract class GameObject {
 		this.height = height;
 		this.objectId = objectId;
 	}
+
+	public GameObject() {}
 	
 	/**
 	 * Update this game object's current state depending on its behaviour.
