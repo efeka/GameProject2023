@@ -2,6 +2,8 @@ package object_templates;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
+import java.awt.image.BufferedImage;
+
 import framework.GameObject;
 import framework.ObjectId;
 import framework.ObjectId.Name;
@@ -25,25 +27,58 @@ public abstract class DiagonalTileBlock extends GameObject {
 	public DiagonalTileBlock(float x, float y, Name objectName, TileOrientation orientation) {
 		super(x, y, TILE_SIZE, TILE_SIZE, new ObjectId(ObjectId.Category.DiagonalBlock, objectName));
 		
+		diagonalDirection = getDirectionByOrientation(orientation);
+	}
+	
+	public DiagonalTileBlock(TileOrientation orientation) {}
+	
+	protected BufferedImage getImageByOrientation(BufferedImage[] tileSet, TileOrientation orientation) {
+		DiagonalDirection direction = getDirectionByOrientation(orientation);
+		BufferedImage texture = null;
+		
+		switch (direction) {
+		case AscendLeft:
+			texture = tileSet[0]; 
+			break;
+		case AscendRight:
+			texture = tileSet[1];
+			break;
+		case DescendLeft:
+			texture = tileSet[2];
+			break;
+		case DescendRight:
+			texture = tileSet[3];
+			break;
+		}
+		
+		return texture;
+	}
+	
+	private DiagonalDirection getDirectionByOrientation(TileOrientation orientation) {
+		DiagonalDirection direction = null;
+		
 		switch (orientation) {
 		case OuterTopLeft:
-			diagonalDirection = DiagonalDirection.AscendLeft;
+			direction = DiagonalDirection.AscendLeft;
 			break;
 		case OuterBottomLeft:
-			diagonalDirection = DiagonalDirection.DescendLeft;
+			direction = DiagonalDirection.DescendLeft;
 			break;
 		case OuterBottomRight:
-			diagonalDirection = DiagonalDirection.DescendRight;
+			direction = DiagonalDirection.DescendRight;
 			break;
 		case OuterTopRight:
-			diagonalDirection = DiagonalDirection.AscendRight;
+			direction = DiagonalDirection.AscendRight;
 			break;
 		default:
 			throw new IllegalArgumentException("Orientation does not represent a diagonal.");
 		}
+		
+		return direction;
 	}
 	
 	public DiagonalDirection getDiagonalDirection() {
 		return diagonalDirection;
 	}
+	
 }

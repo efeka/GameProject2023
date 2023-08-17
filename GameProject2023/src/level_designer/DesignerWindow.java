@@ -11,6 +11,7 @@ public class DesignerWindow extends JFrame {
 	public DesignerWindow(int width, int height) {
 		setSize(width, height);
 		setTitle("Game Project 2023 - Level Designer");
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 		int leftPanelWidth = (int) (width * 0.7f);
 		int rightPanelWidth = width - leftPanelWidth;

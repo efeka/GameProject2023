@@ -1,7 +1,5 @@
 package framework;
 
-import object_templates.TileOrientation;
-
 public class ObjectId {
 	
 	/**
@@ -49,7 +47,10 @@ public class ObjectId {
 		StoneTileBlock_InnerBottomLeft(1011),
 		StoneTileBlock_InnerBottomRight(1012),
 		
-		DiagonalStoneBlock(2000)
+		DiagonalStoneTileBlock_OuterTopLeft(2000),
+		DiagonalStoneTileBlock_OuterTopRight(2001),
+		DiagonalStoneTileBlock_OuterBottomLeft(2002),
+		DiagonalStoneTileBlock_OuterBottomRight(2003),
 		;
 		
 		private int uid;

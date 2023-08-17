@@ -71,18 +71,10 @@ public class PlayerData {
 		this.staminaRegen = staminaRegen;
 	}
 
-	private int clamp(int min, int num, int max) {
-		if (num < min)
-			num = min;
-		if (num > max)
-			num = max;
-		return num;
-	}
-	
 	private float clamp(float min, float num, float max) {
 		if (min - num > 0f)
 			num = min;
-		if (max - num < 0f)
+		else if (max - num < 0f)
 			num = max;
 		return num;
 	}

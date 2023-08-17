@@ -19,10 +19,12 @@ public class TextureLoader {
 	
 	private TextureLoader() {
 		try {
-			playerSheet = loadSheet("player_sheet_32x32.png");
-			blockSheet = loadSheet("block_sheet_16x16.png");
-		} catch(IOException e) {
-			System.err.println("Failed to load a sprite sheet file.");
+			FileIO fileIO = new FileIO();
+			playerSheet = fileIO.loadSheet("player_sheet_32x32.png");
+			blockSheet = fileIO.loadSheet("block_sheet_16x16.png");
+		} 
+		catch(IOException e) {
+			System.err.println("Failed to load an image file from /res.");
 			e.printStackTrace();
 		}
 		
@@ -33,13 +35,6 @@ public class TextureLoader {
 		if (instance == null)
 			instance = new TextureLoader();
 		return instance;
-	}
-	
-	// Load the image file with the given file name to use as a sprite sheet.
-	private BufferedImage loadSheet(String filename) throws IOException {
-		BufferedImage image = null;
-		image = ImageIO.read(getClass().getResource("/" + filename));
-		return image;
 	}
 	
 	private void loadTextures() {

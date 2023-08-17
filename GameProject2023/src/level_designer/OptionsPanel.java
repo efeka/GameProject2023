@@ -25,6 +25,7 @@ import javax.swing.SwingConstants;
 import framework.GameObject;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
+import game_objects.DiagonalStoneTileBlock;
 import game_objects.Player;
 import game_objects.StoneTileBlock;
 import object_templates.TileOrientation;
@@ -37,7 +38,7 @@ public class OptionsPanel extends JPanel {
 		void onGameObjectSelected(BufferedImage selectedImage, Name objectName);
 		void onBackgroundColorSelected(Color color);
 		void onGridToggle(boolean toggle);
-		void deleteDesign();
+		void clearDesign();
 		void saveDesign();
 	}
 	
@@ -94,10 +95,10 @@ public class OptionsPanel extends JPanel {
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new FlowLayout());
 		
-		JButton deleteButton = new JButton("Delete Design");
-		deleteButton.addActionListener(e -> {
+		JButton clearButton = new JButton("Delete Design");
+		clearButton.addActionListener(e -> {
 			if (optionSelectionListener != null)
-				optionSelectionListener.deleteDesign();
+				optionSelectionListener.clearDesign();
 		});
 		
 		JButton saveButton = new JButton("Save Design");
@@ -105,7 +106,7 @@ public class OptionsPanel extends JPanel {
 			if (optionSelectionListener != null)
 				optionSelectionListener.saveDesign();
 		});
-		bottomPanel.add(deleteButton);
+		bottomPanel.add(clearButton);
 		bottomPanel.add(saveButton);
 		
 		// Center panel contains the buttons that allow the selection of GameObjects
@@ -162,7 +163,17 @@ public class OptionsPanel extends JPanel {
 		// Menus should not be available in the Level Designer
 		case Menu:
 			break;
-		case DiagonalStoneBlock:
+		case DiagonalStoneTileBlock_OuterBottomLeft:
+			gameObject = new DiagonalStoneTileBlock(TileOrientation.OuterBottomLeft);
+			break;
+		case DiagonalStoneTileBlock_OuterBottomRight:
+			gameObject = new DiagonalStoneTileBlock(TileOrientation.OuterBottomRight);
+			break;
+		case DiagonalStoneTileBlock_OuterTopLeft:
+			gameObject = new DiagonalStoneTileBlock(TileOrientation.OuterTopLeft);
+			break;
+		case DiagonalStoneTileBlock_OuterTopRight:
+			gameObject = new DiagonalStoneTileBlock(TileOrientation.OuterTopLeft);
 			break;
 		case StoneTileBlock_Center:
 			gameObject = new StoneTileBlock(TileOrientation.Center);
@@ -208,10 +219,8 @@ public class OptionsPanel extends JPanel {
 		BufferedImage texture;
 		if (gameObject == null)
 			texture = TextureLoader.getInstance().missingSprite;
-		else {
+		else
 			texture = gameObject.getTexture();
-			gameObject = null;
-		}
 		
 		return texture;
 	}

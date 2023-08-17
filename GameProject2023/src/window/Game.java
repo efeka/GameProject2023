@@ -49,12 +49,12 @@ public class Game extends Canvas implements Runnable {
 		int blocks = 20;
 		int blockSize = GameConstants.ScaleConstants.TILE_SIZE;
 		objectHandler.addObject(new StoneTileBlock(x, y,
-				ObjectId.Name.StoneTileBlock, TileOrientation.OuterTopLeft),
+				ObjectId.Name.StoneTileBlock_OuterTopLeft, TileOrientation.OuterTopLeft),
 				ObjectHandler.MIDDLE_LAYER);
 		for (int i = 1; i < blocks; i++) {
 			TileOrientation orientation = i != blocks - 1 ? TileOrientation.OuterTop : TileOrientation.OuterTopRight;
 			objectHandler.addObject(new StoneTileBlock(x + i * blockSize, y,
-					ObjectId.Name.StoneTileBlock, orientation),
+					ObjectId.Name.StoneTileBlock_OuterTop, orientation),
 					ObjectHandler.MIDDLE_LAYER);
 		}
 		objectHandler.addObject(new Player(x, y - 80, playerData, objectHandler, keyInput), ObjectHandler.MIDDLE_LAYER);
@@ -69,10 +69,10 @@ public class Game extends Canvas implements Runnable {
 				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopLeft),
 				ObjectHandler.MIDDLE_LAYER);
 		objectHandler.addObject(new StoneTileBlock(x + blockSize * 13, y - blockSize * 3,
-				ObjectId.Name.StoneTileBlock, TileOrientation.OuterTop),
+				ObjectId.Name.StoneTileBlock_OuterTop, TileOrientation.OuterTop),
 				ObjectHandler.MIDDLE_LAYER);
 		objectHandler.addObject(new StoneTileBlock(x + blockSize * 14, y - blockSize * 3,
-				ObjectId.Name.StoneTileBlock, TileOrientation.OuterTop),
+				ObjectId.Name.StoneTileBlock_OuterTop, TileOrientation.OuterTop),
 				ObjectHandler.MIDDLE_LAYER);
 		objectHandler.addObject(new DiagonalStoneTileBlock(x + blockSize * 17, y - blockSize,
 				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopRight),

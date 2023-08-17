@@ -14,25 +14,17 @@ public class DiagonalStoneTileBlock extends DiagonalTileBlock {
 		super(x, y, objectName, orientation);
 		
 		TextureLoader textureLoader = TextureLoader.getInstance();
-		switch (diagonalDirection) {
-		case AscendLeft:
-			texture = textureLoader.diagonalStoneSprites[0]; 
-			break;
-		case AscendRight:
-			texture = textureLoader.diagonalStoneSprites[1];
-			break;
-		case DescendLeft:
-			texture = textureLoader.diagonalStoneSprites[2];
-			break;
-		case DescendRight:
-			texture = textureLoader.diagonalStoneSprites[3];
-			break;
-		}
+		texture = getImageByOrientation(textureLoader.diagonalStoneSprites, orientation);
+	}
+	
+	public DiagonalStoneTileBlock(TileOrientation orientation) {
+		super(orientation);
+		TextureLoader textureLoader = TextureLoader.getInstance();
+		texture = getImageByOrientation(textureLoader.diagonalStoneSprites, orientation);
 	}
 
 	@Override
-	public void tick() {
-	}
+	public void tick() {}
 
 	@Override
 	public void render(Graphics g) {

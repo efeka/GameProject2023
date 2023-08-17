@@ -93,7 +93,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	}
 
 	@Override
-	public void deleteDesign() {
+	public void clearDesign() {
 		GridCell[][] grid = levelGrid.getGrid();
 		for (int i = 0; i < levelGrid.rows; i++)
 			for (int j = 0; j < levelGrid.cols; j++)
@@ -126,10 +126,14 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		if (!isValidPosition(cellRow, cellCol))
 			return;
 
-		if (leftMousePressed)
+		if (leftMousePressed) {
 			levelGrid.getGrid()[cellRow][cellCol].image = selectedImage;
-		else if (rightMousePressed)
+			levelGrid.getGrid()[cellRow][cellCol].objectName = selectedObjectName;
+		}
+		else if (rightMousePressed) {
 			levelGrid.getGrid()[cellRow][cellCol].image = null;
+			levelGrid.getGrid()[cellRow][cellCol].objectName = null;
+		}
 
 		repaint();
 	}
@@ -145,10 +149,14 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		if (!isValidPosition(cellRow, cellCol))
 			return;
 
-		if (leftMousePressed)
+		if (leftMousePressed) {
 			levelGrid.getGrid()[cellRow][cellCol].image = selectedImage;
-		else if (rightMousePressed)
+			levelGrid.getGrid()[cellRow][cellCol].objectName = selectedObjectName;
+		}
+		else if (rightMousePressed) {
 			levelGrid.getGrid()[cellRow][cellCol].image = null;
+			levelGrid.getGrid()[cellRow][cellCol].objectName = null;
+		}
 
 		repaint();
 	}
