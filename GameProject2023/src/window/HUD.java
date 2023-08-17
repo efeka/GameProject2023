@@ -19,7 +19,7 @@ public class HUD extends GameObject {
 	private int staminaHeight;
 	
 	public HUD(float x, float y, int width, int height, PlayerData playerData) {
-		super(x, y, width, height, new ObjectId(Category.Menu, Name.Menu));
+		super(x, y, width, height, new ObjectId(Category.Menu, Name.HUD));
 		this.playerData = playerData;
 		
 		healthWidthUnit = (float) width / playerData.getMaxHealth();

@@ -43,10 +43,6 @@ public class Player extends Creature {
 		texture = TextureLoader.getInstance().playerSprites[0];
 		setupAnimations();
 	}
-	
-	public Player() {
-		texture = TextureLoader.getInstance().playerSprites[0];
-	}
 
 	@Override
 	public void tick() {

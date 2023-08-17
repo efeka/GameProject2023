@@ -13,7 +13,7 @@ public class PlayerData {
 		this.currentHealth = currentHealth;
 		this.maxStamina = maxStamina;
 		this.currentStamina = currentStamina;
-		staminaRegen = maxStamina / 100f;
+		staminaRegen = maxStamina / 200f;
 	}
 	
 	public PlayerData(int maxHealth, int maxStamina) {
@@ -22,6 +22,15 @@ public class PlayerData {
 		
 		currentHealth = maxHealth;
 		currentStamina = maxStamina;
+		staminaRegen = maxStamina / 200f;
+	}
+	
+	public PlayerData() {
+		maxHealth = 100;
+		maxStamina = 70;
+		currentHealth = maxHealth;
+		currentStamina = maxStamina;
+		
 		staminaRegen = maxStamina / 200f;
 	}
 	

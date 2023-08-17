@@ -1,7 +1,7 @@
 package framework;
 
 public interface GameConstants {
-	
+
 	public static class ScaleConstants {
 		private static final int DEFAULT_TILE_SIZE = 48;
 		private static final int DEFAULT_PLAYER_WIDTH = 64;

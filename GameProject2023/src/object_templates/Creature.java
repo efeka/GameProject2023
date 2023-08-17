@@ -20,7 +20,5 @@ public abstract class Creature extends GameObject {
 		falling = true;
 		jumping = false;
 	}
-	
-	public Creature() {}
 
 }

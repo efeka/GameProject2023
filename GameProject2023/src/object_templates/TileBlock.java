@@ -13,10 +13,6 @@ public abstract class TileBlock extends GameObject {
 		super(x, y, TILE_SIZE, TILE_SIZE, new ObjectId(ObjectId.Category.Block, objectName));
 	}
 	
-	public TileBlock(TileOrientation orientation) {
-		super();
-	}
-	
 	protected BufferedImage getImageByOrientation(BufferedImage[] tileSet, TileOrientation orientation) {
 		return tileSet[orientation.getValue()];
 	}

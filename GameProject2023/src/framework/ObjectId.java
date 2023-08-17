@@ -30,7 +30,7 @@ public class ObjectId {
 	 */
 	public enum Name {
 		Player(1),
-		Menu(2),
+		HUD(2),
 
 		// Tile blocks
 		StoneTileBlock_OuterTopLeft(1000),

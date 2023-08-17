@@ -9,8 +9,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import framework.FileIO;
 import framework.ObjectId.Name;
 
 public class DrawingPanel extends JPanel implements MouseListener, MouseMotionListener, OptionsPanel.OptionSelectionListener {
@@ -101,10 +103,28 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		repaint();
 	}
 
-	// TODO
+	/**
+	 * Saves the contents of the drawing area into the levels file.
+	 */
 	@Override
 	public void saveDesign() {
+		int rows = levelGrid.rows;
+		int cols = levelGrid.cols;
 		
+		int[][] objectUIDs = new int[rows][cols];
+		GridCell[][] grid = levelGrid.getGrid();
+		
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				Name objectName = grid[i][j].objectName;
+				int uid = objectName != null ? objectName.getUID() : 0;
+				objectUIDs[i][j] = uid;
+			}
+		}
+		
+		new FileIO().saveLevel("levels.txt", objectUIDs);
+		
+		JOptionPane.showMessageDialog(this, "Save successful");
 	}
 	
 	@Override

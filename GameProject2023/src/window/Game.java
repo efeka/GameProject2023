@@ -1,21 +1,12 @@
 package window;
 
-import static framework.GameConstants.ScaleConstants.TILE_SIZE;
-
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.image.BufferStrategy;
 
-import framework.GameConstants;
 import framework.ObjectHandler;
-import framework.ObjectId;
-import game_objects.DiagonalStoneTileBlock;
-import game_objects.Player;
-import game_objects.StoneTileBlock;
-import object_templates.PlayerData;
-import object_templates.TileOrientation;
 
 @SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {
@@ -38,52 +29,10 @@ public class Game extends Canvas implements Runnable {
 		addKeyListener(keyInput);
 		window = new GameWindow(this);
 		
+		// Load the first level
 		objectHandler = new ObjectHandler();
-		PlayerData playerData = new PlayerData(100, 70);
-		HUD hud = new HUD(10, 10, TILE_SIZE * 3, TILE_SIZE / 2, playerData);
-		objectHandler.addObject(hud, ObjectHandler.MENU_LAYER);
-		
-		// TODO temporary, for debug
-		int x = 200;
-		int y = 600;
-		int blocks = 20;
-		int blockSize = GameConstants.ScaleConstants.TILE_SIZE;
-		objectHandler.addObject(new StoneTileBlock(x, y,
-				ObjectId.Name.StoneTileBlock_OuterTopLeft, TileOrientation.OuterTopLeft),
-				ObjectHandler.MIDDLE_LAYER);
-		for (int i = 1; i < blocks; i++) {
-			TileOrientation orientation = i != blocks - 1 ? TileOrientation.OuterTop : TileOrientation.OuterTopRight;
-			objectHandler.addObject(new StoneTileBlock(x + i * blockSize, y,
-					ObjectId.Name.StoneTileBlock_OuterTop, orientation),
-					ObjectHandler.MIDDLE_LAYER);
-		}
-		objectHandler.addObject(new Player(x, y - 80, playerData, objectHandler, keyInput), ObjectHandler.MIDDLE_LAYER);
-		
-		objectHandler.addObject(new DiagonalStoneTileBlock(x + blockSize * 10, y - blockSize,
-				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopLeft),
-				ObjectHandler.MIDDLE_LAYER);
-		objectHandler.addObject(new DiagonalStoneTileBlock(x + blockSize * 11, y - blockSize * 2,
-				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopLeft),
-				ObjectHandler.MIDDLE_LAYER);
-		objectHandler.addObject(new DiagonalStoneTileBlock(x + blockSize * 12, y - blockSize * 3,
-				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopLeft),
-				ObjectHandler.MIDDLE_LAYER);
-		objectHandler.addObject(new StoneTileBlock(x + blockSize * 13, y - blockSize * 3,
-				ObjectId.Name.StoneTileBlock_OuterTop, TileOrientation.OuterTop),
-				ObjectHandler.MIDDLE_LAYER);
-		objectHandler.addObject(new StoneTileBlock(x + blockSize * 14, y - blockSize * 3,
-				ObjectId.Name.StoneTileBlock_OuterTop, TileOrientation.OuterTop),
-				ObjectHandler.MIDDLE_LAYER);
-		objectHandler.addObject(new DiagonalStoneTileBlock(x + blockSize * 17, y - blockSize,
-				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopRight),
-				ObjectHandler.MIDDLE_LAYER);
-		objectHandler.addObject(new DiagonalStoneTileBlock(x + blockSize * 16, y - blockSize * 2,
-				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopRight),
-				ObjectHandler.MIDDLE_LAYER);
-		objectHandler.addObject(new DiagonalStoneTileBlock(x + blockSize * 15, y - blockSize * 3,
-				ObjectId.Name.DiagonalStoneBlock, TileOrientation.OuterTopRight),
-				ObjectHandler.MIDDLE_LAYER);
-		
+		objectHandler.setupGame(keyInput);
+
 		requestFocus();
 		start();
 	}

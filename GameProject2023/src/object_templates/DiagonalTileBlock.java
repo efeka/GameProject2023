@@ -29,9 +29,7 @@ public abstract class DiagonalTileBlock extends GameObject {
 		
 		diagonalDirection = getDirectionByOrientation(orientation);
 	}
-	
-	public DiagonalTileBlock(TileOrientation orientation) {}
-	
+
 	protected BufferedImage getImageByOrientation(BufferedImage[] tileSet, TileOrientation orientation) {
 		DiagonalDirection direction = getDirectionByOrientation(orientation);
 		BufferedImage texture = null;

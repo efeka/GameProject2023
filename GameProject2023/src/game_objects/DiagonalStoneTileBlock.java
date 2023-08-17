@@ -16,12 +16,6 @@ public class DiagonalStoneTileBlock extends DiagonalTileBlock {
 		TextureLoader textureLoader = TextureLoader.getInstance();
 		texture = getImageByOrientation(textureLoader.diagonalStoneSprites, orientation);
 	}
-	
-	public DiagonalStoneTileBlock(TileOrientation orientation) {
-		super(orientation);
-		TextureLoader textureLoader = TextureLoader.getInstance();
-		texture = getImageByOrientation(textureLoader.diagonalStoneSprites, orientation);
-	}
 
 	@Override
 	public void tick() {}

@@ -23,8 +23,6 @@ public abstract class GameObject {
 		this.objectId = objectId;
 	}
 
-	public GameObject() {}
-	
 	/**
 	 * Update this game object's current state depending on its behaviour.
 	 */

@@ -16,12 +16,6 @@ public class StoneTileBlock extends TileBlock {
 		BufferedImage[] tileSet = TextureLoader.getInstance().stoneSprites;
 		texture = getImageByOrientation(tileSet, orientation);
 	}
-	
-	public StoneTileBlock(TileOrientation orientation) {
-		super(orientation);
-		BufferedImage[] tileSet = TextureLoader.getInstance().stoneSprites;
-		texture = getImageByOrientation(tileSet, orientation);
-	}
 
 	@Override
 	public void tick() {}
