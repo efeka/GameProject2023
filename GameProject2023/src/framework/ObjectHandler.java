@@ -56,8 +56,11 @@ public class ObjectHandler {
 		for (int i = 0; i < TILE_ROWS; i++) {
 			for (int j = 0; j < TILE_COLUMNS; j++) {
 				Name objectName = ObjectId.Name.getByUID(objectUIDs[i][j]);
-				int x = j * TILE_COLUMNS;
-				int y = i * TILE_ROWS;
+				if (objectName == null)
+					continue;
+				
+				int x = j * TILE_SIZE;
+				int y = i * TILE_SIZE;
 				
 				GameObject gameObject = createObjectByName(objectName, x, y);
 				addObject(gameObject, MIDDLE_LAYER);
@@ -141,7 +144,7 @@ public class ObjectHandler {
 	
 	public GameObject createObjectByName(Name objectName, int x, int y) {
 		GameObject gameObject = null;
-		
+
 		switch (objectName) {
 		case Player:
 			gameObject = new Player(x, y, playerData, this, keyInput);
