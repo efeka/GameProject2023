@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import framework.GameObject;
+import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import game_objects.DiagonalStoneTileBlock;
@@ -93,7 +94,9 @@ public class OptionsPanel extends JPanel {
 		
 		// Bottom panel contains the Delete and Save buttons
 		JPanel bottomPanel = new JPanel();
-		bottomPanel.setLayout(new FlowLayout());
+		FlowLayout bottomPanelLayout = new FlowLayout();
+		bottomPanelLayout.setHgap(30);
+		bottomPanel.setLayout(bottomPanelLayout);
 		
 		JButton clearButton = new JButton("Delete Design");
 		clearButton.addActionListener(e -> {
@@ -121,7 +124,7 @@ public class OptionsPanel extends JPanel {
 
 		for (int i = 0; i < enumValues.length; i++) {
 		    Name objectName = enumValues[i];
-		    if (objectName == Name.Menu)
+		    if (objectName == Name.HUD)
 		        continue;
 
 		    // Get objects image by Name
@@ -154,75 +157,8 @@ public class OptionsPanel extends JPanel {
 	}
 	
 	private BufferedImage getImageByObjectName(Name objectName) {
-		GameObject gameObject = null;
-		
-		switch (objectName) {
-		case Player:
-			gameObject = new Player();
-			break;
-		// Menus should not be available in the Level Designer
-		case Menu:
-			break;
-		case DiagonalStoneTileBlock_OuterBottomLeft:
-			gameObject = new DiagonalStoneTileBlock(TileOrientation.OuterBottomLeft);
-			break;
-		case DiagonalStoneTileBlock_OuterBottomRight:
-			gameObject = new DiagonalStoneTileBlock(TileOrientation.OuterBottomRight);
-			break;
-		case DiagonalStoneTileBlock_OuterTopLeft:
-			gameObject = new DiagonalStoneTileBlock(TileOrientation.OuterTopLeft);
-			break;
-		case DiagonalStoneTileBlock_OuterTopRight:
-			gameObject = new DiagonalStoneTileBlock(TileOrientation.OuterTopLeft);
-			break;
-		case StoneTileBlock_Center:
-			gameObject = new StoneTileBlock(TileOrientation.Center);
-			break;
-		case StoneTileBlock_InnerBottomLeft:
-			gameObject = new StoneTileBlock(TileOrientation.InnerBottomLeft);
-			break;
-		case StoneTileBlock_InnerBottomRight:
-			gameObject = new StoneTileBlock(TileOrientation.InnerBottomRight);
-			break;
-		case StoneTileBlock_InnerTopLeft:
-			gameObject = new StoneTileBlock(TileOrientation.InnerTopLeft);
-			break;
-		case StoneTileBlock_InnerTopRight:
-			gameObject = new StoneTileBlock(TileOrientation.InnerTopRight);
-			break;
-		case StoneTileBlock_OuterBottom:
-			gameObject = new StoneTileBlock(TileOrientation.OuterBottom);
-			break;
-		case StoneTileBlock_OuterBottomLeft:
-			gameObject = new StoneTileBlock(TileOrientation.OuterBottomLeft);
-			break;
-		case StoneTileBlock_OuterBottomRight:
-			gameObject = new StoneTileBlock(TileOrientation.OuterBottomRight);
-			break;
-		case StoneTileBlock_OuterLeft:
-			gameObject = new StoneTileBlock(TileOrientation.OuterLeft);
-			break;
-		case StoneTileBlock_OuterRight:
-			gameObject = new StoneTileBlock(TileOrientation.OuterRight);
-			break;
-		case StoneTileBlock_OuterTop:
-			gameObject = new StoneTileBlock(TileOrientation.OuterTop);
-			break;
-		case StoneTileBlock_OuterTopLeft:
-			gameObject = new StoneTileBlock(TileOrientation.OuterTopLeft);
-			break;
-		case StoneTileBlock_OuterTopRight:
-			gameObject = new StoneTileBlock(TileOrientation.OuterTopRight);
-			break;
-		}
-		
-		BufferedImage texture;
-		if (gameObject == null)
-			texture = TextureLoader.getInstance().missingSprite;
-		else
-			texture = gameObject.getTexture();
-		
-		return texture;
+		GameObject gameObject = new ObjectHandler().createObjectByName(objectName, -1, -1);
+		return gameObject != null ? gameObject.getTexture() : TextureLoader.getInstance().missingSprite;
 	}
 	
 	public void setOptionSelectionListener(OptionSelectionListener listener) {
