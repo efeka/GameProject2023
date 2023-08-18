@@ -15,6 +15,7 @@ import object_templates.PlayerData;
 import object_templates.TileOrientation;
 import window.HUD;
 import window.KeyInput;
+import window.MouseInput;
 
 public class ObjectHandler {
 
@@ -26,6 +27,7 @@ public class ObjectHandler {
 	private ArrayList<GameObject> bottomLayer, middleLayer, topLayer, menuLayer;
 	
 	private KeyInput keyInput;
+	private MouseInput mouseInput;
 	private PlayerData playerData;
 	
 	/**
@@ -43,8 +45,9 @@ public class ObjectHandler {
 	 * Load the first level from the levels file and initialize objects.
 	 * @param keyInput the key listener object attached to the game window
 	 */
-	public void setupGame(KeyInput keyInput) {
+	public void setupGame(KeyInput keyInput, MouseInput mouseInput) {
 		this.keyInput = keyInput;
+		this.mouseInput = mouseInput;
 		playerData = new PlayerData(100, 70);
 		
 		HUD hud = (HUD) createObjectByName(Name.HUD, 10, 10);
@@ -147,7 +150,7 @@ public class ObjectHandler {
 
 		switch (objectName) {
 		case Player:
-			gameObject = new Player(x, y, playerData, this, keyInput);
+			gameObject = new Player(x, y, playerData, this, keyInput, mouseInput);
 			break;
 		case HUD:
 			gameObject = new HUD(x, y, TILE_SIZE * 3, TILE_SIZE / 2, playerData);

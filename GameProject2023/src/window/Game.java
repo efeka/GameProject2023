@@ -26,12 +26,16 @@ public class Game extends Canvas implements Runnable {
 	 */
 	public Game() {
 		KeyInput keyInput = new KeyInput();
+		MouseInput mouseInput = new MouseInput();
 		addKeyListener(keyInput);
-		window = new GameWindow(this);
+		addMouseListener(mouseInput);
+		addMouseMotionListener(mouseInput);
 		
+		window = new GameWindow(this);
+
 		// Load the first level
 		objectHandler = new ObjectHandler();
-		objectHandler.setupGame(keyInput);
+		objectHandler.setupGame(keyInput, mouseInput);
 
 		requestFocus();
 		start();

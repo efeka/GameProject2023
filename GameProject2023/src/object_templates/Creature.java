@@ -10,7 +10,7 @@ public abstract class Creature extends GameObject {
 	protected final int TERMINAL_VELOCITY = GameConstants.CreatureConstants.TERMINAL_VELOCITY;
 	
 	protected float velX, velY;
-	protected boolean falling, jumping;
+	protected boolean falling, jumping, attacking;
 	// 1 for right, -1 for left
 	protected int direction = 1;
 	
@@ -19,6 +19,7 @@ public abstract class Creature extends GameObject {
 		
 		falling = true;
 		jumping = false;
+		attacking = false;
 	}
 
 }

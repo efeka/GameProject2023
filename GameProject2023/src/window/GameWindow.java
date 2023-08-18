@@ -5,7 +5,9 @@ import javax.swing.JFrame;
 import framework.GameConstants;
 
 public class GameWindow extends JFrame {
-	
+
+	private static final long serialVersionUID = -7086381604555111950L;
+
 	/**
 	 * Creates the main application window.
 	 *
@@ -13,6 +15,7 @@ public class GameWindow extends JFrame {
 	 */
 	public GameWindow(Game game) {
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(GameConstants.ScaleConstants.GAME_WIDTH, GameConstants.ScaleConstants.GAME_HEIGHT);
 		setResizable(false);

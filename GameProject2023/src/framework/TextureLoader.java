@@ -3,8 +3,6 @@ package framework;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
 public class TextureLoader {
 	
 	private static TextureLoader instance = null;
@@ -13,7 +11,8 @@ public class TextureLoader {
 	private BufferedImage blockSheet = null;
 	
 	public BufferedImage missingSprite;
-	public BufferedImage[] playerSprites;
+	public BufferedImage[] playerRunIdleSprites;
+	public BufferedImage[] playerAttackSprites;
 	public BufferedImage[] stoneSprites;
 	public BufferedImage[] diagonalStoneSprites;
 	
@@ -44,16 +43,22 @@ public class TextureLoader {
 		for (int i = 0; i < stoneSprites.length; i++)
 			stoneSprites[i] = blockSheet.getSubimage(i * 16, 0, 16, 16);
 		
-		playerSprites = new BufferedImage[36];
+		playerRunIdleSprites = new BufferedImage[36];
 		for (int i = 0; i < 10; i++)
-			playerSprites[i] = playerSheet.getSubimage(1 + i * 33, 1, 32, 32);
+			playerRunIdleSprites[i] = playerSheet.getSubimage(1 + i * 33, 1, 32, 32);
 		for (int i = 10; i < 20; i++)
-			playerSprites[i] = playerSheet.getSubimage(1 + (i - 10) * 33, 34, 32, 32);
+			playerRunIdleSprites[i] = playerSheet.getSubimage(1 + (i - 10) * 33, 34, 32, 32);
 		for (int i = 20; i < 28; i++)
-			playerSprites[i] = playerSheet.getSubimage(1 + (i - 20) * 33, 67, 32, 32);
+			playerRunIdleSprites[i] = playerSheet.getSubimage(1 + (i - 20) * 33, 67, 32, 32);
 		for (int i = 28; i < 36; i++)
-			playerSprites[i] = playerSheet.getSubimage(1 + (i - 28) * 33, 100, 32, 32);
+			playerRunIdleSprites[i] = playerSheet.getSubimage(1 + (i - 28) * 33, 100, 32, 32);
 		
+		playerAttackSprites = new BufferedImage[12];
+		for (int i = 0; i < 6; i++) 
+			playerAttackSprites[i] = playerSheet.getSubimage(1 + i * 65, 133, 64, 64);
+		for (int i = 6; i < 12; i++)
+			playerAttackSprites[i] = playerSheet.getSubimage(1 + (i - 6) * 65, 198, 64, 64);
+			
 		diagonalStoneSprites = new BufferedImage[4];
 		for (int i = 0; i < diagonalStoneSprites.length; i++)
 			diagonalStoneSprites[i] = blockSheet.getSubimage(i * 16, 32, 16, 16);

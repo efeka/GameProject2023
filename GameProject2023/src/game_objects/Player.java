@@ -18,36 +18,41 @@ import object_templates.DiagonalTileBlock;
 import object_templates.PlayerData;
 import window.Animation;
 import window.KeyInput;
+import window.MouseInput;
 
 public class Player extends Creature {
 
 	private PlayerData playerData;
-	
+
 	private ObjectHandler objectHandler;
 	private KeyInput keyInput;
+	MouseInput mouseInput;
 
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = -8f;
 
-	private Animation idleRightAnimation;
-	private Animation idleLeftAnimation;
-	private Animation runningRightAnimation;
-	private Animation runningLeftAnimation;
-	
-	public Player(int x, int y, PlayerData playerData, ObjectHandler objectHandler, KeyInput keyInput) {
+	private Animation[] idleAnimation;
+	private Animation[] runAnimation;
+	private Animation[] attackAnimation;
+
+	private int attackCooldown = 500;
+	private long lastAttackTimer = attackCooldown;
+
+	public Player(int x, int y, PlayerData playerData, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, new ObjectId(Category.Player, Name.Player));
 		this.playerData = playerData;
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
-		
-		texture = TextureLoader.getInstance().playerSprites[0];
+		this.mouseInput = mouseInput;
+
+		texture = TextureLoader.getInstance().playerRunIdleSprites[0];
 		setupAnimations();
 	}
 
 	@Override
 	public void tick() {
 		playerData.regenerateStamina();
-		
+
 		x += velX;
 		y += velY;
 
@@ -59,8 +64,9 @@ public class Player extends Creature {
 		}
 
 		handleMovement();
+		handleAttacking();
 		handleCollision();
-		
+
 		runAnimations();
 	}
 
@@ -75,6 +81,11 @@ public class Player extends Creature {
 			direction = 1;
 		else if (velX < 0)
 			direction = -1;
+
+		if (attacking) {
+			velX = 0;
+			return;
+		}
 		
 		// Horizontal movement
 		boolean rightPressed = keyInput.isMoveRightKeyPressed();
@@ -91,6 +102,22 @@ public class Player extends Creature {
 		if (!jumping && keyInput.isJumpKeyPressed()) {
 			velY = jumpingSpeed;
 			jumping = true;
+		}
+	}
+
+	private void handleAttacking() {
+		if (attacking && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce())) {
+			attacking = false;
+			
+			attackAnimation[0].resetAnimation();
+			attackAnimation[1].resetAnimation();
+		}
+
+		if (mouseInput.isAttackButtonPressed()) {
+			if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
+				attacking = true;
+				lastAttackTimer = System.currentTimeMillis();
+			}
 		}
 	}
 
@@ -158,7 +185,7 @@ public class Player extends Creature {
 			int diagonalDistance = bottomBoundsCollisionX - otherBounds.x;
 			int diagonalCollisionY = otherBounds.y + otherBounds.height - diagonalDistance;
 			int heightDiff = diagonalCollisionY - bottomBoundsCollisionY;
-			
+
 			y += heightDiff - 10;
 
 			velY = 0;
@@ -190,62 +217,84 @@ public class Player extends Creature {
 		float yOffset = 4 * this.height / 5f;
 		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
 	}
-	
+
 	private void setupAnimations() {
-		BufferedImage[] sprites = TextureLoader.getInstance().playerSprites;
-		
+		idleAnimation = new Animation[2];
+		runAnimation = new Animation[2];
+		attackAnimation = new Animation[2];
+
+		BufferedImage[] sprites = TextureLoader.getInstance().playerRunIdleSprites;
+		BufferedImage[] attackSprites = TextureLoader.getInstance().playerAttackSprites;
+
 		final int idleDelay = 8;
 		final int runDelay = 10;
-		
-		idleRightAnimation = new Animation(idleDelay, sprites[0], sprites[1], sprites[2], sprites[3],
+		final int attackDelay = 4;
+
+		idleAnimation[0] = new Animation(idleDelay, false, sprites[0], sprites[1], sprites[2], sprites[3],
 				sprites[4], sprites[5], sprites[6], sprites[7], sprites[8], sprites[9]);
-		idleLeftAnimation = new Animation(idleDelay, sprites[10], sprites[11], sprites[12], sprites[13],
+		idleAnimation[1] = new Animation(idleDelay, false, sprites[10], sprites[11], sprites[12], sprites[13],
 				sprites[14], sprites[15], sprites[16], sprites[17], sprites[18], sprites[19]);
-		runningRightAnimation = new Animation(runDelay, sprites[20], sprites[21], sprites[22], sprites[23],
+		runAnimation[0] = new Animation(runDelay, false, sprites[20], sprites[21], sprites[22], sprites[23],
 				sprites[24], sprites[25], sprites[26], sprites[27]);
-		runningLeftAnimation = new Animation(runDelay, sprites[28], sprites[29], sprites[30], sprites[31],
+		runAnimation[1] = new Animation(runDelay, false, sprites[28], sprites[29], sprites[30], sprites[31],
 				sprites[32], sprites[33], sprites[34], sprites[35]);
+		attackAnimation[0] = new Animation(attackDelay, true, attackSprites[0], attackSprites[1], attackSprites[2],
+				attackSprites[3], attackSprites[4], attackSprites[5]);
+		attackAnimation[1] = new Animation(attackDelay, true, attackSprites[6], attackSprites[7], attackSprites[8],
+				attackSprites[9], attackSprites[10], attackSprites[11]);
 	}
-	
+
 	private void runAnimations() {
 		// Looking right
 		if (direction == 1) {
+			// Attacking
+			if (attacking)
+				attackAnimation[0].runAnimation();
 			// Not moving
-			if (velX == 0)
-				idleRightAnimation.runAnimation();
+			else if (velX == 0)
+				idleAnimation[0].runAnimation();
 			// Moving right
 			else
-				runningRightAnimation.runAnimation();
+				runAnimation[0].runAnimation();
 		}
 		// Looking left
 		else if (direction == -1) {
+			// Attacking
+			if (attacking)
+				attackAnimation[1].runAnimation();
 			// Not moving
-			if (velX == 0)
-				idleLeftAnimation.runAnimation();
+			else if (velX == 0)
+				idleAnimation[1].runAnimation();
 			// Moving left
 			else
-				runningLeftAnimation.runAnimation();
+				runAnimation[1].runAnimation();
 		}
 	}
-	
+
 	private void drawAnimations(Graphics g) {
 		// Looking right
 		if (direction == 1) {
+			// Attacking
+			if (attacking)
+				attackAnimation[0].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Not moving
-			if (velX == 0)
-				idleRightAnimation.drawAnimation(g, (int) x, (int) y, width, height);
+			else if (velX == 0)
+				idleAnimation[0].drawAnimation(g, (int) x, (int) y, width, height);
 			// Moving right
 			else
-				runningRightAnimation.drawAnimation(g, (int) x, (int) y, width, height);
+				runAnimation[0].drawAnimation(g, (int) x, (int) y, width, height);
 		}
 		// Looking left
 		else if (direction == -1) {
+			// Attacking
+			if (attacking)
+				attackAnimation[1].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Not moving
-			if (velX == 0)
-				idleLeftAnimation.drawAnimation(g, (int) x, (int) y, width, height);
+			else if (velX == 0)
+				idleAnimation[1].drawAnimation(g, (int) x, (int) y, width, height);
 			// Moving left
 			else
-				runningLeftAnimation.drawAnimation(g, (int) x, (int) y, width, height);
+				runAnimation[1].drawAnimation(g, (int) x, (int) y, width, height);
 		}
 	}
 
