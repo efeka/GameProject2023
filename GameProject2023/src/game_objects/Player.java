@@ -29,11 +29,12 @@ public class Player extends Creature {
 	MouseInput mouseInput;
 
 	private float runningSpeed = 3f;
-	private float jumpingSpeed = -8f;
+	private float jumpingSpeed = -9f;
 
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
 	private Animation[] attackAnimation;
+	private BufferedImage[] jumpingSprites;
 
 	private int attackCooldown = 500;
 	private long lastAttackTimer = attackCooldown;
@@ -223,11 +224,14 @@ public class Player extends Creature {
 		runAnimation = new Animation[2];
 		attackAnimation = new Animation[2];
 
-		BufferedImage[] sprites = TextureLoader.getInstance().playerRunIdleSprites;
-		BufferedImage[] attackSprites = TextureLoader.getInstance().playerAttackSprites;
+		TextureLoader textureLoader = TextureLoader.getInstance();
+		BufferedImage[] sprites = textureLoader.playerRunIdleSprites;
+		BufferedImage[] attackSprites = textureLoader.playerAttackSprites;
 
+		jumpingSprites = textureLoader.playerJumpSprites;
+		
 		final int idleDelay = 8;
-		final int runDelay = 10;
+		final int runDelay = 8;
 		final int attackDelay = 4;
 
 		idleAnimation[0] = new Animation(idleDelay, false, sprites[0], sprites[1], sprites[2], sprites[3],
@@ -277,6 +281,15 @@ public class Player extends Creature {
 			// Attacking
 			if (attacking)
 				attackAnimation[0].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+			// Jumping
+			else if (jumping) {
+				// Going up / reached peak
+				if (velY <= 0)
+					g.drawImage(jumpingSprites[0], (int) x, (int) y, width, height, null);
+				// Going down
+				else if (velY > 0)
+					g.drawImage(jumpingSprites[1], (int) x, (int) y, width, height, null);
+			}
 			// Not moving
 			else if (velX == 0)
 				idleAnimation[0].drawAnimation(g, (int) x, (int) y, width, height);
@@ -289,6 +302,15 @@ public class Player extends Creature {
 			// Attacking
 			if (attacking)
 				attackAnimation[1].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+			// Jumping
+			else if (jumping) {
+				// Going up / reached peak
+				if (velY <= 0)
+					g.drawImage(jumpingSprites[2], (int) x, (int) y, width, height, null);
+				// Going down
+				else if (velY > 0)
+					g.drawImage(jumpingSprites[3], (int) x, (int) y, width, height, null);
+			}
 			// Not moving
 			else if (velX == 0)
 				idleAnimation[1].drawAnimation(g, (int) x, (int) y, width, height);

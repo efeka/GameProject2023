@@ -27,11 +27,18 @@ public class Animation {
 		this.onlyPlayOnce = onlyPlayOnce;
 
 		frameIndex = delayCounter = 0;
-		frameCount = args.length;
-
+		frameCount = onlyPlayOnce ? args.length + 1 : args.length;
+		
+		// If onlyPlayOnce is true, the last frame needs to be played twice.
+		// Without this adjustment, the delay cannot be applied to the last frame
+		// resulting in it being skipped immediately. 
 		images = new BufferedImage[frameCount];
-		for (int i = 0; i < frameCount; i++)
-			images[i] = args[i];
+		for (int i = 0; i < frameCount; i++) {
+			if (onlyPlayOnce && i == frameCount - 1)
+				images[i] = args[args.length - 1];
+			else
+				images[i] = args[i];
+		}
 
 		currentImage = images[0];
 	}

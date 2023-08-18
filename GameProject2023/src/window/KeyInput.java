@@ -40,6 +40,8 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_ENTER:
 			selectionKeyPressed = true;
 			break;
+		case KeyEvent.VK_ESCAPE:
+			System.exit(0);
 		}
 	}
 	
