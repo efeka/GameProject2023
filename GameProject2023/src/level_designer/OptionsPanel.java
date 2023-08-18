@@ -116,13 +116,12 @@ public class OptionsPanel extends JPanel {
 		// The selected game object can be drawn into the grid in the DrawingPanel
 		JPanel centerPanel = new JPanel(new GridBagLayout());
 		Name[] enumValues = Name.values();
-		JButton[] buttons = new JButton[enumValues.length];
 
 		int columnCount = 4;
 		int buttonSize = (getWidth() - 10) / columnCount;
 		GridBagConstraints gbc = new GridBagConstraints();
 
-		for (int i = 0; i < enumValues.length; i++) {
+		for (int i = 0, gridBagIndex = 0; i < enumValues.length; i++) {
 		    Name objectName = enumValues[i];
 		    if (objectName == Name.HUD)
 		        continue;
@@ -131,21 +130,24 @@ public class OptionsPanel extends JPanel {
 		    BufferedImage objectImage = getImageByObjectName(objectName);
 
 		    ImageIcon scaledIcon = new ImageIcon(objectImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH));
-		    buttons[i] = new JButton(scaledIcon);
-		    buttons[i].setPreferredSize(new Dimension(buttonSize, buttonSize));
-		    buttons[i].setMargin(new Insets(0, 0, 0, 0));
+		    JButton button = new JButton();
+		    button = new JButton(scaledIcon);
+		    button.setPreferredSize(new Dimension(buttonSize, buttonSize));
+		    button.setMargin(new Insets(0, 0, 0, 0));
 		    
-		    buttons[i].addActionListener(new ActionListener() {
+		    button.addActionListener(new ActionListener() {
 		        public void actionPerformed(ActionEvent e) {
 		            if (optionSelectionListener != null)
 		                optionSelectionListener.onGameObjectSelected(objectImage, objectName);
 		        }
 		    });
 
-		    gbc.gridx = (i - 1) % columnCount;
-		    gbc.gridy = (i - 1) / columnCount;
+		    gbc.gridx = gridBagIndex % columnCount;
+		    gbc.gridy = gridBagIndex / columnCount;
+		    gridBagIndex++;
 		    gbc.anchor = GridBagConstraints.CENTER;
-		    centerPanel.add(buttons[i], gbc);
+
+		    centerPanel.add(button, gbc);
 		}
 
 		JScrollPane scrollPane = new JScrollPane(centerPanel);

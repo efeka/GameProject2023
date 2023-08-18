@@ -11,45 +11,30 @@ import framework.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
-import framework.ObjectId.Name;
 import framework.TextureLoader;
 import object_templates.Creature;
-import object_templates.DiagonalTileBlock;
 import window.Animation;
-import window.KeyInput;
-import window.MouseInput;
 
-public class Player extends Creature {
+public class BasicEnemy extends Creature {
 
 	private ObjectHandler objectHandler;
-	private KeyInput keyInput;
-	MouseInput mouseInput;
-
-	private float runningSpeed = 3f;
-	private float jumpingSpeed = -9f;
-
+	
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
 	private Animation[] attackAnimation;
 	private BufferedImage[] jumpingSprites;
-
-	private int attackCooldown = 500;
-	private long lastAttackTimer = attackCooldown;
-
-	public Player(int x, int y, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 100, 70, new ObjectId(Category.Player, Name.Player));
+	
+	public BasicEnemy(int x, int y, ObjectHandler objectHandler) {
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 100, 70, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));
+		
 		this.objectHandler = objectHandler;
-		this.keyInput = keyInput;
-		this.mouseInput = mouseInput;
 
-		texture = TextureLoader.getInstance().playerRunIdleSprites[0];
+		texture = TextureLoader.getInstance().basicEnemyRunIdleSprites[0];
 		setupAnimations();
 	}
 
 	@Override
 	public void tick() {
-		regenerateStamina();
-		
 		x += velX;
 		y += velY;
 
@@ -60,10 +45,8 @@ public class Player extends Creature {
 				velY = TERMINAL_VELOCITY;
 		}
 
-		handleMovement();
-		handleAttacking();
 		handleCollision();
-
+		
 		runAnimations();
 	}
 
@@ -71,60 +54,14 @@ public class Player extends Creature {
 	public void render(Graphics g) {
 		drawAnimations(g);
 	}
-
-	// Use the keyboard inputs of the user to move the player
-	private void handleMovement() {
-		if (velX > 0)
-			direction = 1;
-		else if (velX < 0)
-			direction = -1;
-
-		if (attacking) {
-			velX = 0;
-			return;
-		}
-		
-		// Horizontal movement
-		boolean rightPressed = keyInput.isMoveRightKeyPressed();
-		boolean leftPressed = keyInput.isMoveLeftKeyPressed();
-
-		if (rightPressed && !leftPressed)
-			velX = runningSpeed;
-		else if (leftPressed && !rightPressed)
-			velX = -runningSpeed;
-		else if ((rightPressed && leftPressed) || (!rightPressed && !leftPressed))
-			velX = 0;
-
-		// Vertical movement
-		if (!jumping && keyInput.isJumpKeyPressed()) {
-			velY = jumpingSpeed;
-			jumping = true;
-		}
-	}
-
-	private void handleAttacking() {
-		if (attacking && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce())) {
-			attacking = false;
-			
-			attackAnimation[0].resetAnimation();
-			attackAnimation[1].resetAnimation();
-		}
-
-		if (mouseInput.isAttackButtonPressed()) {
-			if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
-				attacking = true;
-				lastAttackTimer = System.currentTimeMillis();
-			}
-		}
-	}
-
+	
 	private void handleCollision() {
 		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
 			// Collision with Blocks
 			if (other.getObjectId().getCategory() == Category.Block)
 				checkBlockCollision(other);
-			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
-				checkDiagonalBlockCollision(other);
+			if (other.getObjectId().getCategory() == Category.Player)
+				checkPlayerCollision((Player) other);
 		}
 	}
 
@@ -163,37 +100,11 @@ public class Player extends Creature {
 			velY = 0;
 		}
 	}
-
-	// TODO currently only works for the topleft diagonal
-	private void checkDiagonalBlockCollision(GameObject other) {
-		DiagonalTileBlock otherObj = (DiagonalTileBlock) other;
-		Rectangle otherBounds = otherObj.getBounds();
-		Rectangle bottomBounds = getBottomBounds();
-
-		// Bottom collision
-		if (bottomBounds.intersects(otherBounds)) {
-			int bottomBoundsCollisionX = bottomBounds.x + bottomBounds.width;
-			int bottomBoundsCollisionY = bottomBounds.y + bottomBounds.height;
-
-			if (bottomBoundsCollisionX > otherBounds.x + otherBounds.width)
-				return;
-
-			// Output of f(x) = x function, where x is the collision point
-			int diagonalDistance = bottomBoundsCollisionX - otherBounds.x;
-			int diagonalCollisionY = otherBounds.y + otherBounds.height - diagonalDistance;
-			int heightDiff = diagonalCollisionY - bottomBoundsCollisionY;
-
-			y += heightDiff - 10;
-
-			velY = 0;
-			falling = false;
-			jumping = false;
-		}
-		else
-			falling = true;
+	
+	private void checkPlayerCollision(Player player) {
+		
 	}
-
-	// TODO Make sure collision is consistent in different game resolutions
+	
 	private Rectangle getHorizontalBounds() {
 		float height = 3 * this.height / 5f;
 		float yOffset = this.height / 5f; 
@@ -223,15 +134,15 @@ public class Player extends Creature {
 			attackX = (int) x - width / 2;
 		return new Rectangle(attackX, (int) y, width, height);
 	}
-
+	
 	private void setupAnimations() {
 		idleAnimation = new Animation[2];
 		runAnimation = new Animation[2];
 		attackAnimation = new Animation[2];
 
 		TextureLoader textureLoader = TextureLoader.getInstance();
-		BufferedImage[] sprites = textureLoader.playerRunIdleSprites;
-		BufferedImage[] attackSprites = textureLoader.playerAttackSprites;
+		BufferedImage[] sprites = textureLoader.basicEnemyRunIdleSprites;
+		BufferedImage[] attackSprites = textureLoader.basicEnemyAttackSprites;
 
 		jumpingSprites = textureLoader.playerJumpSprites;
 		
@@ -252,7 +163,7 @@ public class Player extends Creature {
 		attackAnimation[1] = new Animation(attackDelay, true, attackSprites[6], attackSprites[7], attackSprites[8],
 				attackSprites[9], attackSprites[10], attackSprites[11]);
 	}
-
+	
 	private void runAnimations() {
 		// Looking right
 		if (direction == 1) {

@@ -8,10 +8,10 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 import framework.ObjectId.Name;
+import game_objects.BasicEnemy;
 import game_objects.DiagonalStoneTileBlock;
 import game_objects.Player;
 import game_objects.StoneTileBlock;
-import object_templates.PlayerData;
 import object_templates.TileOrientation;
 import window.HUD;
 import window.KeyInput;
@@ -19,6 +19,8 @@ import window.MouseInput;
 
 public class ObjectHandler {
 
+	private Player player = null;
+	
 	public static final int BOTTOM_LAYER = 0;
 	public static final int MIDDLE_LAYER = 1;
 	public static final int TOP_LAYER = 2;
@@ -28,7 +30,6 @@ public class ObjectHandler {
 	
 	private KeyInput keyInput;
 	private MouseInput mouseInput;
-	private PlayerData playerData;
 	
 	/**
 	 * This is the class responsible for adding and removing GameObjects from the game.
@@ -48,11 +49,7 @@ public class ObjectHandler {
 	public void setupGame(KeyInput keyInput, MouseInput mouseInput) {
 		this.keyInput = keyInput;
 		this.mouseInput = mouseInput;
-		playerData = new PlayerData(100, 70);
-		
-		HUD hud = (HUD) createObjectByName(Name.HUD, 10, 10);
-		addObject(hud, ObjectHandler.MENU_LAYER);
-		
+
 		FileIO fileIO = new FileIO();
 		int[][] objectUIDs = fileIO.loadLevel("levels.txt", 0);
 		
@@ -69,6 +66,9 @@ public class ObjectHandler {
 				addObject(gameObject, MIDDLE_LAYER);
 			}
 		}
+		
+		HUD hud = (HUD) createObjectByName(Name.HUD, 10, 10);
+		addObject(hud, ObjectHandler.MENU_LAYER);
 	}
 	
 	/**
@@ -150,10 +150,14 @@ public class ObjectHandler {
 
 		switch (objectName) {
 		case Player:
-			gameObject = new Player(x, y, playerData, this, keyInput, mouseInput);
+			gameObject = new Player(x, y, this, keyInput, mouseInput);
+			player = (Player) gameObject;
+			break;
+		case BasicEnemy:
+			gameObject = new BasicEnemy(x, y, this);
 			break;
 		case HUD:
-			gameObject = new HUD(x, y, TILE_SIZE * 3, TILE_SIZE / 2, playerData);
+			gameObject = new HUD(x, y, TILE_SIZE * 3, TILE_SIZE / 2, player);
 			break;
 		case DiagonalStoneTileBlock_OuterBottomLeft:
 			gameObject = new DiagonalStoneTileBlock(x, y, objectName, TileOrientation.OuterBottomLeft);
@@ -205,7 +209,7 @@ public class ObjectHandler {
 			break;
 		case StoneTileBlock_OuterTopRight:
 			gameObject = new StoneTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
-			break;		
+			break;
 		}
 		
 		if (gameObject == null)

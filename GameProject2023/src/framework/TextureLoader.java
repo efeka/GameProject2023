@@ -9,11 +9,18 @@ public class TextureLoader {
 	
 	private BufferedImage playerSheet = null;
 	private BufferedImage blockSheet = null;
+	private BufferedImage enemySheet = null;
 	
 	public BufferedImage missingSprite;
+	
 	public BufferedImage[] playerRunIdleSprites;
 	public BufferedImage[] playerAttackSprites;
 	public BufferedImage[] playerJumpSprites;
+	
+	public BufferedImage[] basicEnemyRunIdleSprites;
+	public BufferedImage[] basicEnemyAttackSprites;
+	public BufferedImage[] basicEnemyJumpSprites;
+	
 	public BufferedImage[] stoneSprites;
 	public BufferedImage[] diagonalStoneSprites;
 	
@@ -21,6 +28,7 @@ public class TextureLoader {
 		try {
 			FileIO fileIO = new FileIO();
 			playerSheet = fileIO.loadSheet("player_sheet_32x32.png");
+			enemySheet = fileIO.loadSheet("enemy_sheet_32x32.png");
 			blockSheet = fileIO.loadSheet("block_sheet_16x16.png");
 		} 
 		catch(IOException e) {
@@ -69,6 +77,28 @@ public class TextureLoader {
 		diagonalStoneSprites = new BufferedImage[4];
 		for (int i = 0; i < diagonalStoneSprites.length; i++)
 			diagonalStoneSprites[i] = blockSheet.getSubimage(i * 16, 32, 16, 16);
+		
+		basicEnemyRunIdleSprites = new BufferedImage[36];
+		for (int i = 0; i < 10; i++)
+			basicEnemyRunIdleSprites[i] = enemySheet.getSubimage(1 + i * 33, 1, 32, 32);
+		for (int i = 10; i < 20; i++)
+			basicEnemyRunIdleSprites[i] = enemySheet.getSubimage(1 + (i - 10) * 33, 34, 32, 32);
+		for (int i = 20; i < 28; i++)
+			basicEnemyRunIdleSprites[i] = enemySheet.getSubimage(1 + (i - 20) * 33, 67, 32, 32);
+		for (int i = 28; i < 36; i++)
+			basicEnemyRunIdleSprites[i] = enemySheet.getSubimage(1 + (i - 28) * 33, 100, 32, 32);
+		
+		basicEnemyAttackSprites = new BufferedImage[16];
+		for (int i = 0; i < 6; i++) 
+			basicEnemyAttackSprites[i] = enemySheet.getSubimage(1 + i * 65, 133, 64, 64);
+		for (int i = 6; i < 12; i++)
+			basicEnemyAttackSprites[i] = enemySheet.getSubimage(1 + (i - 6) * 65, 198, 64, 64);
+			
+		basicEnemyJumpSprites = new BufferedImage[4];
+		for (int i = 0; i < 2; i++)
+			basicEnemyJumpSprites[i] = enemySheet.getSubimage(265 + i * 33, 67, 32, 32);
+		for (int i = 2; i < 4; i++)
+			basicEnemyJumpSprites[i] = enemySheet.getSubimage(265 + (i - 2) * 33, 100, 32, 32);
 	}
 	
 }

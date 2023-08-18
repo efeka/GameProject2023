@@ -18,7 +18,7 @@ public class ObjectId {
 	/**
 	 * Name is used as a spesific descriptor for the object.
 	 * This allows differentiating objects which are under the same category.
-	 * The {@code uid} field is used as a unique id, used for saving and loading
+	 * The {@code uid} is used as a unique id for saving and loading
 	 * levels from the save file into the game.
 	 * 
 	 * TODO: Many approaches was taken into consideration while deciding on
@@ -30,7 +30,9 @@ public class ObjectId {
 	 */
 	public enum Name {
 		Player(1),
-		HUD(2),
+		BasicEnemy(2),
+		
+		HUD(500),
 
 		// Tile blocks
 		StoneTileBlock_OuterTopLeft(1000),
