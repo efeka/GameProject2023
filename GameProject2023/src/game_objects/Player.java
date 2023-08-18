@@ -3,7 +3,9 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -37,7 +39,7 @@ public class Player extends Creature {
 	private long lastAttackTimer = attackCooldown;
 
 	public Player(int x, int y, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 100, 70, new ObjectId(Category.Player, Name.Player));
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 		this.mouseInput = mouseInput;
@@ -70,6 +72,18 @@ public class Player extends Creature {
 	@Override
 	public void render(Graphics g) {
 		drawAnimations(g);
+		
+		/*
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setColor(Color.white);
+		g2d.draw(getBottomBounds());
+		g2d.draw(getHorizontalBounds());
+		g2d.draw(getTopBounds());
+		g2d.setColor(new Color(255, 255, 255, 70));
+		g2d.draw(getBounds());
+		g2d.setColor(new Color(255, 0, 0, 100));
+		g2d.draw(getGroundAttackBounds());
+		*/
 	}
 
 	// Use the keyboard inputs of the user to move the player
@@ -117,6 +131,12 @@ public class Player extends Creature {
 			}
 		}
 	}
+	
+	// TODO
+	@Override
+	public void takeDamage(GameObject attacker, int damageAmount) {
+		
+	}
 
 	private void handleCollision() {
 		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
@@ -125,6 +145,11 @@ public class Player extends Creature {
 				checkBlockCollision(other);
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
+			
+			// Attack collision with enemies
+			if (other.getObjectId().getCategory() == Category.Enemy) 
+				if (attacking && getGroundAttackBounds().intersects(other.getBounds()))
+					((Creature) other).takeDamage(this, damage);
 		}
 	}
 
@@ -143,18 +168,13 @@ public class Player extends Creature {
 
 		// Horizontal collision
 		if (getHorizontalBounds().intersects(otherBounds)) {
-			if (velX > 0) 
+			int xDiff = (int) (x - other.getX());
+			// Player is to the left of the object
+			if (xDiff < 0)
 				x = other.getX() - width;
-			else if (velX < 0)
+			// Player is to the right of the object
+			else
 				x = other.getX() + other.getWidth();
-			else {
-				int xDiff = (int) x - (int) other.getX();
-				if (xDiff < 0)
-					x = other.getX() - width;
-				else
-					x = other.getX() + other.getWidth();
-			}
-
 		}
 
 		// Top collision

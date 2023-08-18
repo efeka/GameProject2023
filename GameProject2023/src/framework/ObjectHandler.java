@@ -51,7 +51,7 @@ public class ObjectHandler {
 		this.mouseInput = mouseInput;
 
 		FileIO fileIO = new FileIO();
-		int[][] objectUIDs = fileIO.loadLevel("levels.txt", 0);
+		int[][] objectUIDs = fileIO.loadLevel("levels.txt", 1);
 		
 		for (int i = 0; i < TILE_ROWS; i++) {
 			for (int j = 0; j < TILE_COLUMNS; j++) {

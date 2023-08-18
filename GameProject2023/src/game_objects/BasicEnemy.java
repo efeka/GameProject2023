@@ -19,13 +19,20 @@ public class BasicEnemy extends Creature {
 
 	private ObjectHandler objectHandler;
 	
+	private boolean knockedBack = false;
+	
+	private float runningSpeed = 3f;
+	private float jumpingSpeed = -9f;
+	private float knockbackHorizontalSpeed = 2f;
+	private float knockbackVerticalSpeed = -3f;
+	
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
 	private Animation[] attackAnimation;
 	private BufferedImage[] jumpingSprites;
 	
 	public BasicEnemy(int x, int y, ObjectHandler objectHandler) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 100, 70, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, 70, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));
 		
 		this.objectHandler = objectHandler;
 
@@ -44,7 +51,9 @@ public class BasicEnemy extends Creature {
 			if (velY > TERMINAL_VELOCITY)
 				velY = TERMINAL_VELOCITY;
 		}
-
+		
+		// if (!knockedBack)
+		//handleMovement();
 		handleCollision();
 		
 		runAnimations();
@@ -74,6 +83,12 @@ public class BasicEnemy extends Creature {
 			velY = 0;
 			falling = false;
 			jumping = false;
+			
+			// Reset knock back after hitting the ground
+			if (knockedBack) {
+				knockedBack = false;
+				velX = 0;
+			}
 		}
 		else
 			falling = true;
@@ -91,7 +106,6 @@ public class BasicEnemy extends Creature {
 				else
 					x = other.getX() + other.getWidth();
 			}
-
 		}
 
 		// Top collision
@@ -103,6 +117,23 @@ public class BasicEnemy extends Creature {
 	
 	private void checkPlayerCollision(Player player) {
 		
+	}
+	
+	// This enemy gets knocked back away from the attacker
+	@Override
+	public void takeDamage(GameObject attacker, int damageAmount) {
+		knockedBack = true;
+		
+		setHealth(health - damageAmount);
+		
+		int xDiff = (int) (x - attacker.getX());
+		// Attacker is to the left
+		if (xDiff < 0)
+			velX = -knockbackHorizontalSpeed;
+		// Attacker is to the right
+		else
+			velX = knockbackHorizontalSpeed;
+		velY = knockbackVerticalSpeed;
 	}
 	
 	private Rectangle getHorizontalBounds() {

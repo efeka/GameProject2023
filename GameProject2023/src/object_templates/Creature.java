@@ -14,16 +14,18 @@ public abstract class Creature extends GameObject {
 	// 1 for right, -1 for left
 	protected int direction = 1;
 	
+	protected int damage;
 	protected int maxHealth, maxStamina;
 	protected float health, stamina;
 	protected float staminaRegen;
 	
-	public Creature(int x, int y, int width, int height, int maxHealth, int maxStamina, ObjectId objectId) {
+	public Creature(int x, int y, int width, int height, int damage, int maxHealth, int maxStamina, ObjectId objectId) {
 		super(x, y, width, height, objectId);
 		
 		health = this.maxHealth = maxHealth;
 		stamina = this.maxStamina = maxStamina;
 		staminaRegen = (int) (stamina / 200f);
+		this.damage = damage;
 		
 		falling = true;
 		jumping = false;
@@ -36,6 +38,8 @@ public abstract class Creature extends GameObject {
 		if (stamina > maxStamina)
 			stamina = maxStamina;
 	}
+	
+	public abstract void takeDamage(GameObject attacker, int damageAmount);
 	
 	public int getMaxHealth() {
 		return maxHealth;
@@ -50,8 +54,7 @@ public abstract class Creature extends GameObject {
 	}
 
 	public void setHealth(float health) {
-		if (health >= 0 && health < maxHealth)
-			this.health = health;
+		this.health = clamp(0f, health, maxHealth);
 	}
 
 	public int getMaxStamina() {
@@ -67,8 +70,15 @@ public abstract class Creature extends GameObject {
 	}
 
 	public void setStamina(float stamina) {
-		if (stamina >= 0 && stamina < maxStamina)
-			this.stamina = stamina;
+		this.stamina = clamp(0f, stamina, maxStamina);
+	}
+	
+	private float clamp(float min, float num, float max) {
+		if (num < min)
+			num = min;
+		else if (num > max)
+			num = max;
+		return num;
 	}
 
 }
