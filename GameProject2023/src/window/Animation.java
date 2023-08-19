@@ -96,5 +96,9 @@ public class Animation {
 	public boolean isPlayedOnce() {
 		return playedOnce;
 	}
+	
+	public int getCurrentFrame() {
+		return frameIndex;
+	}
 
 }

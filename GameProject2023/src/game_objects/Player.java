@@ -28,7 +28,10 @@ public class Player extends Creature {
 	MouseInput mouseInput;
 
 	private float runningSpeed = 3f;
-	private float jumpingSpeed = -9f;
+	private float jumpingSpeed = -9.5f;
+
+	private int invulnerableDuration = 200;
+	private long lastInvulnerableTimer = invulnerableDuration; 
 
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
@@ -51,7 +54,7 @@ public class Player extends Creature {
 	@Override
 	public void tick() {
 		regenerateStamina();
-		
+
 		x += velX;
 		y += velY;
 
@@ -61,6 +64,9 @@ public class Player extends Creature {
 			if (velY > TERMINAL_VELOCITY)
 				velY = TERMINAL_VELOCITY;
 		}
+
+		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
+			invulnerable = false;
 
 		handleMovement();
 		handleAttacking();
@@ -72,32 +78,48 @@ public class Player extends Creature {
 	@Override
 	public void render(Graphics g) {
 		drawAnimations(g);
-		
-		/*
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(Color.white);
-		g2d.draw(getBottomBounds());
-		g2d.draw(getHorizontalBounds());
-		g2d.draw(getTopBounds());
-		g2d.setColor(new Color(255, 255, 255, 70));
-		g2d.draw(getBounds());
-		g2d.setColor(new Color(255, 0, 0, 100));
-		g2d.draw(getGroundAttackBounds());
-		*/
+
+		// Debug
+		if (keyInput.debugPressed) {
+			g.setColor(new Color(0, 0, 0, 150));
+			g.fillRect(10, 40, 170, 115);
+			
+			g.setColor(new Color(220, 80, 80));
+			g.drawString("Health..........................." + health, 20, 60);
+			g.setColor(new Color(80, 220, 80));
+			g.drawString("Stamina........................." + stamina, 20, 80);
+			
+			g.setColor(Color.white);
+			g.drawString("Attacking........................" + attacking, 20, 100);
+			g.drawString("Invulnerable...................." + invulnerable, 20, 120);
+			g.drawString("Knocked back................" + knockedBack, 20, 140);
+
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setColor(Color.white);
+			g2d.draw(getBottomBounds());
+			g2d.draw(getHorizontalBounds());
+			g2d.draw(getTopBounds());
+			g2d.setColor(new Color(255, 255, 255, 70));
+			g2d.draw(getBounds());
+			g2d.setColor(new Color(255, 0, 0, 100));
+			g2d.draw(getGroundAttackBounds());
+		}
 	}
 
 	// Use the keyboard inputs of the user to move the player
 	private void handleMovement() {
+		if (attacking) {
+			velX = 0;
+			return;
+		}
+		if (knockedBack)
+			return;
+
 		if (velX > 0)
 			direction = 1;
 		else if (velX < 0)
 			direction = -1;
 
-		if (attacking) {
-			velX = 0;
-			return;
-		}
-		
 		// Horizontal movement
 		boolean rightPressed = keyInput.isMoveRightKeyPressed();
 		boolean leftPressed = keyInput.isMoveLeftKeyPressed();
@@ -119,7 +141,7 @@ public class Player extends Creature {
 	private void handleAttacking() {
 		if (attacking && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce())) {
 			attacking = false;
-			
+
 			attackAnimation[0].resetAnimation();
 			attackAnimation[1].resetAnimation();
 		}
@@ -131,11 +153,26 @@ public class Player extends Creature {
 			}
 		}
 	}
-	
-	// TODO
+
 	@Override
 	public void takeDamage(GameObject attacker, int damageAmount) {
-		
+		if (invulnerable)
+			return;
+
+		lastInvulnerableTimer = System.currentTimeMillis();
+		invulnerable = true;
+		knockedBack = true;
+
+		setHealth(health - damageAmount);
+
+		int xDiff = (int) (x - attacker.getX());
+		// Attacker is to the left
+		if (xDiff < 0)
+			velX = -knockbackHorizontalSpeed;
+		// Attacker is to the right
+		else
+			velX = knockbackHorizontalSpeed;
+		velY = knockbackVerticalSpeed;
 	}
 
 	private void handleCollision() {
@@ -145,7 +182,7 @@ public class Player extends Creature {
 				checkBlockCollision(other);
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
-			
+
 			// Attack collision with enemies
 			if (other.getObjectId().getCategory() == Category.Enemy) 
 				if (attacking && getGroundAttackBounds().intersects(other.getBounds()))
@@ -162,6 +199,12 @@ public class Player extends Creature {
 			velY = 0;
 			falling = false;
 			jumping = false;
+
+			// Reset knock back after hitting the ground
+			if (knockedBack) {
+				knockedBack = false;
+				velX = 0;
+			}
 		}
 		else
 			falling = true;
@@ -171,7 +214,7 @@ public class Player extends Creature {
 			int xDiff = (int) (x - other.getX());
 			// Player is to the left of the object
 			if (xDiff < 0)
-				x = other.getX() - width;
+				x = other.getX() - getHorizontalBounds().width;
 			// Player is to the right of the object
 			else
 				x = other.getX() + other.getWidth();
@@ -213,7 +256,6 @@ public class Player extends Creature {
 			falling = true;
 	}
 
-	// TODO Make sure collision is consistent in different game resolutions
 	private Rectangle getHorizontalBounds() {
 		float height = 3 * this.height / 5f;
 		float yOffset = this.height / 5f; 
@@ -234,14 +276,15 @@ public class Player extends Creature {
 		float yOffset = 4 * this.height / 5f;
 		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
 	}
-	
+
 	private Rectangle getGroundAttackBounds() {
 		int attackX;
+		int attackWidth = (int) (4f * width / 5);
 		if (direction == 1)
 			attackX = (int) x + width / 2;
 		else
-			attackX = (int) x - width / 2;
-		return new Rectangle(attackX, (int) y, width, height);
+			attackX = (int) x - attackWidth / 2;
+		return new Rectangle(attackX, (int) y, attackWidth, height);
 	}
 
 	private void setupAnimations() {
@@ -254,7 +297,7 @@ public class Player extends Creature {
 		BufferedImage[] attackSprites = textureLoader.playerAttackSprites;
 
 		jumpingSprites = textureLoader.playerJumpSprites;
-		
+
 		final int idleDelay = 8;
 		final int runDelay = 8;
 		final int attackDelay = 4;

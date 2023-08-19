@@ -3,7 +3,6 @@ package window;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Window;
 import java.awt.image.BufferStrategy;
 
 import framework.ObjectHandler;
@@ -14,7 +13,7 @@ public class Game extends Canvas implements Runnable {
 	private Thread thread;
 	public static boolean running = false;
 	
-	private Window window;
+	private GameWindow window;
 	
 	private ObjectHandler objectHandler;
 	

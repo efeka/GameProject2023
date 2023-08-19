@@ -16,8 +16,12 @@ public class KeyInput extends KeyAdapter {
 	private boolean navigateDownKeyPressed = false;
 	private boolean selectionKeyPressed = false;
 	
+	// Debug
+	private boolean ctrlPressed = false;
+	public boolean debugPressed = false;
+	
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e) {	
 		// TODO Load key configurations from a certain source instead of hard coding
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
@@ -40,8 +44,16 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_ENTER:
 			selectionKeyPressed = true;
 			break;
+		// Debug
 		case KeyEvent.VK_ESCAPE:
 			System.exit(0);
+		case KeyEvent.VK_CONTROL:
+			ctrlPressed = true;
+		case KeyEvent.VK_X:
+			if (ctrlPressed) {
+				debugPressed = !debugPressed;
+				ctrlPressed = false;
+			}
 		}
 	}
 	
@@ -69,6 +81,9 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_ENTER:
 			selectionKeyPressed = false;
 			break;
+		// Debug
+		case KeyEvent.VK_CONTROL:
+			ctrlPressed = false;
 		}
 	}
 	

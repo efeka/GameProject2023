@@ -18,13 +18,16 @@ import window.Animation;
 public class BasicEnemy extends Creature {
 
 	private ObjectHandler objectHandler;
-	
-	private boolean knockedBack = false;
+
+	private boolean startedAttacking = false;
+	private int attackCooldown = 2000;
+	private long lastAttackTimer = attackCooldown;
+
+	private int invulnerableDuration = 700;
+	private long lastInvulnerableTimer = invulnerableDuration; 
 	
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = -9f;
-	private float knockbackHorizontalSpeed = 2f;
-	private float knockbackVerticalSpeed = -3f;
 	
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
@@ -52,8 +55,12 @@ public class BasicEnemy extends Creature {
 				velY = TERMINAL_VELOCITY;
 		}
 		
-		// if (!knockedBack)
+		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
+			invulnerable = false;
+		
+		//if (!knockedBack)
 		//handleMovement();
+		handleAttacking();
 		handleCollision();
 		
 		runAnimations();
@@ -69,8 +76,6 @@ public class BasicEnemy extends Creature {
 			// Collision with Blocks
 			if (other.getObjectId().getCategory() == Category.Block)
 				checkBlockCollision(other);
-			if (other.getObjectId().getCategory() == Category.Player)
-				checkPlayerCollision((Player) other);
 		}
 	}
 
@@ -95,17 +100,13 @@ public class BasicEnemy extends Creature {
 
 		// Horizontal collision
 		if (getHorizontalBounds().intersects(otherBounds)) {
-			if (velX > 0) 
+			int xDiff = (int) (x - other.getX());
+			// Player is to the left of the object
+			if (xDiff < 0)
 				x = other.getX() - width;
-			else if (velX < 0)
+			// Player is to the right of the object
+			else
 				x = other.getX() + other.getWidth();
-			else {
-				int xDiff = (int) x - (int) other.getX();
-				if (xDiff < 0)
-					x = other.getX() - width;
-				else
-					x = other.getX() + other.getWidth();
-			}
 		}
 
 		// Top collision
@@ -115,13 +116,43 @@ public class BasicEnemy extends Creature {
 		}
 	}
 	
-	private void checkPlayerCollision(Player player) {
+	private void handleAttacking() {
+		if (startedAttacking && !attacking) { 
+			if ((attackAnimation[0].getCurrentFrame() >= 4 && attackAnimation[0].getCurrentFrame() < 7) ||
+					attackAnimation[1].getCurrentFrame() >= 4 && attackAnimation[1].getCurrentFrame() < 7)
+				attacking = true;
+			else
+				attacking = false;
+		}
+			
+		if (knockedBack || (attacking && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce()))) {
+			attacking = false;
+			startedAttacking = false;
+			
+			attackAnimation[0].resetAnimation();
+			attackAnimation[1].resetAnimation();
+		}
 		
+		Player player = objectHandler.getPlayer();
+		if (player.getBounds().intersects(getGroundAttackBounds())) {
+			if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
+				startedAttacking = true;
+				lastAttackTimer = System.currentTimeMillis();
+			}
+			
+			// Damage the player
+			if (attacking)
+				player.takeDamage(this, damage);
+		}
 	}
-	
-	// This enemy gets knocked back away from the attacker
+
 	@Override
 	public void takeDamage(GameObject attacker, int damageAmount) {
+		if (invulnerable)
+			return;
+		
+		lastInvulnerableTimer = System.currentTimeMillis();
+		invulnerable = true;
 		knockedBack = true;
 		
 		setHealth(health - damageAmount);
@@ -179,7 +210,7 @@ public class BasicEnemy extends Creature {
 		
 		final int idleDelay = 8;
 		final int runDelay = 8;
-		final int attackDelay = 4;
+		final int attackDelay = 10;
 
 		idleAnimation[0] = new Animation(idleDelay, false, sprites[0], sprites[1], sprites[2], sprites[3],
 				sprites[4], sprites[5], sprites[6], sprites[7], sprites[8], sprites[9]);
@@ -190,16 +221,16 @@ public class BasicEnemy extends Creature {
 		runAnimation[1] = new Animation(runDelay, false, sprites[28], sprites[29], sprites[30], sprites[31],
 				sprites[32], sprites[33], sprites[34], sprites[35]);
 		attackAnimation[0] = new Animation(attackDelay, true, attackSprites[0], attackSprites[1], attackSprites[2],
-				attackSprites[3], attackSprites[4], attackSprites[5]);
+				attackSprites[3], attackSprites[4], attackSprites[5], attackSprites[6], attackSprites[7]);
 		attackAnimation[1] = new Animation(attackDelay, true, attackSprites[6], attackSprites[7], attackSprites[8],
-				attackSprites[9], attackSprites[10], attackSprites[11]);
+				attackSprites[9], attackSprites[10], attackSprites[11], attackSprites[12], attackSprites[13]);
 	}
 	
 	private void runAnimations() {
 		// Looking right
 		if (direction == 1) {
 			// Attacking
-			if (attacking)
+			if (startedAttacking)
 				attackAnimation[0].runAnimation();
 			// Not moving
 			else if (velX == 0)
@@ -211,7 +242,7 @@ public class BasicEnemy extends Creature {
 		// Looking left
 		else if (direction == -1) {
 			// Attacking
-			if (attacking)
+			if (startedAttacking)
 				attackAnimation[1].runAnimation();
 			// Not moving
 			else if (velX == 0)
@@ -226,7 +257,7 @@ public class BasicEnemy extends Creature {
 		// Looking right
 		if (direction == 1) {
 			// Attacking
-			if (attacking)
+			if (startedAttacking)
 				attackAnimation[0].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Jumping
 			else if (jumping) {
@@ -247,7 +278,7 @@ public class BasicEnemy extends Creature {
 		// Looking left
 		else if (direction == -1) {
 			// Attacking
-			if (attacking)
+			if (startedAttacking)
 				attackAnimation[1].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Jumping
 			else if (jumping) {
