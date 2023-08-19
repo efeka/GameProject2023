@@ -81,12 +81,18 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 					g.drawRect(cell.x, cell.y, cell.size, cell.size);	
 			}
 		}
+		
+		if (selectedObjectName != null) {
+			g.setColor(Color.BLACK);
+			g.drawString(selectedObjectName.toString(), 5, getHeight() - 5);
+		}
 	}
 
 	@Override
 	public void onGameObjectSelected(BufferedImage selectedImage, Name objectName) {
 		this.selectedImage = selectedImage;
 		this.selectedObjectName = objectName;
+		repaint();
 	}
 
 	@Override

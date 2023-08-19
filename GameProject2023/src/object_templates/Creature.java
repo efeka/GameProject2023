@@ -9,10 +9,14 @@ public abstract class Creature extends GameObject {
 	protected final float GRAVITY = GameConstants.CreatureConstants.GRAVITY;
 	protected final int TERMINAL_VELOCITY = GameConstants.CreatureConstants.TERMINAL_VELOCITY;
 	
-	protected float velX, velY;
-	protected boolean falling, jumping, attacking;
+	protected boolean falling, jumping, attacking, knockedBack, invulnerable;
+	
 	// 1 for right, -1 for left
 	protected int direction = 1;
+	protected float velX, velY;
+	
+	protected float knockbackHorizontalSpeed = 3f;
+	protected float knockbackVerticalSpeed = -4f;
 	
 	protected int damage;
 	protected int maxHealth, maxStamina;
@@ -30,6 +34,8 @@ public abstract class Creature extends GameObject {
 		falling = true;
 		jumping = false;
 		attacking = false;
+		knockedBack = false;
+		invulnerable = false;
 	}
 
 	public void regenerateStamina() {

@@ -22,7 +22,10 @@ public class TextureLoader {
 	public BufferedImage[] basicEnemyJumpSprites;
 	
 	public BufferedImage[] stoneSprites;
+	public BufferedImage[] grassSprites;
+	public BufferedImage[] rockSprites;
 	public BufferedImage[] diagonalStoneSprites;
+	public BufferedImage[] woodJumpThroughSprites;
 	
 	private TextureLoader() {
 		try {
@@ -46,11 +49,21 @@ public class TextureLoader {
 	}
 	
 	private void loadTextures() {
-		missingSprite = blockSheet.getSubimage(208, 0, 16, 16);
+		missingSprite = blockSheet.getSubimage(222, 1, 16, 16);
 		
 		stoneSprites = new BufferedImage[13];
 		for (int i = 0; i < stoneSprites.length; i++)
-			stoneSprites[i] = blockSheet.getSubimage(i * 16, 0, 16, 16);
+			stoneSprites[i] = blockSheet.getSubimage(1 + i * 17, 1, 16, 16);
+		grassSprites = new BufferedImage[13];
+		for (int i = 0; i < grassSprites.length; i++)
+			grassSprites[i] = blockSheet.getSubimage(1 + i * 17, 18, 16, 16);
+		rockSprites = new BufferedImage[13];
+		for (int i = 0; i < rockSprites.length; i++)
+			rockSprites[i] = blockSheet.getSubimage(1 + i * 17, 35, 16, 16);
+		
+		woodJumpThroughSprites = new BufferedImage[3];
+		for (int i = 0; i < woodJumpThroughSprites.length; i++)
+			woodJumpThroughSprites[i] = blockSheet.getSubimage(1 + i * 17, 69, 16, 16);
 		
 		playerRunIdleSprites = new BufferedImage[36];
 		for (int i = 0; i < 10; i++)
@@ -76,7 +89,7 @@ public class TextureLoader {
 		
 		diagonalStoneSprites = new BufferedImage[4];
 		for (int i = 0; i < diagonalStoneSprites.length; i++)
-			diagonalStoneSprites[i] = blockSheet.getSubimage(i * 16, 32, 16, 16);
+			diagonalStoneSprites[i] = blockSheet.getSubimage(1 + i * 17, 52, 16, 16);
 		
 		basicEnemyRunIdleSprites = new BufferedImage[36];
 		for (int i = 0; i < 10; i++)

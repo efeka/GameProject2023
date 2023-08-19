@@ -8,8 +8,8 @@ public interface GameConstants {
 		private static final int DEFAULT_PLAYER_HEIGHT = 64;
 		
 		public static final float SCALE = 1f;
-		public static final int TILE_COLUMNS = 26;
-		public static final int TILE_ROWS = 14;
+		public static final int TILE_COLUMNS = 32;
+		public static final int TILE_ROWS = 18;
 		
 		public static final int TILE_SIZE = (int) (DEFAULT_TILE_SIZE * SCALE);
 		public static final int PLAYER_WIDTH = (int) (DEFAULT_PLAYER_WIDTH * SCALE);

@@ -10,8 +10,11 @@ import java.util.ArrayList;
 import framework.ObjectId.Name;
 import game_objects.BasicEnemy;
 import game_objects.DiagonalStoneTileBlock;
+import game_objects.GrassTileBlock;
 import game_objects.Player;
+import game_objects.RockTileBlock;
 import game_objects.StoneTileBlock;
+import game_objects.WoodJumpThroughTileBlock;
 import object_templates.TileOrientation;
 import window.HUD;
 import window.KeyInput;
@@ -210,12 +213,103 @@ public class ObjectHandler {
 		case StoneTileBlock_OuterTopRight:
 			gameObject = new StoneTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
 			break;
+		case GrassTileBlock_Center:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.Center);
+			break;
+		case GrassTileBlock_InnerBottomLeft:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.InnerBottomLeft);
+			break;
+		case GrassTileBlock_InnerBottomRight:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.InnerBottomRight);
+			break;
+		case GrassTileBlock_InnerTopLeft:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.InnerTopLeft);
+			break;
+		case GrassTileBlock_InnerTopRight:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.InnerTopRight);
+			break;
+		case GrassTileBlock_OuterBottom:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterBottom);
+			break;
+		case GrassTileBlock_OuterBottomLeft:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterBottomLeft);
+			break;
+		case GrassTileBlock_OuterBottomRight:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterBottomRight);
+			break;
+		case GrassTileBlock_OuterLeft:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterLeft);
+			break;
+		case GrassTileBlock_OuterRight:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterRight);
+			break;
+		case GrassTileBlock_OuterTop:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterTop);
+			break;
+		case GrassTileBlock_OuterTopLeft:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterTopLeft);
+			break;
+		case GrassTileBlock_OuterTopRight:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
+			break;
+		case RockTileBlock_Center:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.Center);
+			break;
+		case RockTileBlock_InnerBottomLeft:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.InnerBottomLeft);
+			break;
+		case RockTileBlock_InnerBottomRight:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.InnerBottomRight);
+			break;
+		case RockTileBlock_InnerTopLeft:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.InnerTopLeft);
+			break;
+		case RockTileBlock_InnerTopRight:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.InnerTopRight);
+			break;
+		case RockTileBlock_OuterBottom:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.OuterBottom);
+			break;
+		case RockTileBlock_OuterBottomLeft:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.OuterBottomLeft);
+			break;
+		case RockTileBlock_OuterBottomRight:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.OuterBottomRight);
+			break;
+		case RockTileBlock_OuterLeft:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.OuterLeft);
+			break;
+		case RockTileBlock_OuterRight:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.OuterRight);
+			break;
+		case RockTileBlock_OuterTop:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.OuterTop);
+			break;
+		case RockTileBlock_OuterTopLeft:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.OuterTopLeft);
+			break;
+		case RockTileBlock_OuterTopRight:
+			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
+			break;
+		case WoodJumpThroughTileBlock_Center:
+			gameObject = new WoodJumpThroughTileBlock(x, y, objectName, TileOrientation.Center);
+			break;
+		case WoodJumpThroughTileBlock_OuterLeft:
+			gameObject = new WoodJumpThroughTileBlock(x, y, objectName, TileOrientation.OuterLeft);
+			break;
+		case WoodJumpThroughTileBlock_OuterRight:
+			gameObject = new WoodJumpThroughTileBlock(x, y, objectName, TileOrientation.OuterRight);
+			break;
 		}
 		
 		if (gameObject == null)
 			System.err.println("Could not create game object with the name: " + objectName);
 		
 		return gameObject;
+	}
+	
+	public Player getPlayer() {
+		return player;
 	}
 	
 }

@@ -44,7 +44,7 @@ public class OptionsPanel extends JPanel {
 	}
 	
 	private OptionSelectionListener optionSelectionListener;
-	
+
 	public OptionsPanel(int width, int height) {
 		setSize(width, height);
 		setPreferredSize(new Dimension(width, height));
@@ -117,7 +117,7 @@ public class OptionsPanel extends JPanel {
 		JPanel centerPanel = new JPanel(new GridBagLayout());
 		Name[] enumValues = Name.values();
 
-		int columnCount = 4;
+		int columnCount = 5;
 		int buttonSize = (getWidth() - 10) / columnCount;
 		GridBagConstraints gbc = new GridBagConstraints();
 
@@ -125,13 +125,12 @@ public class OptionsPanel extends JPanel {
 		    Name objectName = enumValues[i];
 		    if (objectName == Name.HUD)
 		        continue;
-
+		    
 		    // Get objects image by Name
 		    BufferedImage objectImage = getImageByObjectName(objectName);
 
 		    ImageIcon scaledIcon = new ImageIcon(objectImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH));
-		    JButton button = new JButton();
-		    button = new JButton(scaledIcon);
+		    JButton button = new JButton(scaledIcon);
 		    button.setPreferredSize(new Dimension(buttonSize, buttonSize));
 		    button.setMargin(new Insets(0, 0, 0, 0));
 		    
@@ -141,7 +140,7 @@ public class OptionsPanel extends JPanel {
 		                optionSelectionListener.onGameObjectSelected(objectImage, objectName);
 		        }
 		    });
-
+		    
 		    gbc.gridx = gridBagIndex % columnCount;
 		    gbc.gridy = gridBagIndex / columnCount;
 		    gridBagIndex++;
@@ -152,6 +151,7 @@ public class OptionsPanel extends JPanel {
 
 		JScrollPane scrollPane = new JScrollPane(centerPanel);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
 		add(topPanel, BorderLayout.NORTH);
 		add(scrollPane, BorderLayout.CENTER);
