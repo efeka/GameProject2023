@@ -1,7 +1,6 @@
-package object_templates;
+package abstract_objects;
 
 import framework.GameConstants;
-import framework.GameObject;
 import framework.ObjectId;
 
 public abstract class Creature extends GameObject {
@@ -14,9 +13,6 @@ public abstract class Creature extends GameObject {
 	// 1 for right, -1 for left
 	protected int direction = 1;
 	protected float velX, velY;
-	
-	protected float knockbackHorizontalSpeed = 3f;
-	protected float knockbackVerticalSpeed = -4f;
 	
 	protected int damage;
 	protected int maxHealth, maxStamina;
@@ -45,7 +41,8 @@ public abstract class Creature extends GameObject {
 			stamina = maxStamina;
 	}
 	
-	public abstract void takeDamage(GameObject attacker, int damageAmount);
+	public abstract void takeDamage(int damageAmount);
+	public abstract void applyKnockback(GameObject attacker, float velX, float velY);
 	
 	public int getMaxHealth() {
 		return maxHealth;

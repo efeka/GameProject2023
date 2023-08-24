@@ -1,8 +1,11 @@
-package framework;
+package abstract_objects;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+
+import framework.ObjectId;
+import framework.TextureLoader;
 
 /**
  * The GameObject class is the base class for all objects in the game that require frequent updating and rendering.

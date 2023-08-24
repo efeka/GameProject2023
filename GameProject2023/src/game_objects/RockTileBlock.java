@@ -3,10 +3,10 @@ package game_objects;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import abstract_objects.TileBlock;
+import abstract_objects.TileOrientation;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
-import object_templates.TileBlock;
-import object_templates.TileOrientation;
 
 public class RockTileBlock extends TileBlock {
 

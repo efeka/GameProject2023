@@ -1,4 +1,4 @@
-package window;
+package main;
 
 public class GameMain {
 

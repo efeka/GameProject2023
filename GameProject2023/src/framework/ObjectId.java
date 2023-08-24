@@ -1,6 +1,6 @@
 package framework;
 
-import object_templates.TileOrientation;
+import abstract_objects.TileOrientation;
 
 public class ObjectId {
 	

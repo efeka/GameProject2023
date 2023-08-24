@@ -3,7 +3,7 @@ package window;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import framework.GameObject;
+import abstract_objects.GameObject;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;

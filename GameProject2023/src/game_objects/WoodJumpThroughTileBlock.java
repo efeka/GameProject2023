@@ -3,10 +3,10 @@ package game_objects;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import abstract_objects.JumpThroughTileBlock;
+import abstract_objects.TileOrientation;
 import framework.TextureLoader;
 import framework.ObjectId.Name;
-import object_templates.JumpThroughTileBlock;
-import object_templates.TileOrientation;
 
 public class WoodJumpThroughTileBlock extends JumpThroughTileBlock {
 

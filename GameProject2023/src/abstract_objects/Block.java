@@ -1,8 +1,7 @@
-package object_templates;
+package abstract_objects;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
-import framework.GameObject;
 import framework.ObjectId;
 
 public abstract class Block extends GameObject {

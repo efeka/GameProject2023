@@ -22,14 +22,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
-import framework.GameObject;
+import abstract_objects.GameObject;
+import abstract_objects.TileOrientation;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import game_objects.DiagonalStoneTileBlock;
 import game_objects.Player;
 import game_objects.StoneTileBlock;
-import object_templates.TileOrientation;
 
 public class OptionsPanel extends JPanel {
 

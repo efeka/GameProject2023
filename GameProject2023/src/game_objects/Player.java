@@ -8,15 +8,16 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
-import framework.GameObject;
+import abstract_objects.Creature;
+import abstract_objects.DiagonalTileBlock;
+import abstract_objects.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
-import object_templates.Creature;
-import object_templates.DiagonalTileBlock;
 import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
@@ -28,9 +29,9 @@ public class Player extends Creature {
 	MouseInput mouseInput;
 
 	private float runningSpeed = 3f;
-	private float jumpingSpeed = -9.5f;
+	private float jumpingSpeed = -8.5f;
 
-	private int invulnerableDuration = 200;
+	private int invulnerableDuration = 500;
 	private long lastInvulnerableTimer = invulnerableDuration; 
 
 	private Animation[] idleAnimation;
@@ -38,6 +39,10 @@ public class Player extends Creature {
 	private Animation[] attackAnimation;
 	private BufferedImage[] jumpingSprites;
 
+	private int firstAbilityCooldown = 500;
+	private long lastFirstAbilityTimer = firstAbilityCooldown;
+	private boolean usingFirstAbility = false;
+	
 	private int attackCooldown = 500;
 	private long lastAttackTimer = attackCooldown;
 
@@ -82,17 +87,21 @@ public class Player extends Creature {
 		// Debug
 		if (keyInput.debugPressed) {
 			g.setColor(new Color(0, 0, 0, 150));
-			g.fillRect(10, 40, 170, 115);
+			g.fillRect(10, 40, 170, 155);
 			
 			g.setColor(new Color(220, 80, 80));
 			g.drawString("Health..........................." + health, 20, 60);
 			g.setColor(new Color(80, 220, 80));
 			g.drawString("Stamina........................." + stamina, 20, 80);
 			
+			g.setColor(Color.CYAN);
+			g.drawString("velX: " + velX, 20, 100);
+			g.drawString("velY: " + velY, 20, 120);
+			
 			g.setColor(Color.white);
-			g.drawString("Attacking........................" + attacking, 20, 100);
-			g.drawString("Invulnerable...................." + invulnerable, 20, 120);
-			g.drawString("Knocked back................" + knockedBack, 20, 140);
+			g.drawString("Attacking........................" + attacking, 20, 140);
+			g.drawString("Invulnerable...................." + invulnerable, 20, 160);
+			g.drawString("Knocked back................" + knockedBack, 20, 180);
 
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setColor(Color.white);
@@ -139,9 +148,9 @@ public class Player extends Creature {
 	}
 
 	private void handleAttacking() {
-		if (attacking && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce())) {
-			attacking = false;
-
+		if ((attacking || usingFirstAbility) && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce())) {
+			attacking = usingFirstAbility = false;
+			
 			attackAnimation[0].resetAnimation();
 			attackAnimation[1].resetAnimation();
 		}
@@ -152,31 +161,52 @@ public class Player extends Creature {
 				lastAttackTimer = System.currentTimeMillis();
 			}
 		}
+		
+		// TODO temporary
+		if (keyInput.isFirstAbilityKeyPressed()) {
+			if (System.currentTimeMillis() - lastFirstAbilityTimer >= firstAbilityCooldown) {
+				usingFirstAbility = true;
+				lastFirstAbilityTimer = System.currentTimeMillis();
+			}
+		}
 	}
 
 	@Override
-	public void takeDamage(GameObject attacker, int damageAmount) {
+	public void takeDamage(int damageAmount) {
 		if (invulnerable)
 			return;
 
 		lastInvulnerableTimer = System.currentTimeMillis();
 		invulnerable = true;
-		knockedBack = true;
 
 		setHealth(health - damageAmount);
+	}
 
+	@Override
+	public void applyKnockback(GameObject attacker, float velX, float velY) {
+		if (knockedBack)
+			return;
+		
+		knockedBack = true;
+		
 		int xDiff = (int) (x - attacker.getX());
 		// Attacker is to the left
 		if (xDiff < 0)
-			velX = -knockbackHorizontalSpeed;
+			this.velX = -velX;
 		// Attacker is to the right
 		else
-			velX = knockbackHorizontalSpeed;
-		velY = knockbackVerticalSpeed;
+			this.velX = velX;
+		
+		this.velY = velY;
 	}
 
 	private void handleCollision() {
-		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
+		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		for (int i = midLayer.size() - 1; i >= 0; i--) {
+			GameObject other = midLayer.get(i);
+			if (other.equals(this))
+				continue;
+			
 			// Collision with Blocks
 			if (other.getObjectId().getCategory() == Category.Block)
 				checkBlockCollision(other);
@@ -184,9 +214,20 @@ public class Player extends Creature {
 				checkDiagonalBlockCollision(other);
 
 			// Attack collision with enemies
-			if (other.getObjectId().getCategory() == Category.Enemy) 
-				if (attacking && getGroundAttackBounds().intersects(other.getBounds()))
-					((Creature) other).takeDamage(this, damage);
+			if (other.getObjectId().getCategory() == Category.Enemy) { 
+				if (getGroundAttackBounds().intersects(other.getBounds())) {
+					Creature otherCreature = (Creature) other;
+					if (attacking) {
+						otherCreature.takeDamage(damage);
+						otherCreature.applyKnockback(this, 3, -4);
+					}
+					else if (usingFirstAbility) {
+						otherCreature.takeDamage((int) (damage * 0.5f));
+						otherCreature.applyKnockback(this, 1, -6);
+					}
+				}
+				
+			}
 		}
 	}
 
@@ -320,7 +361,7 @@ public class Player extends Creature {
 		// Looking right
 		if (direction == 1) {
 			// Attacking
-			if (attacking)
+			if (attacking || usingFirstAbility)
 				attackAnimation[0].runAnimation();
 			// Not moving
 			else if (velX == 0)
@@ -332,7 +373,7 @@ public class Player extends Creature {
 		// Looking left
 		else if (direction == -1) {
 			// Attacking
-			if (attacking)
+			if (attacking || usingFirstAbility)
 				attackAnimation[1].runAnimation();
 			// Not moving
 			else if (velX == 0)
@@ -347,7 +388,7 @@ public class Player extends Creature {
 		// Looking right
 		if (direction == 1) {
 			// Attacking
-			if (attacking)
+			if (attacking || usingFirstAbility)
 				attackAnimation[0].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Jumping
 			else if (jumping) {
@@ -368,7 +409,7 @@ public class Player extends Creature {
 		// Looking left
 		else if (direction == -1) {
 			// Attacking
-			if (attacking)
+			if (attacking || usingFirstAbility)
 				attackAnimation[1].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Jumping
 			else if (jumping) {

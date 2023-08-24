@@ -20,7 +20,7 @@ public interface GameConstants {
 	}
 	
 	public static class CreatureConstants {
-		public static final float GRAVITY = 0.3f;
+		public static final float GRAVITY = 0.2f;
 		public static final int TERMINAL_VELOCITY = 15;		
 	}	
 	

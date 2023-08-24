@@ -7,12 +7,12 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-import framework.GameObject;
+import abstract_objects.Creature;
+import abstract_objects.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.TextureLoader;
-import object_templates.Creature;
 import window.Animation;
 
 public class BasicEnemy extends Creature {
@@ -141,30 +141,40 @@ public class BasicEnemy extends Creature {
 			}
 			
 			// Damage the player
-			if (attacking)
-				player.takeDamage(this, damage);
+			if (attacking) {
+				player.takeDamage(damage);
+				player.applyKnockback(this, 4, -5);
+			}
 		}
 	}
 
 	@Override
-	public void takeDamage(GameObject attacker, int damageAmount) {
+	public void takeDamage(int damageAmount) {
 		if (invulnerable)
 			return;
 		
 		lastInvulnerableTimer = System.currentTimeMillis();
 		invulnerable = true;
-		knockedBack = true;
 		
 		setHealth(health - damageAmount);
+		
+		if (health <= 0)
+			objectHandler.removeObject(this);
+	}
+	
+	@Override
+	public void applyKnockback(GameObject attacker, float velX, float velY) {
+		knockedBack = true;
 		
 		int xDiff = (int) (x - attacker.getX());
 		// Attacker is to the left
 		if (xDiff < 0)
-			velX = -knockbackHorizontalSpeed;
+			this.velX = -velX;
 		// Attacker is to the right
 		else
-			velX = knockbackHorizontalSpeed;
-		velY = knockbackVerticalSpeed;
+			this.velX = velX;
+		
+		this.velY = velY;
 	}
 	
 	private Rectangle getHorizontalBounds() {

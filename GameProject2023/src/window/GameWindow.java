@@ -3,6 +3,7 @@ package window;
 import javax.swing.JFrame;
 
 import framework.GameConstants;
+import main.Game;
 
 public class GameWindow extends JFrame {
 

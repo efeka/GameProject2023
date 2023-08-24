@@ -1,4 +1,4 @@
-package window;
+package main;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -6,6 +6,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
 import framework.ObjectHandler;
+import window.GameWindow;
+import window.KeyInput;
+import window.MouseInput;
 
 @SuppressWarnings("serial")
 public class Game extends Canvas implements Runnable {

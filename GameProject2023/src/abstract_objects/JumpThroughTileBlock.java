@@ -1,10 +1,9 @@
-package object_templates;
+package abstract_objects;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.image.BufferedImage;
 
-import framework.GameObject;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.ObjectId.Category;

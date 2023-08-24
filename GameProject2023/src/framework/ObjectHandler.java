@@ -7,6 +7,8 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import abstract_objects.GameObject;
+import abstract_objects.TileOrientation;
 import framework.ObjectId.Name;
 import game_objects.BasicEnemy;
 import game_objects.DiagonalStoneTileBlock;
@@ -15,7 +17,6 @@ import game_objects.Player;
 import game_objects.RockTileBlock;
 import game_objects.StoneTileBlock;
 import game_objects.WoodJumpThroughTileBlock;
-import object_templates.TileOrientation;
 import window.HUD;
 import window.KeyInput;
 import window.MouseInput;
@@ -79,14 +80,14 @@ public class ObjectHandler {
 	 * This should be called in every frame of the game loop.
 	 */
 	public void updateObjects() {
-		for (GameObject go : middleLayer)
-			go.tick();
-		for (GameObject go : bottomLayer)
-			go.tick();
-		for (GameObject go : topLayer)
-			go.tick();
-		for (GameObject go : menuLayer)
-			go.tick();
+		for (int i = middleLayer.size() - 1; i >= 0; i--) 
+			middleLayer.get(i).tick();
+		for (int i = bottomLayer.size() - 1; i >= 0; i--) 
+			bottomLayer.get(i).tick();
+		for (int i = topLayer.size() - 1; i >= 0; i--) 
+			topLayer.get(i).tick();
+		for (int i = menuLayer.size() - 1; i >= 0; i--) 
+			menuLayer.get(i).tick();
 	}
 
 	/**
@@ -95,14 +96,14 @@ public class ObjectHandler {
 	 * @param g graphics object to use for rendering
 	 */
 	public void renderObjects(Graphics g) {
-		for (GameObject go : bottomLayer)
-			go.render(g);
-		for (GameObject go : middleLayer)
-			go.render(g);
-		for (GameObject go : topLayer)
-			go.render(g);
-		for (GameObject go : menuLayer)
-			go.render(g);
+		for (int i = bottomLayer.size() - 1; i >= 0; i--) 
+			bottomLayer.get(i).render(g);
+		for (int i = middleLayer.size() - 1; i >= 0; i--) 
+			middleLayer.get(i).render(g);
+		for (int i = topLayer.size() - 1; i >= 0; i--) 
+			topLayer.get(i).render(g);
+		for (int i = menuLayer.size() - 1; i >= 0; i--) 
+			menuLayer.get(i).render(g);
 	}
 
 	public void addObject(GameObject object, int layer) {

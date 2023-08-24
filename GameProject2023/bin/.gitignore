@@ -1,2 +1,7 @@
-/window/
 /game_objects/
+/object_templates/
+/framework/
+/window/
+/abstract_objects/
+/level_designer/
+/main/
