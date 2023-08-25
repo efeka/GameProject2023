@@ -91,23 +91,24 @@ public class Player extends Creature {
 
 		// Debug
 		if (keyInput.debugPressed) {
+			int consoleX = 180, consoleY = 10;
 			g.setFont(new Font("Calibri", Font.PLAIN, 15));
 			g.setColor(new Color(0, 0, 0, 150));
-			g.fillRect(10, 40, 170, 155);
+			g.fillRect(consoleX - 5, consoleY, 170, 155);
 			
 			g.setColor(new Color(220, 80, 80));
-			g.drawString("Health......................" + (int) health, 20, 60);
+			g.drawString("Health......................" + (int) health, consoleX, consoleY += 20);
 			g.setColor(new Color(80, 220, 80));
-			g.drawString("Stamina...................." + (int) stamina, 20, 80);
+			g.drawString("Stamina...................." + (int) stamina, consoleX, consoleY += 20);
 			
 			g.setColor(Color.CYAN);
-			g.drawString("velX: " + velX, 20, 100);
-			g.drawString("velY: " + velY, 20, 120);
+			g.drawString("velX: " + velX, consoleX, consoleY += 20);
+			g.drawString("velY: " + velY, consoleX, consoleY += 20);
 			
 			g.setColor(Color.white);
-			g.drawString("Attacking................." + attacking, 20, 140);
-			g.drawString("Invulnerable............" + invulnerable, 20, 160);
-			g.drawString("Knocked back.........." + knockedBack, 20, 180);
+			g.drawString("Attacking................." + attacking, consoleX, consoleY += 20);
+			g.drawString("Invulnerable............" + invulnerable, consoleX, consoleY += 20);
+			g.drawString("Knocked back.........." + knockedBack, consoleX, consoleY += 20);
 
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setColor(Color.white);
@@ -348,93 +349,58 @@ public class Player extends Creature {
 	}
 
 	private void runAnimations() {
-		// Looking right
-		if (direction == 1) {
-			if (weapon.getAbility(0).isAbilityBeingUsed())
-				weapon.getAbility(0).getAnimation(0).runAnimation();
-			else if (weapon.getAbility(1).isAbilityBeingUsed())
-				weapon.getAbility(1).getAnimation(0).runAnimation();
-			// Attacking
-			else if (attacking)
-				attackAnimation[0].runAnimation();
-			// Not moving
-			else if (velX == 0)
-				idleAnimation[0].runAnimation();
-			// Moving right
-			else
-				runAnimation[0].runAnimation();
-		}
-		// Looking left
-		else if (direction == -1) {
-			if (weapon.getAbility(0).isAbilityBeingUsed())
-				weapon.getAbility(0).getAnimation(1).runAnimation();
-			else if (weapon.getAbility(1).isAbilityBeingUsed())
-				weapon.getAbility(1).getAnimation(1).runAnimation();
-			// Attacking
-			else if (attacking)
-				attackAnimation[1].runAnimation();
-			// Not moving
-			else if (velX == 0)
-				idleAnimation[1].runAnimation();
-			// Moving left
-			else
-				runAnimation[1].runAnimation();
-		}
+		// Maps the player's direction to array indices 
+		// to avoid writing duplicate code for different directions 
+		int directionToIndex = (-direction + 1) / 2;
+
+		// Using first ability
+		if (weapon.getAbility(0).isAbilityBeingUsed())
+			weapon.getAbility(0).getAnimation(directionToIndex).runAnimation();
+		// Using second ability
+		else if (weapon.getAbility(1).isAbilityBeingUsed())
+			weapon.getAbility(1).getAnimation(directionToIndex).runAnimation();
+		// Attacking
+		else if (attacking)
+			attackAnimation[directionToIndex].runAnimation();
+		// Idle
+		else if (velX == 0)
+			idleAnimation[directionToIndex].runAnimation();
+		// Running
+		else if (velX != 0)
+			runAnimation[directionToIndex].runAnimation();
 	}
 
 	private void drawAnimations(Graphics g) {
-		// Looking right
-		if (direction == 1) {
-			if (weapon.getAbility(0).isAbilityBeingUsed())
-				weapon.getAbility(0).getAnimation(0).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			else if (weapon.getAbility(1).isAbilityBeingUsed())
-				weapon.getAbility(1).getAnimation(0).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			// Attacking
-			else if (attacking)
-				attackAnimation[0].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			// Jumping
-			else if (jumping) {
-				// Going up / reached peak
-				if (velY <= 0)
-					g.drawImage(jumpingSprites[0], (int) x, (int) y, width, height, null);
-				// Going down
-				else if (velY > 0)
-					g.drawImage(jumpingSprites[1], (int) x, (int) y, width, height, null);
-			}
-			// Not moving
-			else if (velX == 0)
-				idleAnimation[0].drawAnimation(g, (int) x, (int) y, width, height);
-			// Moving right
-			else
-				runAnimation[0].drawAnimation(g, (int) x, (int) y, width, height);
+		// Maps the player's direction to array indices
+		// to avoid writing duplicate code for different directions
+		int directionToIndex = (-direction + 1) / 2;
+
+		// Using first ability
+		if (weapon.getAbility(0).isAbilityBeingUsed())
+			weapon.getAbility(0).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		// Using second ability
+		else if (weapon.getAbility(1).isAbilityBeingUsed())
+			weapon.getAbility(1).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		// Attacking
+		else if (attacking)
+			attackAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		// Jumping
+		else if (jumping) {
+			// Going up
+			if (velY <= 0)
+				g.drawImage(jumpingSprites[0 + directionToIndex * 2], (int) x, (int) y, width, height, null);
+			// Going down
+			else if (velY > 0)
+				g.drawImage(jumpingSprites[1 + directionToIndex * 2], (int) x, (int) y, width, height, null);	
 		}
-		// Looking left
-		else if (direction == -1) {
-			if (weapon.getAbility(0).isAbilityBeingUsed())
-				weapon.getAbility(0).getAnimation(1).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			else if (weapon.getAbility(1).isAbilityBeingUsed())
-				weapon.getAbility(1).getAnimation(1).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			// Attacking
-			else if (attacking)
-				attackAnimation[1].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			// Jumping
-			else if (jumping) {
-				// Going up / reached peak
-				if (velY <= 0)
-					g.drawImage(jumpingSprites[2], (int) x, (int) y, width, height, null);
-				// Going down
-				else if (velY > 0)
-					g.drawImage(jumpingSprites[3], (int) x, (int) y, width, height, null);
-			}
-			// Not moving
-			else if (velX == 0)
-				idleAnimation[1].drawAnimation(g, (int) x, (int) y, width, height);
-			// Moving left
-			else
-				runAnimation[1].drawAnimation(g, (int) x, (int) y, width, height);
-		}
+		// Idle
+		else if (velX == 0)
+			idleAnimation[directionToIndex].drawAnimation(g, (int) x, (int) y, width, height);
+		// Running
+		else if (velX != 0)
+			runAnimation[directionToIndex].drawAnimation(g, (int) x, (int) y, width, height);
 	}
-	
+
 	public Weapon getWeapon() {
 		return weapon;
 	}
