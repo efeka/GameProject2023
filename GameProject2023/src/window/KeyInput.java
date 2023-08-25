@@ -13,6 +13,7 @@ public class KeyInput extends KeyAdapter {
 	private boolean crouchKeyPressed = false;
 	// Player ability keys
 	private boolean firstAbilityKeyPressed = false;
+	private boolean secondAbilityKeyPressed = false;
 	// Menu navigation keys
 	private boolean navigateUpKeyPressed = false;
 	private boolean navigateDownKeyPressed = false;
@@ -48,6 +49,9 @@ public class KeyInput extends KeyAdapter {
 			break;
 		case KeyEvent.VK_Q:
 			firstAbilityKeyPressed = true;
+			break;
+		case KeyEvent.VK_E:
+			secondAbilityKeyPressed = true;
 			break;
 		// Debug
 		case KeyEvent.VK_ESCAPE:
@@ -89,6 +93,9 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_Q:
 			firstAbilityKeyPressed = false;
 			break;
+		case KeyEvent.VK_E:
+			secondAbilityKeyPressed = false;
+			break;
 		// Debug
 		case KeyEvent.VK_CONTROL:
 			ctrlPressed = false;
@@ -129,5 +136,9 @@ public class KeyInput extends KeyAdapter {
 	
 	public boolean isFirstAbilityKeyPressed() {
 		return firstAbilityKeyPressed;
+	}
+	
+	public boolean isSecondAbilityKeyPressed() {
+		return secondAbilityKeyPressed;
 	}
 }

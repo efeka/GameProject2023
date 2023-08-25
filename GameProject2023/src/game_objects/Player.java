@@ -4,6 +4,7 @@ import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -18,6 +19,8 @@ import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
+import player_weapons.Sword;
+import player_weapons.Weapon;
 import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
@@ -26,32 +29,32 @@ public class Player extends Creature {
 
 	private ObjectHandler objectHandler;
 	private KeyInput keyInput;
-	MouseInput mouseInput;
+	private MouseInput mouseInput;
+	
+	private Weapon weapon;
 
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = -8.5f;
 
 	private int invulnerableDuration = 500;
-	private long lastInvulnerableTimer = invulnerableDuration; 
-
+	private long lastInvulnerableTimer = -invulnerableDuration; 
+	private int attackCooldown = 500;
+	private long lastAttackTimer = -attackCooldown;
+	
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
 	private Animation[] attackAnimation;
 	private BufferedImage[] jumpingSprites;
-
-	private int firstAbilityCooldown = 500;
-	private long lastFirstAbilityTimer = firstAbilityCooldown;
-	private boolean usingFirstAbility = false;
-	
-	private int attackCooldown = 500;
-	private long lastAttackTimer = attackCooldown;
 
 	public Player(int x, int y, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 		this.mouseInput = mouseInput;
-
+		objectHandler.setPlayer(this);
+		
+		weapon = new Sword(objectHandler);
+		
 		texture = TextureLoader.getInstance().playerRunIdleSprites[0];
 		setupAnimations();
 	}
@@ -75,6 +78,8 @@ public class Player extends Creature {
 
 		handleMovement();
 		handleAttacking();
+		if (!attacking)
+			handleAbilities();
 		handleCollision();
 
 		runAnimations();
@@ -86,22 +91,23 @@ public class Player extends Creature {
 
 		// Debug
 		if (keyInput.debugPressed) {
+			g.setFont(new Font("Calibri", Font.PLAIN, 15));
 			g.setColor(new Color(0, 0, 0, 150));
 			g.fillRect(10, 40, 170, 155);
 			
 			g.setColor(new Color(220, 80, 80));
-			g.drawString("Health..........................." + health, 20, 60);
+			g.drawString("Health......................" + (int) health, 20, 60);
 			g.setColor(new Color(80, 220, 80));
-			g.drawString("Stamina........................." + stamina, 20, 80);
+			g.drawString("Stamina...................." + (int) stamina, 20, 80);
 			
 			g.setColor(Color.CYAN);
 			g.drawString("velX: " + velX, 20, 100);
 			g.drawString("velY: " + velY, 20, 120);
 			
 			g.setColor(Color.white);
-			g.drawString("Attacking........................" + attacking, 20, 140);
-			g.drawString("Invulnerable...................." + invulnerable, 20, 160);
-			g.drawString("Knocked back................" + knockedBack, 20, 180);
+			g.drawString("Attacking................." + attacking, 20, 140);
+			g.drawString("Invulnerable............" + invulnerable, 20, 160);
+			g.drawString("Knocked back.........." + knockedBack, 20, 180);
 
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setColor(Color.white);
@@ -146,10 +152,10 @@ public class Player extends Creature {
 			jumping = true;
 		}
 	}
-
+	
 	private void handleAttacking() {
-		if ((attacking || usingFirstAbility) && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce())) {
-			attacking = usingFirstAbility = false;
+		if (attacking && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce())) {
+			attacking = false;
 			
 			attackAnimation[0].resetAnimation();
 			attackAnimation[1].resetAnimation();
@@ -161,16 +167,15 @@ public class Player extends Creature {
 				lastAttackTimer = System.currentTimeMillis();
 			}
 		}
-		
-		// TODO temporary
-		if (keyInput.isFirstAbilityKeyPressed()) {
-			if (System.currentTimeMillis() - lastFirstAbilityTimer >= firstAbilityCooldown) {
-				usingFirstAbility = true;
-				lastFirstAbilityTimer = System.currentTimeMillis();
-			}
-		}
 	}
-
+	
+	private void handleAbilities() {
+		if (keyInput.isFirstAbilityKeyPressed() || weapon.getAbility(0).isAbilityBeingUsed())
+			weapon.useAbility(0);
+		if (keyInput.isSecondAbilityKeyPressed() || weapon.getAbility(1).isAbilityBeingUsed())
+			weapon.useAbility(1);
+	}
+	
 	@Override
 	public void takeDamage(int damageAmount) {
 		if (invulnerable)
@@ -183,20 +188,9 @@ public class Player extends Creature {
 	}
 
 	@Override
-	public void applyKnockback(GameObject attacker, float velX, float velY) {
-		if (knockedBack)
-			return;
-		
+	public void applyKnockback(float velX, float velY) {
 		knockedBack = true;
-		
-		int xDiff = (int) (x - attacker.getX());
-		// Attacker is to the left
-		if (xDiff < 0)
-			this.velX = -velX;
-		// Attacker is to the right
-		else
-			this.velX = velX;
-		
+		this.velX = velX;
 		this.velY = velY;
 	}
 
@@ -219,11 +213,7 @@ public class Player extends Creature {
 					Creature otherCreature = (Creature) other;
 					if (attacking) {
 						otherCreature.takeDamage(damage);
-						otherCreature.applyKnockback(this, 3, -4);
-					}
-					else if (usingFirstAbility) {
-						otherCreature.takeDamage((int) (damage * 0.5f));
-						otherCreature.applyKnockback(this, 1, -6);
+						otherCreature.applyKnockback(3 * direction, -4);
 					}
 				}
 				
@@ -360,8 +350,12 @@ public class Player extends Creature {
 	private void runAnimations() {
 		// Looking right
 		if (direction == 1) {
+			if (weapon.getAbility(0).isAbilityBeingUsed())
+				weapon.getAbility(0).getAnimation(0).runAnimation();
+			else if (weapon.getAbility(1).isAbilityBeingUsed())
+				weapon.getAbility(1).getAnimation(0).runAnimation();
 			// Attacking
-			if (attacking || usingFirstAbility)
+			else if (attacking)
 				attackAnimation[0].runAnimation();
 			// Not moving
 			else if (velX == 0)
@@ -372,8 +366,12 @@ public class Player extends Creature {
 		}
 		// Looking left
 		else if (direction == -1) {
+			if (weapon.getAbility(0).isAbilityBeingUsed())
+				weapon.getAbility(0).getAnimation(1).runAnimation();
+			else if (weapon.getAbility(1).isAbilityBeingUsed())
+				weapon.getAbility(1).getAnimation(1).runAnimation();
 			// Attacking
-			if (attacking || usingFirstAbility)
+			else if (attacking)
 				attackAnimation[1].runAnimation();
 			// Not moving
 			else if (velX == 0)
@@ -387,8 +385,12 @@ public class Player extends Creature {
 	private void drawAnimations(Graphics g) {
 		// Looking right
 		if (direction == 1) {
+			if (weapon.getAbility(0).isAbilityBeingUsed())
+				weapon.getAbility(0).getAnimation(0).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+			else if (weapon.getAbility(1).isAbilityBeingUsed())
+				weapon.getAbility(1).getAnimation(0).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Attacking
-			if (attacking || usingFirstAbility)
+			else if (attacking)
 				attackAnimation[0].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Jumping
 			else if (jumping) {
@@ -408,8 +410,12 @@ public class Player extends Creature {
 		}
 		// Looking left
 		else if (direction == -1) {
+			if (weapon.getAbility(0).isAbilityBeingUsed())
+				weapon.getAbility(0).getAnimation(1).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+			else if (weapon.getAbility(1).isAbilityBeingUsed())
+				weapon.getAbility(1).getAnimation(1).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Attacking
-			if (attacking || usingFirstAbility)
+			else if (attacking)
 				attackAnimation[1].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 			// Jumping
 			else if (jumping) {
@@ -427,6 +433,14 @@ public class Player extends Creature {
 			else
 				runAnimation[1].drawAnimation(g, (int) x, (int) y, width, height);
 		}
+	}
+	
+	public Weapon getWeapon() {
+		return weapon;
+	}
+	
+	public void setWeapon(Weapon weapon) {
+		this.weapon = weapon;
 	}
 
 }

@@ -34,7 +34,7 @@ public class ObjectId {
 	public enum Name {
 		Player(1),
 		BasicEnemy(2),
-		
+
 		HUD(500),
 
 		// Tile blocks

@@ -42,7 +42,7 @@ public abstract class Creature extends GameObject {
 	}
 	
 	public abstract void takeDamage(int damageAmount);
-	public abstract void applyKnockback(GameObject attacker, float velX, float velY);
+	public abstract void applyKnockback(float velX, float velY);
 	
 	public int getMaxHealth() {
 		return maxHealth;
@@ -76,6 +76,78 @@ public abstract class Creature extends GameObject {
 		this.stamina = clamp(0f, stamina, maxStamina);
 	}
 	
+	public boolean isFalling() {
+		return falling;
+	}
+
+	public void setFalling(boolean falling) {
+		this.falling = falling;
+	}
+
+	public boolean isJumping() {
+		return jumping;
+	}
+
+	public void setJumping(boolean jumping) {
+		this.jumping = jumping;
+	}
+
+	public boolean isAttacking() {
+		return attacking;
+	}
+
+	public void setAttacking(boolean attacking) {
+		this.attacking = attacking;
+	}
+
+	public boolean isKnockedBack() {
+		return knockedBack;
+	}
+
+	public void setKnockedBack(boolean knockedBack) {
+		this.knockedBack = knockedBack;
+	}
+
+	public boolean isInvulnerable() {
+		return invulnerable;
+	}
+
+	public void setInvulnerable(boolean invulnerable) {
+		this.invulnerable = invulnerable;
+	}
+
+	public int getDirection() {
+		return direction;
+	}
+
+	public void setDirection(int direction) {
+		this.direction = direction;
+	}
+
+	public float getVelX() {
+		return velX;
+	}
+
+	public void setVelX(float velX) {
+		this.velX = velX;
+	}
+
+	public float getVelY() {
+		return velY;
+	}
+
+	public void setVelY(float velY) {
+		this.velY = velY;
+	}
+
+	public float getStaminaRegen() {
+		return staminaRegen;
+	}
+
+	public void setStaminaRegen(float staminaRegen) {
+		this.staminaRegen = staminaRegen;
+	}
+
 	private float clamp(float min, float num, float max) {
 		if (num < min)
 			num = min;

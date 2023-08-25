@@ -151,11 +151,11 @@ public class ObjectHandler {
 	
 	public GameObject createObjectByName(Name objectName, int x, int y) {
 		GameObject gameObject = null;
-
+		
 		switch (objectName) {
 		case Player:
-			gameObject = new Player(x, y, this, keyInput, mouseInput);
-			player = (Player) gameObject;
+			player = new Player(x, y, this, keyInput, mouseInput);
+			gameObject = player;
 			break;
 		case BasicEnemy:
 			gameObject = new BasicEnemy(x, y, this);
@@ -311,6 +311,10 @@ public class ObjectHandler {
 	
 	public Player getPlayer() {
 		return player;
+	}
+	
+	public void setPlayer(Player player) {
+		this.player = player;
 	}
 	
 }

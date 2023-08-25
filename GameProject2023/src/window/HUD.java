@@ -1,6 +1,8 @@
 package window;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 
 import abstract_objects.GameObject;
@@ -8,6 +10,7 @@ import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.Player;
+import player_weapons.Weapon;
 
 public class HUD extends GameObject {
 
@@ -59,6 +62,37 @@ public class HUD extends GameObject {
 		g.setColor(Color.BLACK);
 		g.drawRect((int) x, (int) y, (int) (player.getMaxHealth() * healthWidthUnit), healthHeight);
 		g.drawRect((int) x, (int) y + healthHeight, (int) (player.getMaxStamina() * staminaWidthUnit), staminaHeight);
+	
+		// Ability cooldowns
+		int ovalSize = 40;
+		g.setColor(Color.WHITE);
+		g.drawOval((int) x, 50, ovalSize, ovalSize);
+		Font font = new Font("Calibri", Font.BOLD, 18);
+		FontMetrics metrics = g.getFontMetrics(font);
+		int strX = (int) x + (ovalSize - metrics.stringWidth("Q")) / 2;
+		int strY = 53 + ((ovalSize - metrics.getHeight()) / 2) + metrics.getAscent();
+		g.setFont(font);
+		g.drawString("Q", strX, strY);
+		
+		Weapon weapon = player.getWeapon();
+		int timeLeft = weapon.getAbility(0).timeLeftUntilReady();
+		int maxTime = weapon.getAbility(0).getCooldown();
+		if (timeLeft > 0) {
+			g.setColor(new Color(255, 255, 255, 80));
+			float cooldownRatio = (float) timeLeft / maxTime;
+			g.fillArc((int) x, 50, ovalSize, ovalSize, 90, (int) (-360 * cooldownRatio));
+		}
+		strX += 60;
+		g.setColor(Color.WHITE);
+		g.drawOval((int) x + 58, 50, ovalSize, ovalSize);
+		g.drawString("E", strX, strY);
+		timeLeft = weapon.getAbility(1).timeLeftUntilReady();
+		maxTime = weapon.getAbility(1).getCooldown();
+		if (timeLeft > 0) {
+			g.setColor(new Color(255, 255, 255, 80));
+			float cooldownRatio = (float) timeLeft / maxTime;
+			g.fillArc((int) x + 60, 50, ovalSize, ovalSize, 90, (int) (-360 * cooldownRatio));
+		}
 	}
 
 }

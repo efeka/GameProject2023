@@ -143,7 +143,7 @@ public class BasicEnemy extends Creature {
 			// Damage the player
 			if (attacking) {
 				player.takeDamage(damage);
-				player.applyKnockback(this, 4, -5);
+				player.applyKnockback(4 * direction, -5);
 			}
 		}
 	}
@@ -163,17 +163,9 @@ public class BasicEnemy extends Creature {
 	}
 	
 	@Override
-	public void applyKnockback(GameObject attacker, float velX, float velY) {
+	public void applyKnockback(float velX, float velY) {
 		knockedBack = true;
-		
-		int xDiff = (int) (x - attacker.getX());
-		// Attacker is to the left
-		if (xDiff < 0)
-			this.velX = -velX;
-		// Attacker is to the right
-		else
-			this.velX = velX;
-		
+		this.velX = velX;
 		this.velY = velY;
 	}
 	

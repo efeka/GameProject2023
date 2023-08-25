@@ -15,6 +15,7 @@ public class TextureLoader {
 	
 	public BufferedImage[] playerRunIdleSprites;
 	public BufferedImage[] playerAttackSprites;
+	public BufferedImage[] playerSwordStabSprites;
 	public BufferedImage[] playerJumpSprites;
 	
 	public BufferedImage[] basicEnemyRunIdleSprites;
@@ -76,11 +77,17 @@ public class TextureLoader {
 			playerRunIdleSprites[i] = playerSheet.getSubimage(265 + (i - 28) * 33, 100, 32, 32);
 		
 		playerAttackSprites = new BufferedImage[12];
-		for (int i = 0; i < 6; i++) 
+		for (int i = 0; i < 6; i++) {
 			playerAttackSprites[i] = playerSheet.getSubimage(1 + i * 65, 133, 64, 64);
-		for (int i = 6; i < 12; i++)
-			playerAttackSprites[i] = playerSheet.getSubimage(1 + (i - 6) * 65, 198, 64, 64);
-			
+			playerAttackSprites[i + 6] = playerSheet.getSubimage(1 + i * 65, 198, 64, 64);			
+		}
+
+		playerSwordStabSprites = new BufferedImage[14];
+		for (int i = 0; i < 7; i++) {
+			playerSwordStabSprites[i] = playerSheet.getSubimage(1 + i * 65, 263, 64, 64);
+			playerSwordStabSprites[i + 7] = playerSheet.getSubimage(1 + i * 65, 328, 64, 64);
+		}
+		
 		playerJumpSprites = new BufferedImage[4];
 		for (int i = 0; i < 2; i++)
 			playerJumpSprites[i] = playerSheet.getSubimage(529 + i * 33, 67, 32, 32);
