@@ -1,7 +1,5 @@
 package framework;
 
-import abstract_objects.TileOrientation;
-
 public class ObjectId {
 	
 	/**

@@ -2,14 +2,14 @@ package player_weapons;
 
 import window.Animation;
 
-public class PlayerAbility {
+public class WeaponAbility {
 
 	private int cooldown;
 	private long lastUsedTimer;
 	
 	private Animation[] animation;
 	
-	public PlayerAbility(int cooldownMillis, Animation[] animation) {
+	public WeaponAbility(int cooldownMillis, Animation[] animation) {
 		cooldown = cooldownMillis;
 		lastUsedTimer = -cooldownMillis;
 		this.animation = animation;
