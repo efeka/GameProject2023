@@ -10,15 +10,16 @@ import abstract_objects.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
+import game_objects.DamagePopup;
 import window.Animation;
 
-public class Sword extends Weapon {
+public class Fisticuffs extends Weapon {
 
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
 	private Animation[] attackAnimation;
 
-	public Sword(ObjectHandler objectHandler) {
+	public Fisticuffs(ObjectHandler objectHandler) {
 		super(objectHandler);
 		setupAnimations();
 		setupAbilities();
@@ -29,19 +30,17 @@ public class Sword extends Weapon {
 		abilities = new WeaponAbility[2];
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
-		// Regular attack
-		int attackDelay = 4;
-		BufferedImage[] swordAttackSprites = textureLoader.playerSwordAttackSprites;
-		Animation attackRightAnim = new Animation(Arrays.copyOfRange(swordAttackSprites, 0, swordAttackSprites.length / 2), attackDelay, true); 
-		Animation attackLeftAnim = new Animation(Arrays.copyOfRange(swordAttackSprites, swordAttackSprites.length / 2, swordAttackSprites.length), attackDelay, true);
-		abilities[0] = new WeaponAbility(500, new Animation[] {attackRightAnim, attackLeftAnim});
-
-		// Sword stab
-		int stabDelay = 6;
-		BufferedImage[] swordStabSprites = textureLoader.playerSwordStabSprites;
-		Animation stabRightAnim = new Animation(Arrays.copyOfRange(swordStabSprites, 0, swordStabSprites.length / 2), stabDelay, true);
-		Animation stabLeftAnim = new Animation(Arrays.copyOfRange(swordStabSprites, swordStabSprites.length / 2, swordStabSprites.length), stabDelay, true);
-		abilities[1] = new WeaponAbility(1500, new Animation[] {stabRightAnim, stabLeftAnim});
+		int attackDelay = 6;
+		BufferedImage[] punchSprites = textureLoader.playerAttackSprites;
+		Animation attackRightAnim = new Animation(Arrays.copyOfRange(punchSprites, 0, punchSprites.length / 2), attackDelay, true); 
+		Animation attackLeftAnim = new Animation(Arrays.copyOfRange(punchSprites, punchSprites.length / 2, punchSprites.length), attackDelay, true);
+		abilities[0] = new WeaponAbility(500, 15, new Animation[] {attackRightAnim, attackLeftAnim});
+		
+		int uppercutDelay = 5;
+		BufferedImage[] uppercutSprites = textureLoader.playerSwordAttackSprites;
+		Animation uppercutRightAnim = new Animation(Arrays.copyOfRange(uppercutSprites, 0, uppercutSprites.length / 2), uppercutDelay, true); 
+		Animation uppercutLeftAnim = new Animation(Arrays.copyOfRange(uppercutSprites, uppercutSprites.length / 2, uppercutSprites.length), uppercutDelay, true);
+		abilities[1] = new WeaponAbility(1500, 30, new Animation[] {uppercutRightAnim, uppercutLeftAnim});
 	}
 
 	@Override
@@ -51,8 +50,6 @@ public class Sword extends Weapon {
 
 		WeaponAbility ability = abilities[index];
 		if (!ability.isAbilityBeingUsed()) {
-			// Skips the rest of this method if the ability
-			// is on cooldown and if its animation is done playing.
 			if (ability.isOnCooldown())
 				return;
 			else
@@ -61,41 +58,44 @@ public class Sword extends Weapon {
 
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		switch (index) {
-		
 		case 0:
 			// Attack
 			player.setVelX(0);
+			int currentAnimFrame1 = ability.getAnimation(0).getCurrentFrame();
+			int currentAnimFrame2 = ability.getAnimation(1).getCurrentFrame();
+			if (currentAnimFrame1 != 4 && currentAnimFrame1 != 5 && currentAnimFrame2 != 4 && currentAnimFrame2 != 5)
+				break;
+			
 			for (int i = midLayer.size() - 1; i >= 0; i--) {
 				GameObject other = midLayer.get(i);
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
 					if (getAttackBounds().intersects(other.getBounds())) {
 						Creature otherCreature = (Creature) other;
 						otherCreature.takeDamage(abilities[index].getDamage());
-						float knockbackVelX = 2f * player.getDirection();
+						float knockbackVelX = 3f * player.getDirection();
 						float knockbackVelY = -1f;
 						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
 					}
 				}
 			}
 			break;
-
+			
 		case 1:
-			// Stab
+			// Uppercut
 			player.setVelX(0);
-			int currentAnimFrame1 = ability.getAnimation(0).getCurrentFrame();
-			int currentAnimFrame2 = ability.getAnimation(1).getCurrentFrame();
-			if (currentAnimFrame1 != 4 && currentAnimFrame1 != 5 && currentAnimFrame2 != 4 && currentAnimFrame2 != 5)
-				break;
-
 			for (int i = midLayer.size() - 1; i >= 0; i--) {
 				GameObject other = midLayer.get(i);
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
-					if (getStabBounds().intersects(other.getBounds())) {
+					if (getUppercutBounds().intersects(other.getBounds())) {
 						Creature otherCreature = (Creature) other;
 						otherCreature.takeDamage(abilities[index].getDamage());
-						float knockbackVelX = 5f * player.getDirection();
-						float knockbackVelY = -2f;
+						float knockbackVelX = player.getVelX();
+						float knockbackVelY = -7f;
 						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
+
+						player.setVelX(knockbackVelX);
+						player.setVelY(knockbackVelY);
+						player.setY(player.getY() - 2);
 					}
 				}
 			}
@@ -117,8 +117,8 @@ public class Sword extends Weapon {
 			attackX = (int) x - attackWidth / 2;
 		return new Rectangle(attackX, (int) y, attackWidth, height);
 	}
-
-	private Rectangle getStabBounds() {
+	
+	private Rectangle getUppercutBounds() {
 		int attackX;
 		int attackWidth = (int) (4f * player.getWidth() / 5);
 		int playerX = (int) player.getX();
@@ -131,12 +131,6 @@ public class Sword extends Weapon {
 		else
 			attackX = (int) playerX - attackWidth / 2;
 		return new Rectangle(attackX, playerY, attackWidth, playerHeight);
-	}
-
-	public Animation getAbilityAnimation(int abilityIndex, int animationIndex) {
-		if (!isAbilityIndexValid(abilityIndex))
-			throw new IndexOutOfBoundsException("Index " + abilityIndex + " is invalid for " + getClass());
-		return abilities[abilityIndex].getAnimation(animationIndex);
 	}
 
 	@Override
@@ -154,13 +148,13 @@ public class Sword extends Weapon {
 
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
-		BufferedImage[] idleSprites = textureLoader.playerSwordIdleSprites;
-		BufferedImage[] runSprites = textureLoader.playerSwordRunSprites;
-		BufferedImage[] attackSprites = textureLoader.playerSwordAttackSprites;
+		BufferedImage[] idleSprites = textureLoader.playerIdleSprites;
+		BufferedImage[] runSprites = textureLoader.playerRunSprites;
+		BufferedImage[] attackSprites = textureLoader.playerAttackSprites;
 
 		final int idleDelay = 8;
 		final int runDelay = 8;
-		final int attackDelay = 4;
+		final int attackDelay = 6;
 
 		idleAnimation[0] = new Animation(Arrays.copyOfRange(idleSprites, 0, idleSprites.length / 2), idleDelay, false);
 		idleAnimation[1] = new Animation(Arrays.copyOfRange(idleSprites, idleSprites.length / 2, idleSprites.length), idleDelay, false);

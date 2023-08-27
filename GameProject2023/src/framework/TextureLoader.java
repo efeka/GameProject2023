@@ -54,6 +54,11 @@ public class TextureLoader {
 		return instance;
 	}
 	
+	/* 
+	 * TODO: Textures should not be loaded all at once.
+	 * Because we dont want all textures to be stored in memory at all times.
+	 * Since it is not guaranteed that all textures will be in use at one time.
+	 */
 	private void loadTextures() {
 		missingSprite = blockSheet.getSubimage(222, 1, 16, 16);
 		

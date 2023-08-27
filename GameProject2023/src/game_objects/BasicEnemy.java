@@ -18,7 +18,8 @@ import window.Animation;
 public class BasicEnemy extends Creature {
 
 	private ObjectHandler objectHandler;
-
+	
+	private boolean attacking = false;
 	private boolean startedAttacking = false;
 	private int attackCooldown = 2000;
 	private long lastAttackTimer = attackCooldown;
@@ -157,6 +158,7 @@ public class BasicEnemy extends Creature {
 		invulnerable = true;
 		
 		setHealth(health - damageAmount);
+		objectHandler.addObject(new DamagePopup(x + width / 2, y, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
 		
 		if (health <= 0)
 			objectHandler.removeObject(this);

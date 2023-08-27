@@ -134,6 +134,27 @@ public class ObjectHandler {
 			menuLayer.remove(object);
 	}
 	
+	public void removeObjectFromLayer(GameObject object, int layer) {
+		switch (layer) {
+		case BOTTOM_LAYER:
+			if (bottomLayer.contains(object))
+				bottomLayer.remove(object);
+			break;
+		case MIDDLE_LAYER:
+			if (middleLayer.contains(object))
+				middleLayer.remove(object);
+			break;
+		case TOP_LAYER:
+			if (topLayer.contains(object))
+				topLayer.remove(object);
+			break;
+		case MENU_LAYER:
+			if (menuLayer.contains(object))
+				menuLayer.remove(object);
+			break;
+		}
+	}
+	
 	public ArrayList<GameObject> getLayer(int layer) {
 		switch (layer) {
 		case BOTTOM_LAYER:

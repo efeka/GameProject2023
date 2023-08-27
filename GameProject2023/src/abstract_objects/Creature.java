@@ -8,7 +8,7 @@ public abstract class Creature extends GameObject {
 	protected final float GRAVITY = GameConstants.CreatureConstants.GRAVITY;
 	protected final int TERMINAL_VELOCITY = GameConstants.CreatureConstants.TERMINAL_VELOCITY;
 	
-	protected boolean falling, jumping, attacking, knockedBack, invulnerable;
+	protected boolean falling, jumping, knockedBack, invulnerable;
 	
 	// 1 for right, -1 for left
 	protected int direction = 1;
@@ -29,7 +29,6 @@ public abstract class Creature extends GameObject {
 		
 		falling = true;
 		jumping = false;
-		attacking = false;
 		knockedBack = false;
 		invulnerable = false;
 	}
@@ -90,14 +89,6 @@ public abstract class Creature extends GameObject {
 
 	public void setJumping(boolean jumping) {
 		this.jumping = jumping;
-	}
-
-	public boolean isAttacking() {
-		return attacking;
-	}
-
-	public void setAttacking(boolean attacking) {
-		this.attacking = attacking;
 	}
 
 	public boolean isKnockedBack() {

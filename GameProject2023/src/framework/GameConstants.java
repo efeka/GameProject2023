@@ -1,5 +1,7 @@
 package framework;
 
+import java.awt.Font;
+
 public interface GameConstants {
 
 	public static class ScaleConstants {
@@ -22,6 +24,10 @@ public interface GameConstants {
 	public static class CreatureConstants {
 		public static final float GRAVITY = 0.2f;
 		public static final int TERMINAL_VELOCITY = 15;		
-	}	
+	}
+	
+	public static class FontConstants {
+		public static final Font DAMAGE_FONT = new Font("Calibri", Font.PLAIN, 16);
+	}
 	
 }

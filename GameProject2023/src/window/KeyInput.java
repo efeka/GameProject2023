@@ -22,9 +22,10 @@ public class KeyInput extends KeyAdapter {
 	// Debug
 	private boolean ctrlPressed = false;
 	public boolean debugPressed = false;
+	public boolean[] numberKeyPressed = new boolean[5]; 
 	
 	@Override
-	public void keyPressed(KeyEvent e) {	
+	public void keyPressed(KeyEvent e) {
 		// TODO Load key configurations from a certain source instead of hard coding
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
@@ -63,6 +64,22 @@ public class KeyInput extends KeyAdapter {
 				debugPressed = !debugPressed;
 				ctrlPressed = false;
 			}
+			break;
+		case KeyEvent.VK_1:
+			numberKeyPressed[0] = true;
+			break;
+		case KeyEvent.VK_2:
+			numberKeyPressed[1] = true;
+			break;
+		case KeyEvent.VK_3:
+			numberKeyPressed[2] = true;
+			break;
+		case KeyEvent.VK_4:
+			numberKeyPressed[3] = true;
+			break;
+		case KeyEvent.VK_5:
+			numberKeyPressed[4] = true;
+			break;
 		}
 	}
 	
@@ -99,6 +116,21 @@ public class KeyInput extends KeyAdapter {
 		// Debug
 		case KeyEvent.VK_CONTROL:
 			ctrlPressed = false;
+		case KeyEvent.VK_1:
+			numberKeyPressed[0] = false;
+			break;
+		case KeyEvent.VK_2:
+			numberKeyPressed[1] = false;
+			break;
+		case KeyEvent.VK_3:
+			numberKeyPressed[2] = false;
+			break;
+		case KeyEvent.VK_4:
+			numberKeyPressed[3] = false;
+			break;
+		case KeyEvent.VK_5:
+			numberKeyPressed[4] = false;
+			break;
 		}
 	}
 	

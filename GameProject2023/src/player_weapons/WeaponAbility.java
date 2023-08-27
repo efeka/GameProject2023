@@ -4,6 +4,8 @@ import window.Animation;
 
 public class WeaponAbility {
 
+	private int damage;
+	
 	private int cooldown;
 	private long lastUsedTimer;
 	
@@ -13,6 +15,15 @@ public class WeaponAbility {
 		cooldown = cooldownMillis;
 		lastUsedTimer = -cooldownMillis;
 		this.animation = animation;
+		
+		damage = 0;
+	}
+	
+	public WeaponAbility(int cooldownMillis, int damage, Animation[] animation) {
+		cooldown = cooldownMillis;
+		lastUsedTimer = -cooldownMillis;
+		this.animation = animation;
+		this.damage = damage;
 	}
 	
 	/**
@@ -23,16 +34,23 @@ public class WeaponAbility {
 		return System.currentTimeMillis() - lastUsedTimer < cooldown;
 	}
 	
+	/**
+	 * Returns the animation at the given index.
+	 * @param index the index of the animation
+	 * 		  index = 0 should correspond to an animation that faces right
+	 * 		  index = 1 should correspond to an animation that faces left
+	 * @return the animation at the given index
+	 */
 	public Animation getAnimation(int index) {
 		return animation[index];
 	}
 	
 	public boolean isAbilityBeingUsed() {
-		return !(animation[0].isPlayedOnce() || animation[1].isPlayedOnce());
+		return isOnCooldown() && !animation[0].isPlayedOnce() && !animation[1].isPlayedOnce();
 	}
 	
 	/**
-	 * Resets the animation and the cooldown of the ability.
+	 * Resets the animation and the usage timer of the ability.
 	 */
 	public void startAbility() {
 		if (isOnCooldown())
@@ -48,6 +66,10 @@ public class WeaponAbility {
 	
 	public int getCooldown() {
 		return cooldown;
+	}
+	
+	public int getDamage() {
+		return damage;
 	}
 	
 }
