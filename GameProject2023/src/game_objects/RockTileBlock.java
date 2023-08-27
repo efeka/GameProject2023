@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import abstract_objects.TileBlock;
 import abstract_objects.TileOrientation;
 import framework.ObjectId.Name;
+import framework.TextureLoader.TextureName;
 import framework.TextureLoader;
 
 public class RockTileBlock extends TileBlock {
@@ -13,7 +14,7 @@ public class RockTileBlock extends TileBlock {
 	public RockTileBlock(int x, int y, Name objectName, TileOrientation orientation) {
 		super(x, y, objectName, orientation);
 		
-		BufferedImage[] tileSet = TextureLoader.getInstance().rockSprites;
+		BufferedImage[] tileSet = TextureLoader.getInstance().getTextures(TextureName.RockTiles);
 		texture = getImageByOrientation(tileSet, orientation);
 	}
 

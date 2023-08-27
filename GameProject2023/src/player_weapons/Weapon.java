@@ -36,6 +36,8 @@ public abstract class Weapon {
 	
 	/**
 	 * Use the weapon ability at the given index.
+	 * The functionality of the ability should be implemented here.
+	 * 
 	 * This method should be called constantly until the abilities
 	 * animation is done playing.
 	 * @param index the index of the ability to be used
@@ -44,12 +46,11 @@ public abstract class Weapon {
 	public abstract WeaponAbility getAbility(int index);
 	
 	/**
-	 * The idle, run and attack animations should be initialized inside this method.
+	 * The idle and run animations should be initialized inside this method.
 	 */
 	protected abstract void setupAnimations();
 	public abstract Animation[] getIdleAnimation();
 	public abstract Animation[] getRunAnimation();
-	public abstract Animation[] getAttackAnimation();
 	
 	protected boolean isAbilityIndexValid(int index) {
 		return index >= 0 && index < abilities.length && abilities[index] != null;

@@ -18,6 +18,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import framework.TextureLoader.TextureName;
 import framework.TextureLoader;
 import player_weapons.Sword;
 import player_weapons.Fisticuffs;
@@ -53,8 +54,8 @@ public class Player extends Creature {
 
 		animationHandler = new PlayerAnimationHandler(this);
 
-		jumpSprites = TextureLoader.getInstance().playerJumpSprites;
-		texture = TextureLoader.getInstance().playerIdleSprites[0];
+		jumpSprites = TextureLoader.getInstance().getTextures(TextureName.PlayerJump);
+		texture = TextureLoader.getInstance().getTextures(TextureName.PlayerIdle)[0];
 	}
 
 	@Override
@@ -299,31 +300,25 @@ public class Player extends Creature {
 
 		// Using first ability
 		if (weapon.getAbility(0).isAbilityBeingUsed())
-			weapon.getAbility(0).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2,
-					width * 2, height * 2);
+			weapon.getAbility(0).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		// Using second ability
 		else if (weapon.getAbility(1).isAbilityBeingUsed())
-			weapon.getAbility(1).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2,
-					width * 2, height * 2);
+			weapon.getAbility(1).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		// Jumping
 		else if (jumping) {
 			// Going up
 			if (velY <= 0)
-				g.drawImage(jumpSprites[0 + directionToIndex * 2], (int) x - width / 2, (int) y - height / 2,
-						width * 2, height * 2, null);
+				g.drawImage(jumpSprites[directionToIndex * 2], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
 			// Going down
 			else if (velY > 0)
-				g.drawImage(jumpSprites[1 + directionToIndex * 2], (int) x - width / 2, (int) y - height / 2,
-						width * 2, height * 2, null);	
+				g.drawImage(jumpSprites[directionToIndex * 2 + 1], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);	
 		}
 		// Idle
 		else if (velX == 0)
-			animationHandler.getIdleAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2,
-					width * 2, height * 2);
+			animationHandler.getIdleAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		// Running
 		else if (velX != 0)
-			animationHandler.getRunAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2,
-					width * 2, height * 2);
+			animationHandler.getRunAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 	}
 
 	public Weapon getWeapon() {

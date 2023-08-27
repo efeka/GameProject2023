@@ -8,6 +8,7 @@ import framework.ObjectId;
 import framework.TextureLoader;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import framework.TextureLoader.TextureName;
 
 public abstract class JumpThroughTileBlock extends GameObject {
 
@@ -29,7 +30,7 @@ public abstract class JumpThroughTileBlock extends GameObject {
 			texture = tileSet[2];
 			break;
 		default:
-			texture = TextureLoader.getInstance().missingSprite;
+			texture = TextureLoader.getInstance().getTextures(TextureName.Missing)[0];
 			break;
 		}
 		return texture;

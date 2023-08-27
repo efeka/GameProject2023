@@ -7,7 +7,7 @@ import abstract_objects.GameObject;
 import framework.GameConstants;
 import framework.ObjectHandler;
 
-public class DamagePopup extends GameObject {
+public class DamageNumberPopup extends GameObject {
 
 	private ObjectHandler objectHandler;
 	private String text;
@@ -16,7 +16,7 @@ public class DamagePopup extends GameObject {
 	private int colorAlpha = 255; 
 	private float alphaReductionRate;
 	
-	public DamagePopup(float x, float y, int damage, ObjectHandler objectHandler) {
+	public DamageNumberPopup(float x, float y, int damage, ObjectHandler objectHandler) {
 		super(x, y, 0, 0, null);
 		this.objectHandler = objectHandler;
 

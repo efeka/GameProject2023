@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import framework.ObjectId;
 import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 
 /**
  * The GameObject class is the base class for all objects in the game that require frequent updating and rendering.
@@ -49,7 +50,7 @@ public abstract class GameObject {
 	 */
 	public BufferedImage getTexture() {
 		if (texture == null)
-			texture = TextureLoader.getInstance().missingSprite;
+			texture = TextureLoader.getInstance().getTextures(TextureName.Missing)[0];
 		return texture;
 	}
 	

@@ -1,6 +1,5 @@
 package game_objects;
 
-import player_weapons.Weapon;
 import window.Animation;
 
 public class PlayerAnimationHandler {
@@ -17,20 +16,6 @@ public class PlayerAnimationHandler {
 
 	public Animation getRunAnimation() {
 		return player.getWeapon().getRunAnimation()[getIndexFromDirection()];
-	}
-
-	public Animation getAttackAnimation() {
-		return player.getWeapon().getAttackAnimation()[getIndexFromDirection()];
-	}
-	
-	public void resetAttackAnimations() {
-		player.getWeapon().getAttackAnimation()[0].resetAnimation();
-		player.getWeapon().getAttackAnimation()[1].resetAnimation();
-	}
-	
-	public boolean areAttackAnimationsFinished() {
-		Weapon weapon = player.getWeapon();
-		return weapon.getAttackAnimation()[0].isPlayedOnce() || weapon.getAttackAnimation()[1].isPlayedOnce();
 	}
 	
 	/**

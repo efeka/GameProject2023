@@ -6,6 +6,7 @@ import abstract_objects.DiagonalTileBlock;
 import abstract_objects.TileOrientation;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 
 public class DiagonalStoneTileBlock extends DiagonalTileBlock {
 
@@ -14,7 +15,7 @@ public class DiagonalStoneTileBlock extends DiagonalTileBlock {
 		super(x, y, objectName, orientation);
 		
 		TextureLoader textureLoader = TextureLoader.getInstance();
-		texture = getImageByOrientation(textureLoader.diagonalStoneSprites, orientation);
+		texture = getImageByOrientation(textureLoader.getTextures(TextureName.DiagonalStoneTiles), orientation);
 	}
 
 	@Override

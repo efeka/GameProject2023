@@ -1,23 +1,20 @@
 package player_weapons;
 
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import abstract_objects.Creature;
 import abstract_objects.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
-import game_objects.DamagePopup;
+import framework.TextureLoader.TextureName;
 import window.Animation;
 
 public class Fisticuffs extends Weapon {
 
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
-	private Animation[] attackAnimation;
 
 	public Fisticuffs(ObjectHandler objectHandler) {
 		super(objectHandler);
@@ -31,15 +28,17 @@ public class Fisticuffs extends Weapon {
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
 		int attackDelay = 6;
-		BufferedImage[] punchSprites = textureLoader.playerAttackSprites;
-		Animation attackRightAnim = new Animation(Arrays.copyOfRange(punchSprites, 0, punchSprites.length / 2), attackDelay, true); 
-		Animation attackLeftAnim = new Animation(Arrays.copyOfRange(punchSprites, punchSprites.length / 2, punchSprites.length), attackDelay, true);
+		Animation attackRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerAttack, 1),
+				attackDelay, true);
+		Animation attackLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerAttack, -1),
+				attackDelay, true);
 		abilities[0] = new WeaponAbility(500, 15, new Animation[] {attackRightAnim, attackLeftAnim});
 		
 		int uppercutDelay = 5;
-		BufferedImage[] uppercutSprites = textureLoader.playerSwordAttackSprites;
-		Animation uppercutRightAnim = new Animation(Arrays.copyOfRange(uppercutSprites, 0, uppercutSprites.length / 2), uppercutDelay, true); 
-		Animation uppercutLeftAnim = new Animation(Arrays.copyOfRange(uppercutSprites, uppercutSprites.length / 2, uppercutSprites.length), uppercutDelay, true);
+		Animation uppercutRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerUppercut, 1),
+				uppercutDelay, true);
+		Animation uppercutLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerUppercut, -1),
+				uppercutDelay, true);
 		abilities[1] = new WeaponAbility(1500, 30, new Animation[] {uppercutRightAnim, uppercutLeftAnim});
 	}
 
@@ -144,26 +143,20 @@ public class Fisticuffs extends Weapon {
 	protected void setupAnimations() {
 		idleAnimation = new Animation[2];
 		runAnimation = new Animation[2];
-		attackAnimation = new Animation[2];
 
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
-		BufferedImage[] idleSprites = textureLoader.playerIdleSprites;
-		BufferedImage[] runSprites = textureLoader.playerRunSprites;
-		BufferedImage[] attackSprites = textureLoader.playerAttackSprites;
-
 		final int idleDelay = 8;
 		final int runDelay = 8;
-		final int attackDelay = 6;
 
-		idleAnimation[0] = new Animation(Arrays.copyOfRange(idleSprites, 0, idleSprites.length / 2), idleDelay, false);
-		idleAnimation[1] = new Animation(Arrays.copyOfRange(idleSprites, idleSprites.length / 2, idleSprites.length), idleDelay, false);
-
-		runAnimation[0] = new Animation(Arrays.copyOfRange(runSprites, 0, runSprites.length / 2), runDelay, false);
-		runAnimation[1] = new Animation(Arrays.copyOfRange(runSprites, runSprites.length / 2, runSprites.length), runDelay, false);
-
-		attackAnimation[0] = new Animation(Arrays.copyOfRange(attackSprites, 0, attackSprites.length / 2), attackDelay, true);
-		attackAnimation[1] = new Animation(Arrays.copyOfRange(attackSprites, attackSprites.length / 2, attackSprites.length), attackDelay, true);
+		idleAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerIdle, 1),
+				idleDelay, false);
+		idleAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerIdle, -1),
+				idleDelay, false);
+		runAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerRun, 1),
+				runDelay, false);
+		runAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerRun, -1),
+				runDelay, false);
 	}
 
 	@Override
@@ -174,11 +167,6 @@ public class Fisticuffs extends Weapon {
 	@Override
 	public Animation[] getRunAnimation() {
 		return runAnimation;
-	}
-
-	@Override
-	public Animation[] getAttackAnimation() {
-		return attackAnimation;
 	}
 
 }

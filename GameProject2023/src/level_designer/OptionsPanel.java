@@ -26,6 +26,7 @@ import abstract_objects.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 
 public class OptionsPanel extends JPanel {
 
@@ -156,7 +157,8 @@ public class OptionsPanel extends JPanel {
 	
 	private BufferedImage getImageByObjectName(Name objectName) {
 		GameObject gameObject = new ObjectHandler().createObjectByName(objectName, -1, -1);
-		return gameObject != null ? gameObject.getTexture() : TextureLoader.getInstance().missingSprite;
+		return gameObject != null ? gameObject.getTexture() : 
+			TextureLoader.getInstance().getTextures(TextureName.Missing)[0];
 	}
 	
 	public void setOptionSelectionListener(OptionSelectionListener listener) {

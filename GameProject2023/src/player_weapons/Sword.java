@@ -1,22 +1,20 @@
 package player_weapons;
 
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import abstract_objects.Creature;
 import abstract_objects.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 import window.Animation;
 
 public class Sword extends Weapon {
 
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
-	private Animation[] attackAnimation;
 
 	public Sword(ObjectHandler objectHandler) {
 		super(objectHandler);
@@ -31,17 +29,19 @@ public class Sword extends Weapon {
 
 		// Regular attack
 		int attackDelay = 4;
-		BufferedImage[] swordAttackSprites = textureLoader.playerSwordAttackSprites;
-		Animation attackRightAnim = new Animation(Arrays.copyOfRange(swordAttackSprites, 0, swordAttackSprites.length / 2), attackDelay, true); 
-		Animation attackLeftAnim = new Animation(Arrays.copyOfRange(swordAttackSprites, swordAttackSprites.length / 2, swordAttackSprites.length), attackDelay, true);
-		abilities[0] = new WeaponAbility(500, new Animation[] {attackRightAnim, attackLeftAnim});
+		Animation attackRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordAttack, 1),
+				attackDelay, true);
+		Animation attackLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordAttack, -1),
+				attackDelay, true);
+		abilities[0] = new WeaponAbility(500, 20, new Animation[] {attackRightAnim, attackLeftAnim});
 
 		// Sword stab
 		int stabDelay = 6;
-		BufferedImage[] swordStabSprites = textureLoader.playerSwordStabSprites;
-		Animation stabRightAnim = new Animation(Arrays.copyOfRange(swordStabSprites, 0, swordStabSprites.length / 2), stabDelay, true);
-		Animation stabLeftAnim = new Animation(Arrays.copyOfRange(swordStabSprites, swordStabSprites.length / 2, swordStabSprites.length), stabDelay, true);
-		abilities[1] = new WeaponAbility(1500, new Animation[] {stabRightAnim, stabLeftAnim});
+		Animation stabRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStab, 1),
+				stabDelay, true);
+		Animation stabLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStab, -1),
+				stabDelay, true);
+		abilities[1] = new WeaponAbility(1500, 35, new Animation[] {stabRightAnim, stabLeftAnim});
 	}
 
 	@Override
@@ -150,26 +150,20 @@ public class Sword extends Weapon {
 	protected void setupAnimations() {
 		idleAnimation = new Animation[2];
 		runAnimation = new Animation[2];
-		attackAnimation = new Animation[2];
 
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
-		BufferedImage[] idleSprites = textureLoader.playerSwordIdleSprites;
-		BufferedImage[] runSprites = textureLoader.playerSwordRunSprites;
-		BufferedImage[] attackSprites = textureLoader.playerSwordAttackSprites;
-
 		final int idleDelay = 8;
 		final int runDelay = 8;
-		final int attackDelay = 4;
 
-		idleAnimation[0] = new Animation(Arrays.copyOfRange(idleSprites, 0, idleSprites.length / 2), idleDelay, false);
-		idleAnimation[1] = new Animation(Arrays.copyOfRange(idleSprites, idleSprites.length / 2, idleSprites.length), idleDelay, false);
-
-		runAnimation[0] = new Animation(Arrays.copyOfRange(runSprites, 0, runSprites.length / 2), runDelay, false);
-		runAnimation[1] = new Animation(Arrays.copyOfRange(runSprites, runSprites.length / 2, runSprites.length), runDelay, false);
-
-		attackAnimation[0] = new Animation(Arrays.copyOfRange(attackSprites, 0, attackSprites.length / 2), attackDelay, true);
-		attackAnimation[1] = new Animation(Arrays.copyOfRange(attackSprites, attackSprites.length / 2, attackSprites.length), attackDelay, true);
+		idleAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordIdle, 1),
+				idleDelay, false);
+		idleAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordIdle, -1),
+				idleDelay, false);
+		runAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordRun, 1),
+				runDelay, false);
+		runAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordRun, -1),
+				runDelay, false);
 	}
 
 	@Override
@@ -180,11 +174,6 @@ public class Sword extends Weapon {
 	@Override
 	public Animation[] getRunAnimation() {
 		return runAnimation;
-	}
-
-	@Override
-	public Animation[] getAttackAnimation() {
-		return attackAnimation;
 	}
 
 }

@@ -13,6 +13,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 import window.Animation;
 
 public class BasicEnemy extends Creature {
@@ -40,7 +41,7 @@ public class BasicEnemy extends Creature {
 		
 		this.objectHandler = objectHandler;
 
-		texture = TextureLoader.getInstance().basicEnemyRunIdleSprites[0];
+		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
 		setupAnimations();
 	}
 
@@ -158,7 +159,7 @@ public class BasicEnemy extends Creature {
 		invulnerable = true;
 		
 		setHealth(health - damageAmount);
-		objectHandler.addObject(new DamagePopup(x + width / 2, y, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
+		objectHandler.addObject(new DamageNumberPopup(x + width / 2, y, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
 		
 		if (health <= 0)
 			objectHandler.removeObject(this);
@@ -207,99 +208,65 @@ public class BasicEnemy extends Creature {
 		attackAnimation = new Animation[2];
 
 		TextureLoader textureLoader = TextureLoader.getInstance();
-		BufferedImage[] sprites = textureLoader.basicEnemyRunIdleSprites;
-		BufferedImage[] attackSprites = textureLoader.basicEnemyAttackSprites;
-
-		jumpingSprites = textureLoader.playerJumpSprites;
+		jumpingSprites = textureLoader.getTextures(TextureName.BasicEnemyJump);
 		
 		final int idleDelay = 8;
 		final int runDelay = 8;
 		final int attackDelay = 10;
-
-		idleAnimation[0] = new Animation(idleDelay, false, sprites[0], sprites[1], sprites[2], sprites[3],
-				sprites[4], sprites[5], sprites[6], sprites[7], sprites[8], sprites[9]);
-		idleAnimation[1] = new Animation(idleDelay, false, sprites[10], sprites[11], sprites[12], sprites[13],
-				sprites[14], sprites[15], sprites[16], sprites[17], sprites[18], sprites[19]);
-		runAnimation[0] = new Animation(runDelay, false, sprites[20], sprites[21], sprites[22], sprites[23],
-				sprites[24], sprites[25], sprites[26], sprites[27]);
-		runAnimation[1] = new Animation(runDelay, false, sprites[28], sprites[29], sprites[30], sprites[31],
-				sprites[32], sprites[33], sprites[34], sprites[35]);
-		attackAnimation[0] = new Animation(attackDelay, true, attackSprites[0], attackSprites[1], attackSprites[2],
-				attackSprites[3], attackSprites[4], attackSprites[5], attackSprites[6], attackSprites[7]);
-		attackAnimation[1] = new Animation(attackDelay, true, attackSprites[6], attackSprites[7], attackSprites[8],
-				attackSprites[9], attackSprites[10], attackSprites[11], attackSprites[12], attackSprites[13]);
+		
+		idleAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyIdle, 1),
+				idleDelay, false);
+		idleAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyIdle, -1),
+				idleDelay, false);
+		runAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyRun, 1),
+				runDelay, false);
+		runAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyRun, -1),
+				runDelay, false);
+		attackAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, 1),
+				attackDelay, true);
+		attackAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, -1),
+				attackDelay, true);
 	}
 	
 	private void runAnimations() {
-		// Looking right
-		if (direction == 1) {
-			// Attacking
-			if (startedAttacking)
-				attackAnimation[0].runAnimation();
-			// Not moving
-			else if (velX == 0)
-				idleAnimation[0].runAnimation();
-			// Moving right
-			else
-				runAnimation[0].runAnimation();
-		}
-		// Looking left
-		else if (direction == -1) {
-			// Attacking
-			if (startedAttacking)
-				attackAnimation[1].runAnimation();
-			// Not moving
-			else if (velX == 0)
-				idleAnimation[1].runAnimation();
-			// Moving left
-			else
-				runAnimation[1].runAnimation();
-		}
+		int directionToIndex = getIndexFromDirection();
+		
+		// Attacking
+		if (startedAttacking)
+			attackAnimation[directionToIndex].runAnimation();
+		// Idle
+		else if (velX == 0)
+			idleAnimation[directionToIndex].runAnimation();
+		// Running
+		else if (velX != 0)
+			runAnimation[directionToIndex].runAnimation();
 	}
 
 	private void drawAnimations(Graphics g) {
-		// Looking right
-		if (direction == 1) {
-			// Attacking
-			if (startedAttacking)
-				attackAnimation[0].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			// Jumping
-			else if (jumping) {
-				// Going up / reached peak
-				if (velY <= 0)
-					g.drawImage(jumpingSprites[0], (int) x, (int) y, width, height, null);
-				// Going down
-				else if (velY > 0)
-					g.drawImage(jumpingSprites[1], (int) x, (int) y, width, height, null);
-			}
-			// Not moving
-			else if (velX == 0)
-				idleAnimation[0].drawAnimation(g, (int) x, (int) y, width, height);
-			// Moving right
-			else
-				runAnimation[0].drawAnimation(g, (int) x, (int) y, width, height);
+		int directionToIndex = getIndexFromDirection();
+		
+		// Attacking
+		if (startedAttacking)
+			attackAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		// Jumping
+		else if (jumping) {
+			// Going up
+			if (velY <= 0)
+				g.drawImage(jumpingSprites[directionToIndex * 2], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
+			// Going down
+			else if (velY > 0)
+				g.drawImage(jumpingSprites[directionToIndex * 2 + 1], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
 		}
-		// Looking left
-		else if (direction == -1) {
-			// Attacking
-			if (startedAttacking)
-				attackAnimation[1].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			// Jumping
-			else if (jumping) {
-				// Going up / reached peak
-				if (velY <= 0)
-					g.drawImage(jumpingSprites[2], (int) x, (int) y, width, height, null);
-				// Going down
-				else if (velY > 0)
-					g.drawImage(jumpingSprites[3], (int) x, (int) y, width, height, null);
-			}
-			// Not moving
-			else if (velX == 0)
-				idleAnimation[1].drawAnimation(g, (int) x, (int) y, width, height);
-			// Moving left
-			else
-				runAnimation[1].drawAnimation(g, (int) x, (int) y, width, height);
-		}
+		// Idle
+		else if (velX == 0)
+			idleAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		// Running
+		else
+			runAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+	}
+	
+	public int getIndexFromDirection() {
+		return (-direction + 1) / 2;
 	}
 
 }
