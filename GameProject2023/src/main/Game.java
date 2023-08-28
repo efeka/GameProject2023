@@ -3,6 +3,7 @@ package main;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferStrategy;
 
 import framework.ObjectHandler;
@@ -119,11 +120,33 @@ public class Game extends Canvas implements Runnable {
 		g.setColor(new Color(25, 51, 45));
 		g.fillRect(0, 0, window.getWidth(), window.getHeight());
 		
+		if (shakeCamera && shakeDuration-- < 0)
+			shakeCamera = false;
+		if (shakeCamera) {
+			g.translate(-oldTranslateX, -oldTranslateY);
+			int randomX = (int) (Math.random() * shakeMagnitude - shakeMagnitude / 2);
+			int randomY = (int) (Math.random() * shakeMagnitude - shakeMagnitude / 2);
+			g.translate(randomX, randomY);
+			oldTranslateX = randomX;
+			oldTranslateY = randomY;
+		}
+		
 		// Render game objects
 		objectHandler.renderObjects(g);
 
 		g.dispose();
 		bs.show();
+	}
+	
+	// TODO temporary, ideally should be moved into a camera class
+	private static int oldTranslateX = 0, oldTranslateY = 0;
+	private static boolean shakeCamera = false;
+	private static int shakeMagnitude;
+	private static int shakeDuration;
+	public static void shakeCamera(int duration, int magnitude) {
+		shakeDuration = duration;
+		shakeCamera = true;
+		shakeMagnitude = magnitude;
 	}
 	
 }

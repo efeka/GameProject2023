@@ -15,15 +15,22 @@ public class TextureLoader {
 		PlayerAttack,
 		PlayerUppercut,
 		PlayerJump,
+		
 		PlayerSwordIdle,
 		PlayerSwordRun,
 		PlayerSwordAttack,
 		PlayerSwordStab,
+		
 		PlayerHammerIdle,
+		PlayerHammerRun,
+		PlayerHammerAttack,
+		PlayerHammerVerticalSlam,
+		
 		BasicEnemyRun,
 		BasicEnemyAttack,
 		BasicEnemyIdle,
 		BasicEnemyJump,
+		
 		StoneTiles,
 		GrassTiles,
 		RockTiles,
@@ -73,6 +80,7 @@ public class TextureLoader {
 			}
 			break;
 			// TODO
+		case PlayerHammerAttack:
 		case PlayerUppercut:
 		case PlayerAttack:
 			textures = new BufferedImage[16];
@@ -121,6 +129,20 @@ public class TextureLoader {
 			for (int i = 0; i < 7; i++) {
 				textures[i] = playerSheet.getSubimage(1 + i * 65, 911, 64, 64);
 				textures[i + 7] = playerSheet.getSubimage(1 + i * 65, 976, 64, 64);
+			}
+			break;
+		case PlayerHammerRun:
+			textures = new BufferedImage[16];
+			for (int i = 0; i < 8; i++) {
+				textures[i] = playerSheet.getSubimage(1 + i * 65, 1171, 64, 64);
+				textures[i + 8] = playerSheet.getSubimage(1 + i * 65, 1236, 64, 64);
+			}
+			break;
+		case PlayerHammerVerticalSlam:
+			textures = new BufferedImage[28];
+			for (int i = 0; i < 14; i++) {
+				textures[i] = playerSheet.getSubimage(1 + i * 65, 1041, 64, 64);
+				textures[i + 14] = playerSheet.getSubimage(1 + i * 65, 1106, 64, 64);
 			}
 			break;
 		case BasicEnemyIdle:

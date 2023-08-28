@@ -16,6 +16,8 @@ public class Fisticuffs extends Weapon {
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
 
+	private boolean playerIsLaunchedUp = false;
+
 	public Fisticuffs(ObjectHandler objectHandler) {
 		super(objectHandler);
 		setupAnimations();
@@ -33,7 +35,7 @@ public class Fisticuffs extends Weapon {
 		Animation attackLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerAttack, -1),
 				attackDelay, true);
 		abilities[0] = new WeaponAbility(500, 15, new Animation[] {attackRightAnim, attackLeftAnim});
-		
+
 		int uppercutDelay = 5;
 		Animation uppercutRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerUppercut, 1),
 				uppercutDelay, true);
@@ -64,7 +66,7 @@ public class Fisticuffs extends Weapon {
 			int currentAnimFrame2 = ability.getAnimation(1).getCurrentFrame();
 			if (currentAnimFrame1 != 4 && currentAnimFrame1 != 5 && currentAnimFrame2 != 4 && currentAnimFrame2 != 5)
 				break;
-			
+
 			for (int i = midLayer.size() - 1; i >= 0; i--) {
 				GameObject other = midLayer.get(i);
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
@@ -78,7 +80,7 @@ public class Fisticuffs extends Weapon {
 				}
 			}
 			break;
-			
+
 		case 1:
 			// Uppercut
 			player.setVelX(0);
@@ -87,14 +89,20 @@ public class Fisticuffs extends Weapon {
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
 					if (getUppercutBounds().intersects(other.getBounds())) {
 						Creature otherCreature = (Creature) other;
-						otherCreature.takeDamage(abilities[index].getDamage());
-						float knockbackVelX = player.getVelX();
-						float knockbackVelY = -7f;
-						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
 
-						player.setVelX(knockbackVelX);
-						player.setVelY(knockbackVelY);
-						player.setY(player.getY() - 2);
+						float knockbackVelX = player.getVelX();
+						float knockbackVelY = -10f;
+						if (!otherCreature.isKnockedBack()) {
+							otherCreature.takeDamage(abilities[index].getDamage());
+							otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
+						}
+						if (!playerIsLaunchedUp) {
+							playerIsLaunchedUp = true;
+
+							player.setVelX(knockbackVelX);
+							player.setVelY(knockbackVelY);
+							player.setY(player.getY() - 2);
+						}
 					}
 				}
 			}
@@ -107,7 +115,7 @@ public class Fisticuffs extends Weapon {
 		int y = (int) player.getY();
 		int width = player.getWidth();
 		int height = player.getHeight();
-		
+
 		int attackX;
 		int attackWidth = (int) (4f * width / 5);
 		if (player.getDirection() == 1)
@@ -116,7 +124,7 @@ public class Fisticuffs extends Weapon {
 			attackX = (int) x - attackWidth / 2;
 		return new Rectangle(attackX, (int) y, attackWidth, height);
 	}
-	
+
 	private Rectangle getUppercutBounds() {
 		int attackX;
 		int attackWidth = (int) (4f * player.getWidth() / 5);

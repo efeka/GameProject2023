@@ -43,7 +43,12 @@ public abstract class Weapon {
 	 * @param index the index of the ability to be used
 	 */
 	public abstract void useAbility(int index);
-	public abstract WeaponAbility getAbility(int index);
+	
+	public WeaponAbility getAbility(int index) {
+		if (!isAbilityIndexValid(index))
+			throw new IndexOutOfBoundsException("Index " + index + " is invalid for " + getClass());
+		return abilities[index];
+	}
 	
 	/**
 	 * The idle and run animations should be initialized inside this method.

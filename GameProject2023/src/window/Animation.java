@@ -16,6 +16,8 @@ public class Animation {
 
 	private boolean onlyPlayOnce;
 	private boolean playedOnce = false;
+	
+	private boolean paused = false;
 
 	/**
 	 * Provides sprite animation functionality.
@@ -68,7 +70,7 @@ public class Animation {
 	 * Proceeds to the next frame of animation if enough time has passed to satisfy the delay parameter.
 	 */
 	public void runAnimation() {
-		if (onlyPlayOnce && playedOnce)
+		if ((onlyPlayOnce && playedOnce) || paused)
 			return;
 
 		delayCounter++;
@@ -112,6 +114,14 @@ public class Animation {
 		playedOnce = false;
 		frameIndex = delayCounter = 0;
 		currentImage = images[0];
+	}
+	
+	public void pause() {
+		paused = true;
+	}
+	
+	public void resume() {
+		paused = false;
 	}
 
 	public boolean isPlayedOnce() {

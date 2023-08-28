@@ -28,8 +28,8 @@ public class BasicEnemy extends Creature {
 	private int invulnerableDuration = 700;
 	private long lastInvulnerableTimer = invulnerableDuration; 
 	
-	private float runningSpeed = 3f;
-	private float jumpingSpeed = -9f;
+//	private float runningSpeed = 3f;
+//	private float jumpingSpeed = -9f;
 	
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;

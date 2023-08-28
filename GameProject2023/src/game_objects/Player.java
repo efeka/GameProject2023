@@ -18,10 +18,11 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
-import framework.TextureLoader.TextureName;
 import framework.TextureLoader;
-import player_weapons.Sword;
+import framework.TextureLoader.TextureName;
 import player_weapons.Fisticuffs;
+import player_weapons.Hammer;
+import player_weapons.Sword;
 import player_weapons.Weapon;
 import window.KeyInput;
 import window.MouseInput;
@@ -86,6 +87,8 @@ public class Player extends Creature {
 			setWeapon(new Fisticuffs(objectHandler));
 		else if (keyInput.numberKeyPressed[1])
 			setWeapon(new Sword(objectHandler));
+		else if (keyInput.numberKeyPressed[2])
+			setWeapon(new Hammer(objectHandler));
 	}
 
 	@Override
@@ -97,7 +100,7 @@ public class Player extends Creature {
 			int consoleX = 180, consoleY = 10;
 			g.setFont(new Font("Calibri", Font.PLAIN, 15));
 			g.setColor(new Color(0, 0, 0, 150));
-			g.fillRect(consoleX - 5, consoleY, 170, 155);
+			g.fillRect(consoleX - 5, consoleY, 170, 175);
 
 			g.setColor(new Color(220, 80, 80));
 			g.drawString("Health......................" + (int) health, consoleX, consoleY += 20);
@@ -109,6 +112,8 @@ public class Player extends Creature {
 			g.drawString("velY: " + velY, consoleX, consoleY += 20);
 
 			g.setColor(Color.white);
+			g.drawString("Falling....................." + falling, consoleX, consoleY += 20);
+			g.drawString("Jumping.................." + jumping, consoleX, consoleY += 20);
 			g.drawString("Invulnerable............" + invulnerable, consoleX, consoleY += 20);
 			g.drawString("Knocked back.........." + knockedBack, consoleX, consoleY += 20);
 
@@ -120,6 +125,8 @@ public class Player extends Creature {
 			g2d.setColor(new Color(255, 255, 255, 70));
 			g2d.draw(getBounds());
 			g2d.setColor(new Color(255, 0, 0, 100));
+			g2d.setColor(Color.MAGENTA);
+			g2d.draw(getGroundCheckBounds());
 		}
 	}
 
@@ -178,6 +185,8 @@ public class Player extends Creature {
 
 	private void handleCollision() {
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		falling = true;
+		
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 			if (other.equals(this))
@@ -194,11 +203,14 @@ public class Player extends Creature {
 	private void checkBlockCollision(GameObject other) {
 		Rectangle otherBounds = other.getBounds();
 
+		// Check if the player is grounded or not
+		if (getGroundCheckBounds().intersects(otherBounds))
+			falling = false;
+		
 		// Bottom collision
 		if (getBottomBounds().intersects(otherBounds)) {
 			y = other.getY() - height;
 			velY = 0;
-			falling = false;
 			jumping = false;
 
 			// Reset knock back after hitting the ground
@@ -207,8 +219,6 @@ public class Player extends Creature {
 				velX = 0;
 			}
 		}
-		else
-			falling = true;
 
 		// Horizontal collision
 		if (getHorizontalBounds().intersects(otherBounds)) {
@@ -250,11 +260,8 @@ public class Player extends Creature {
 			y += heightDiff - 10;
 
 			velY = 0;
-			falling = false;
 			jumping = false;
 		}
-		else
-			falling = true;
 	}
 
 	private Rectangle getHorizontalBounds() {
@@ -275,6 +282,14 @@ public class Player extends Creature {
 		float xOffset = (this.width - width) / 2;
 		float height = this.height / 5f;
 		float yOffset = 4 * this.height / 5f;
+		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
+	}
+	
+	private Rectangle getGroundCheckBounds() {
+		float width = 3 * this.width / 5f;
+		float xOffset = (this.width - width) / 2;
+		float height = this.height / 5f;
+		float yOffset = this.height;
 		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
 	}
 
