@@ -16,6 +16,11 @@ public class WeaponAbility {
 		lastUsedTimer = -cooldownMillis;
 		this.animation = animation;
 		
+		if (animation[0].getOnlyPlayOnce())
+			animation[0].setPlayedOnce(true);
+		if (animation[1].getOnlyPlayOnce())
+			animation[1].setPlayedOnce(true);
+		
 		damage = 0;
 	}
 	
@@ -24,6 +29,11 @@ public class WeaponAbility {
 		lastUsedTimer = -cooldownMillis;
 		this.animation = animation;
 		this.damage = damage;
+		
+		if (animation[0].getOnlyPlayOnce())
+			animation[0].setPlayedOnce(true);
+		if (animation[1].getOnlyPlayOnce())
+			animation[1].setPlayedOnce(true);
 	}
 	
 	/**
@@ -46,20 +56,18 @@ public class WeaponAbility {
 	}
 	
 	public boolean isAbilityBeingUsed() {
-		return isOnCooldown() && !animation[0].isPlayedOnce() && !animation[1].isPlayedOnce();
+		return !animation[0].isPlayedOnce() && !animation[1].isPlayedOnce();
 	}
 	
 	/**
 	 * Resets the animation and the usage timer of the ability.
 	 */
-	public void startAbility() {
-		if (isOnCooldown())
-			return;
+	public void resetAbility() {
 		lastUsedTimer = System.currentTimeMillis();
 		animation[0].resetAnimation();
 		animation[1].resetAnimation();
 	}
-	
+ 	
 	public int timeLeftUntilReady() {
 		return (int) (cooldown - (System.currentTimeMillis() - lastUsedTimer)); 
 	}

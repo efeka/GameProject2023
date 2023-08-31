@@ -25,6 +25,8 @@ public class TextureLoader {
 		PlayerHammerRun,
 		PlayerHammerAttack,
 		PlayerHammerVerticalSlam,
+		PlayerHammerSwing,
+		PlayerHammerProjectile,
 		
 		BasicEnemyRun,
 		BasicEnemyAttack,
@@ -36,18 +38,24 @@ public class TextureLoader {
 		RockTiles,
 		DiagonalStoneTiles,
 		WoodJumpThroughTiles,
+		
+		FisticuffsItem,
+		SwordItem,
+		HammerItem,
 	}
 
 	private BufferedImage playerSheet = null;
 	private BufferedImage blockSheet = null;
 	private BufferedImage enemySheet = null;
-
+	private BufferedImage itemSheet = null;
+ 
 	private TextureLoader() {
 		try {
 			FileIO fileIO = new FileIO();
 			playerSheet = fileIO.loadSheet("player_sheet_64x64.png");
 			enemySheet = fileIO.loadSheet("enemy_sheet_64x64.png");
 			blockSheet = fileIO.loadSheet("block_sheet_16x16.png");
+			itemSheet = fileIO.loadSheet("item_sheet_64x64.png");
 		} 
 		catch(IOException e) {
 			System.err.println("Failed to load an image file from the /res folder.");
@@ -134,8 +142,8 @@ public class TextureLoader {
 		case PlayerHammerRun:
 			textures = new BufferedImage[16];
 			for (int i = 0; i < 8; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 1171, 64, 64);
-				textures[i + 8] = playerSheet.getSubimage(1 + i * 65, 1236, 64, 64);
+				textures[i] = playerSheet.getSubimage(1 + i * 65, 1041, 64, 64);
+				textures[i + 8] = playerSheet.getSubimage(1 + i * 65, 1106, 64, 64);
 			}
 			break;
 		case PlayerHammerVerticalSlam:
@@ -144,6 +152,17 @@ public class TextureLoader {
 				textures[i] = playerSheet.getSubimage(1 + i * 65, 1041, 64, 64);
 				textures[i + 14] = playerSheet.getSubimage(1 + i * 65, 1106, 64, 64);
 			}
+			break;
+		case PlayerHammerSwing:
+			textures = new BufferedImage[20];
+			for (int i = 0; i < 10; i++) {
+				textures[i] = playerSheet.getSubimage(1 + i * 65, 1301, 64, 64);
+				textures[i + 10] = playerSheet.getSubimage(1 + i * 65, 1366, 64, 64);
+			}
+			break;
+		case PlayerHammerProjectile:
+			textures = new BufferedImage[1];
+			textures[0] = playerSheet.getSubimage(651, 1301, 64, 64);
 			break;
 		case BasicEnemyIdle:
 			textures = new BufferedImage[20];
@@ -198,6 +217,22 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = blockSheet.getSubimage(1 + i * 17, 69, 16, 16);
 			break;
+		case FisticuffsItem:
+			textures = new BufferedImage[10];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 65, 1, 64, 64);
+			break;
+		case SwordItem:
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 65, 66, 64, 64);
+			break;
+		case HammerItem:
+			textures = new BufferedImage[6];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 65, 131, 64, 64);
+			break;
+		case Missing:
 		default:
 			textures = new BufferedImage[] {blockSheet.getSubimage(222, 1, 16, 16)};
 			break;

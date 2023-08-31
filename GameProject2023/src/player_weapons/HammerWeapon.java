@@ -9,15 +9,16 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import main.Game;
+import items.HammerItem;
+import items.Item;
 import window.Animation;
 
-public class Hammer extends Weapon {
+public class HammerWeapon extends Weapon {
 	
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
 
-	public Hammer(ObjectHandler objectHandler) {
+	public HammerWeapon(ObjectHandler objectHandler) {
 		super(objectHandler);
 		setupAnimations();
 		setupAbilities();
@@ -37,12 +38,19 @@ public class Hammer extends Weapon {
 		abilities[0] = new WeaponAbility(500, 20, new Animation[] {attackRightAnim, attackLeftAnim});
 		
 		// Hammer vertical slam
-		int verticalSlamDelay = 7;
-		Animation vSlamRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerHammerVerticalSlam, 1),
-				verticalSlamDelay, true);
-		Animation vSlamLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerHammerVerticalSlam, -1),
-				verticalSlamDelay, true);
-		abilities[1] = new WeaponAbility(1000, 35, new Animation[] {vSlamRightAnim, vSlamLeftAnim});
+//		int verticalSlamDelay = 7;
+//		Animation vSlamRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerHammerVerticalSlam, 1),
+//				verticalSlamDelay, true);
+//		Animation vSlamLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerHammerVerticalSlam, -1),
+//				verticalSlamDelay, true);
+//		abilities[1] = new WeaponAbility(1000, 35, new Animation[] {vSlamRightAnim, vSlamLeftAnim});
+		
+		int swingDelay = 8;
+		Animation swingRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerHammerSwing, 1),
+				swingDelay, true);
+		Animation swingLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerHammerSwing, -1),
+				swingDelay, true);
+		abilities[1] = new WeaponAbility(800, 35, new Animation[] {swingRightAnim, swingLeftAnim});
 	}
 
 	@Override
@@ -51,13 +59,11 @@ public class Hammer extends Weapon {
 			throw new IndexOutOfBoundsException("Index " + index + " is invalid for " + getClass());
 
 		WeaponAbility ability = abilities[index];
-		if (!ability.isAbilityBeingUsed()) {
-			// Skips the rest of this method if the ability
-			// is on cooldown and if its animation is done playing.
+		if (ability.getAnimation(0).isPlayedOnce() || ability.getAnimation(1).isPlayedOnce()) {
 			if (ability.isOnCooldown())
 				return;
 			else
-				abilities[index].startAbility();
+				ability.resetAbility();
 		}
 		
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
@@ -80,24 +86,11 @@ public class Hammer extends Weapon {
 			break;
 			
 		case 1:
-			// TODO unfinished
-			// Vertical slam
+			// Swing
 			player.setVelX(0);
 			
-			int animationFrame1 = ability.getAnimation(0).getCurrentFrame();
-			int animationFrame2 = ability.getAnimation(1).getCurrentFrame();
-			if ((player.isFalling() || player.isJumping()) && (animationFrame1 == 7 || animationFrame2 == 7)) {
-				ability.getAnimation(0).pause();
-				ability.getAnimation(1).pause();
-			}
-			else if (!player.isFalling() && !player.isJumping()) {
-				ability.getAnimation(0).resume();
-				ability.getAnimation(1).resume();
-			}
-				
-			// TODO temporary, but is a good idea
-			if ((animationFrame1 >= 8 && animationFrame1 <= 10) || (animationFrame2 >= 8 && animationFrame2 <= 10))
-				Game.shakeCamera(1, 8);
+			
+			
 			break;
 		}
 	}
@@ -145,6 +138,11 @@ public class Hammer extends Weapon {
 	@Override
 	public Animation[] getRunAnimation() {
 		return runAnimation;
+	}
+
+	@Override
+	public Item createItemFromWeapon(float x, float y) {
+		return new HammerItem(x, y, objectHandler);
 	}
 
 }

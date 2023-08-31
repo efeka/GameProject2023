@@ -20,9 +20,8 @@ import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import player_weapons.Fisticuffs;
-import player_weapons.Hammer;
-import player_weapons.Sword;
+import items.Item;
+import player_weapons.SwordWeapon;
 import player_weapons.Weapon;
 import window.KeyInput;
 import window.MouseInput;
@@ -37,9 +36,9 @@ public class Player extends Creature {
 
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = -8.5f;
-
-	private int invulnerableDuration = 500;
-	private long lastInvulnerableTimer = -invulnerableDuration; 
+	
+	private boolean canInteract = true;
+	private long lastInteractTimer;
 
 	private PlayerAnimationHandler animationHandler;
 	private BufferedImage[] jumpSprites;
@@ -51,10 +50,11 @@ public class Player extends Creature {
 		this.mouseInput = mouseInput;
 		objectHandler.setPlayer(this);
 
-		weapon = new Sword(objectHandler);
+		weapon = new SwordWeapon(objectHandler);
 
+		invulnerableDuration = 500;
+		
 		animationHandler = new PlayerAnimationHandler(this);
-
 		jumpSprites = TextureLoader.getInstance().getTextures(TextureName.PlayerJump);
 		texture = TextureLoader.getInstance().getTextures(TextureName.PlayerIdle)[0];
 	}
@@ -73,22 +73,22 @@ public class Player extends Creature {
 				velY = TERMINAL_VELOCITY;
 		}
 
-		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
+		long now = System.currentTimeMillis();
+		if (invulnerable && (now - lastInvulnerableTimer >= invulnerableDuration))
 			invulnerable = false;
+		if (!canInteract && (now - lastInteractTimer >= 1000))
+			canInteract = true;
 
-		handleMovement();
-		handleAbilities();
-		handleCollision();
+		// Handle ability usage
+		if (mouseInput.isAttackButtonPressed() || weapon.getAbility(0).isAbilityBeingUsed())
+			weapon.useAbility(0);
+		if (keyInput.isFirstAbilityKeyPressed() || weapon.getAbility(1).isAbilityBeingUsed())
+			weapon.useAbility(1);
+		
+		handleMovement();		
+		handleObjectInteraction();
 
 		runAnimations();
-		
-		// Temporary, for debug
-		if (keyInput.numberKeyPressed[0])
-			setWeapon(new Fisticuffs(objectHandler));
-		else if (keyInput.numberKeyPressed[1])
-			setWeapon(new Sword(objectHandler));
-		else if (keyInput.numberKeyPressed[2])
-			setWeapon(new Hammer(objectHandler));
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class Player extends Creature {
 			int consoleX = 180, consoleY = 10;
 			g.setFont(new Font("Calibri", Font.PLAIN, 15));
 			g.setColor(new Color(0, 0, 0, 150));
-			g.fillRect(consoleX - 5, consoleY, 170, 175);
+			g.fillRect(consoleX - 5, consoleY, 170, 195);
 
 			g.setColor(new Color(220, 80, 80));
 			g.drawString("Health......................" + (int) health, consoleX, consoleY += 20);
@@ -116,6 +116,7 @@ public class Player extends Creature {
 			g.drawString("Jumping.................." + jumping, consoleX, consoleY += 20);
 			g.drawString("Invulnerable............" + invulnerable, consoleX, consoleY += 20);
 			g.drawString("Knocked back.........." + knockedBack, consoleX, consoleY += 20);
+			g.drawString("Can Interact............" + canInteract, consoleX, consoleY += 20);
 
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setColor(Color.white);
@@ -158,13 +159,6 @@ public class Player extends Creature {
 		}
 	}
 
-	private void handleAbilities() {
-		if (mouseInput.isAttackButtonPressed() || weapon.getAbility(0).isAbilityBeingUsed())
-			weapon.useAbility(0);
-		if (keyInput.isFirstAbilityKeyPressed() || weapon.getAbility(1).isAbilityBeingUsed())
-			weapon.useAbility(1);
-	}
-
 	@Override
 	public void takeDamage(int damageAmount) {
 		if (invulnerable)
@@ -183,7 +177,7 @@ public class Player extends Creature {
 		this.velY = velY;
 	}
 
-	private void handleCollision() {
+	private void handleObjectInteraction() {
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		falling = true;
 		
@@ -192,11 +186,21 @@ public class Player extends Creature {
 			if (other.equals(this))
 				continue;
 
-			// Collision with Blocks
+			// Check Collisions
 			if (other.getObjectId().getCategory() == Category.Block)
 				checkBlockCollision(other);
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
+			
+			// Check Item Pickup
+			if (canInteract && keyInput.isInteractKeyPressed() && other.getObjectId().getCategory() == Category.Item) {
+				if (getBounds().intersects(other.getBounds())) {
+					((Item) other).pickupItem();
+					
+					canInteract = false;
+					lastInteractTimer = System.currentTimeMillis();
+				}
+			}
 		}
 	}
 
@@ -335,7 +339,7 @@ public class Player extends Creature {
 		else if (velX != 0)
 			animationHandler.getRunAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 	}
-
+	
 	public Weapon getWeapon() {
 		return weapon;
 	}

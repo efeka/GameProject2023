@@ -18,6 +18,8 @@ public class KeyInput extends KeyAdapter {
 	private boolean navigateUpKeyPressed = false;
 	private boolean navigateDownKeyPressed = false;
 	private boolean selectionKeyPressed = false;
+	// Interaction keys
+	private boolean interactKeyPressed = false;
 	
 	// Debug
 	private boolean ctrlPressed = false;
@@ -53,6 +55,9 @@ public class KeyInput extends KeyAdapter {
 			break;
 		case KeyEvent.VK_E:
 			secondAbilityKeyPressed = true;
+			break;
+		case KeyEvent.VK_F:
+			interactKeyPressed = true;
 			break;
 		// Debug
 		case KeyEvent.VK_ESCAPE:
@@ -113,6 +118,9 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_E:
 			secondAbilityKeyPressed = false;
 			break;
+		case KeyEvent.VK_F:
+			interactKeyPressed = false;
+			break;
 		// Debug
 		case KeyEvent.VK_CONTROL:
 			ctrlPressed = false;
@@ -172,5 +180,9 @@ public class KeyInput extends KeyAdapter {
 	
 	public boolean isSecondAbilityKeyPressed() {
 		return secondAbilityKeyPressed;
+	}
+	
+	public boolean isInteractKeyPressed() {
+		return interactKeyPressed;
 	}
 }

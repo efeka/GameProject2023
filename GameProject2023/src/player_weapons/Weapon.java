@@ -2,6 +2,7 @@ package player_weapons;
 
 import framework.ObjectHandler;
 import game_objects.Player;
+import items.Item;
 import window.Animation;
 
 /*
@@ -60,5 +61,13 @@ public abstract class Weapon {
 	protected boolean isAbilityIndexValid(int index) {
 		return index >= 0 && index < abilities.length && abilities[index] != null;
 	}
+	
+	/**
+	 * Create the Item object corresponding to this wepon.
+	 * @param x the x coordinate of the Item
+	 * @param y the y coordinate of the Item
+	 * @return the Item object
+	 */
+	public abstract Item createItemFromWeapon(float x, float y);
 	
 }

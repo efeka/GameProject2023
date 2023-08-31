@@ -37,10 +37,11 @@ public class BasicEnemy extends Creature {
 	private BufferedImage[] jumpingSprites;
 	
 	public BasicEnemy(int x, int y, ObjectHandler objectHandler) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, 70, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));
-		
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, 70, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
+		invulnerableDuration = 700;
+		
 		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
 		setupAnimations();
 	}

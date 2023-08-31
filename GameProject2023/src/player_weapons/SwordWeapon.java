@@ -9,16 +9,16 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import items.Item;
+import items.SwordItem;
 import window.Animation;
 
-public class Fisticuffs extends Weapon {
+public class SwordWeapon extends Weapon {
 
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
 
-	private boolean playerIsLaunchedUp = false;
-
-	public Fisticuffs(ObjectHandler objectHandler) {
+	public SwordWeapon(ObjectHandler objectHandler) {
 		super(objectHandler);
 		setupAnimations();
 		setupAbilities();
@@ -29,19 +29,21 @@ public class Fisticuffs extends Weapon {
 		abilities = new WeaponAbility[2];
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
-		int attackDelay = 6;
-		Animation attackRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerAttack, 1),
+		// Regular attack
+		int attackDelay = 4;
+		Animation attackRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordAttack, 1),
 				attackDelay, true);
-		Animation attackLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerAttack, -1),
+		Animation attackLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordAttack, -1),
 				attackDelay, true);
-		abilities[0] = new WeaponAbility(500, 15, new Animation[] {attackRightAnim, attackLeftAnim});
+		abilities[0] = new WeaponAbility(500, 20, new Animation[] {attackRightAnim, attackLeftAnim});
 
-		int uppercutDelay = 5;
-		Animation uppercutRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerUppercut, 1),
-				uppercutDelay, true);
-		Animation uppercutLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerUppercut, -1),
-				uppercutDelay, true);
-		abilities[1] = new WeaponAbility(1500, 30, new Animation[] {uppercutRightAnim, uppercutLeftAnim});
+		// Sword stab
+		int stabDelay = 6;
+		Animation stabRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStab, 1),
+				stabDelay, true);
+		Animation stabLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStab, -1),
+				stabDelay, true);
+		abilities[1] = new WeaponAbility(1500, 35, new Animation[] {stabRightAnim, stabLeftAnim});
 	}
 
 	@Override
@@ -50,17 +52,34 @@ public class Fisticuffs extends Weapon {
 			throw new IndexOutOfBoundsException("Index " + index + " is invalid for " + getClass());
 
 		WeaponAbility ability = abilities[index];
-		if (!ability.isAbilityBeingUsed()) {
+		if (ability.getAnimation(0).isPlayedOnce() || ability.getAnimation(1).isPlayedOnce()) {
 			if (ability.isOnCooldown())
 				return;
 			else
-				abilities[index].startAbility();
+				ability.resetAbility();
 		}
 
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		switch (index) {
 		case 0:
 			// Attack
+			player.setVelX(0);
+			for (int i = midLayer.size() - 1; i >= 0; i--) {
+				GameObject other = midLayer.get(i);
+				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
+					if (getAttackBounds().intersects(other.getBounds())) {
+						Creature otherCreature = (Creature) other;
+						otherCreature.takeDamage(abilities[index].getDamage());
+						float knockbackVelX = 2f * player.getDirection();
+						float knockbackVelY = -1f;
+						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
+					}
+				}
+			}
+			break;
+
+		case 1:
+			// Stab
 			player.setVelX(0);
 			int currentAnimFrame1 = ability.getAnimation(0).getCurrentFrame();
 			int currentAnimFrame2 = ability.getAnimation(1).getCurrentFrame();
@@ -70,39 +89,12 @@ public class Fisticuffs extends Weapon {
 			for (int i = midLayer.size() - 1; i >= 0; i--) {
 				GameObject other = midLayer.get(i);
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
-					if (getAttackBounds().intersects(other.getBounds())) {
+					if (getStabBounds().intersects(other.getBounds())) {
 						Creature otherCreature = (Creature) other;
 						otherCreature.takeDamage(abilities[index].getDamage());
-						float knockbackVelX = 3f * player.getDirection();
-						float knockbackVelY = -1f;
+						float knockbackVelX = 5f * player.getDirection();
+						float knockbackVelY = -2f;
 						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
-					}
-				}
-			}
-			break;
-
-		case 1:
-			// Uppercut
-			player.setVelX(0);
-			for (int i = midLayer.size() - 1; i >= 0; i--) {
-				GameObject other = midLayer.get(i);
-				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
-					if (getUppercutBounds().intersects(other.getBounds())) {
-						Creature otherCreature = (Creature) other;
-
-						float knockbackVelX = player.getVelX();
-						float knockbackVelY = -10f;
-						if (!otherCreature.isKnockedBack()) {
-							otherCreature.takeDamage(abilities[index].getDamage());
-							otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
-						}
-						if (!playerIsLaunchedUp) {
-							playerIsLaunchedUp = true;
-
-							player.setVelX(knockbackVelX);
-							player.setVelY(knockbackVelY);
-							player.setY(player.getY() - 2);
-						}
 					}
 				}
 			}
@@ -115,7 +107,7 @@ public class Fisticuffs extends Weapon {
 		int y = (int) player.getY();
 		int width = player.getWidth();
 		int height = player.getHeight();
-
+		
 		int attackX;
 		int attackWidth = (int) (4f * width / 5);
 		if (player.getDirection() == 1)
@@ -125,7 +117,7 @@ public class Fisticuffs extends Weapon {
 		return new Rectangle(attackX, (int) y, attackWidth, height);
 	}
 
-	private Rectangle getUppercutBounds() {
+	private Rectangle getStabBounds() {
 		int attackX;
 		int attackWidth = (int) (4f * player.getWidth() / 5);
 		int playerX = (int) player.getX();
@@ -141,13 +133,6 @@ public class Fisticuffs extends Weapon {
 	}
 
 	@Override
-	public WeaponAbility getAbility(int index) {
-		if (!isAbilityIndexValid(index))
-			throw new IndexOutOfBoundsException("Index " + index + " is invalid for " + getClass());
-		return abilities[index];
-	}
-
-	@Override
 	protected void setupAnimations() {
 		idleAnimation = new Animation[2];
 		runAnimation = new Animation[2];
@@ -157,13 +142,13 @@ public class Fisticuffs extends Weapon {
 		final int idleDelay = 8;
 		final int runDelay = 8;
 
-		idleAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerIdle, 1),
+		idleAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordIdle, 1),
 				idleDelay, false);
-		idleAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerIdle, -1),
+		idleAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordIdle, -1),
 				idleDelay, false);
-		runAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerRun, 1),
+		runAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordRun, 1),
 				runDelay, false);
-		runAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerRun, -1),
+		runAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordRun, -1),
 				runDelay, false);
 	}
 
@@ -175,6 +160,11 @@ public class Fisticuffs extends Weapon {
 	@Override
 	public Animation[] getRunAnimation() {
 		return runAnimation;
+	}
+
+	@Override
+	public Item createItemFromWeapon(float x, float y) {
+		return new SwordItem(x, y, objectHandler);
 	}
 
 }

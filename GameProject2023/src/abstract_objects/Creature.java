@@ -19,6 +19,9 @@ public abstract class Creature extends GameObject {
 	protected float health, stamina;
 	protected float staminaRegen;
 	
+	protected int invulnerableDuration = 500;
+	protected long lastInvulnerableTimer = 0; 
+	
 	public Creature(int x, int y, int width, int height, int damage, int maxHealth, int maxStamina, ObjectId objectId) {
 		super(x, y, width, height, objectId);
 		

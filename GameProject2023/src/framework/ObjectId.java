@@ -14,6 +14,7 @@ public class ObjectId {
 		DiagonalBlock,
 		Enemy,
 		Menu,
+		Item,
 	}
 	
 	/**
@@ -86,6 +87,11 @@ public class ObjectId {
 		WoodJumpThroughTileBlock_OuterLeft(2004),
 		WoodJumpThroughTileBlock_Center(2005),
 		WoodJumpThroughTileBlock_OuterRight(2006),
+		
+		// Weapon items
+		FisticuffsItem(3000),
+		SwordItem(3001),
+		HammerItem(3002),
 		;
 		
 		private int uid;

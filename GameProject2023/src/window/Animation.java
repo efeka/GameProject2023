@@ -128,6 +128,14 @@ public class Animation {
 		return playedOnce;
 	}
 	
+	public void setPlayedOnce(boolean playedOnce) {
+		this.playedOnce = playedOnce;
+	}
+	
+	public boolean getOnlyPlayOnce() {
+		return onlyPlayOnce;
+	}
+	
 	public int getCurrentFrame() {
 		return frameIndex;
 	}

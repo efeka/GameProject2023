@@ -17,6 +17,9 @@ import game_objects.Player;
 import game_objects.RockTileBlock;
 import game_objects.StoneTileBlock;
 import game_objects.WoodJumpThroughTileBlock;
+import items.FisticuffsItem;
+import items.HammerItem;
+import items.SwordItem;
 import window.HUD;
 import window.KeyInput;
 import window.MouseInput;
@@ -55,7 +58,7 @@ public class ObjectHandler {
 		this.mouseInput = mouseInput;
 
 		FileIO fileIO = new FileIO();
-		int[][] objectUIDs = fileIO.loadLevel("levels.txt", 1);
+		int[][] objectUIDs = fileIO.loadLevel("levels.txt", 0);
 		
 		for (int i = 0; i < TILE_ROWS; i++) {
 			for (int j = 0; j < TILE_COLUMNS; j++) {
@@ -321,6 +324,15 @@ public class ObjectHandler {
 			break;
 		case WoodJumpThroughTileBlock_OuterRight:
 			gameObject = new WoodJumpThroughTileBlock(x, y, objectName, TileOrientation.OuterRight);
+			break;
+		case FisticuffsItem:
+			gameObject = new FisticuffsItem(x, y, this);
+			break;
+		case SwordItem:
+			gameObject = new SwordItem(x, y, this); 
+			break;
+		case HammerItem:
+			gameObject = new HammerItem(x, y, this);
 			break;
 		}
 		
