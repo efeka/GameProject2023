@@ -49,7 +49,7 @@ public class FisticuffsWeapon extends Weapon {
 	@Override
 	public void useAbility(int index) {
 		if (!isAbilityIndexValid(index))
-			throw new IndexOutOfBoundsException("Index " + index + " is invalid for " + getClass());
+			return;
 
 		WeaponAbility ability = abilities[index];
 		if (ability.getAnimation(0).isPlayedOnce() || ability.getAnimation(1).isPlayedOnce()) {
@@ -140,13 +140,6 @@ public class FisticuffsWeapon extends Weapon {
 		else
 			attackX = (int) playerX - attackWidth / 2;
 		return new Rectangle(attackX, playerY, attackWidth, playerHeight);
-	}
-
-	@Override
-	public WeaponAbility getAbility(int index) {
-		if (!isAbilityIndexValid(index))
-			throw new IndexOutOfBoundsException("Index " + index + " is invalid for " + getClass());
-		return abilities[index];
 	}
 
 	@Override

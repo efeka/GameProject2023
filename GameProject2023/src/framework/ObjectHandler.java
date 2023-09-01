@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import abstract_objects.GameObject;
 import abstract_objects.TileOrientation;
 import framework.ObjectId.Name;
+import game_objects.ArcherEnemy;
 import game_objects.BasicEnemy;
 import game_objects.DiagonalStoneTileBlock;
 import game_objects.GrassTileBlock;
@@ -184,6 +185,9 @@ public class ObjectHandler {
 		case BasicEnemy:
 			gameObject = new BasicEnemy(x, y, this);
 			break;
+		case ArcherEnemy:
+			gameObject = new ArcherEnemy(x, y, this);
+			break;
 		case HUD:
 			gameObject = new HUD(x, y, TILE_SIZE * 3, TILE_SIZE / 2, player);
 			break;
@@ -333,6 +337,8 @@ public class ObjectHandler {
 			break;
 		case HammerItem:
 			gameObject = new HammerItem(x, y, this);
+			break;
+		case Missing:
 			break;
 		}
 		

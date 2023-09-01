@@ -6,12 +6,14 @@ import items.Item;
 import window.Animation;
 
 /*
- * Weapons can have an ability pool.
- * The player should only have access to 2 or 3 abilities of a single weapon.
- * They can find the same type of weapon throughout a run.
- * Each of these weapons would have a selection of abilities pulled randomly from their pool.
- * Maybe there could be a reroll station which allows the player to reroll an ability of their weapon,
- * which could cost in game currency.
+ * Sword-shield parry
+ * Sword-shield warcry buff
+ * 
+ * Trident throw and teleport
+ * Trident projectile block/reflect
+ * 
+ * Shuriken and sai/claw
+ * 		geri ziplayip asagi dogru 3 5 shuriken
  */
 
 public abstract class Weapon {
@@ -47,7 +49,7 @@ public abstract class Weapon {
 	
 	public WeaponAbility getAbility(int index) {
 		if (!isAbilityIndexValid(index))
-			throw new IndexOutOfBoundsException("Index " + index + " is invalid for " + getClass());
+			return null;
 		return abilities[index];
 	}
 	

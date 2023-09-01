@@ -15,6 +15,7 @@ public class ObjectId {
 		Enemy,
 		Menu,
 		Item,
+		Projectile,
 	}
 	
 	/**
@@ -31,8 +32,10 @@ public class ObjectId {
 	 * get rid of reduntant code in this class.
 	 */
 	public enum Name {
+		Missing(-1),
 		Player(1),
 		BasicEnemy(2),
+		ArcherEnemy(3),
 
 		HUD(500),
 

@@ -79,15 +79,20 @@ public class Player extends Creature {
 		if (!canInteract && (now - lastInteractTimer >= 1000))
 			canInteract = true;
 
-		// Handle ability usage
-		if (mouseInput.isAttackButtonPressed() || weapon.getAbility(0).isAbilityBeingUsed())
-			weapon.useAbility(0);
-		if (keyInput.isFirstAbilityKeyPressed() || weapon.getAbility(1).isAbilityBeingUsed())
-			weapon.useAbility(1);
-		
-		handleMovement();		
+		handleMovement();
 		handleObjectInteraction();
-
+		
+		// Handle ability usage
+		if (mouseInput.isAttackButtonPressed() || 
+				(weapon.getAbility(0) != null && weapon.getAbility(0).isAbilityBeingUsed()))
+			weapon.useAbility(0);
+		if (keyInput.isFirstAbilityKeyPressed() ||
+				(weapon.getAbility(1) != null && weapon.getAbility(1).isAbilityBeingUsed()))
+			weapon.useAbility(1);
+		if (keyInput.isSecondAbilityKeyPressed() ||
+				(weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed()))
+			weapon.useAbility(2);
+		
 		runAnimations();
 	}
 
@@ -301,11 +306,14 @@ public class Player extends Creature {
 		int directionToIndex = animationHandler.getIndexFromDirection();
 
 		// Using first ability
-		if (weapon.getAbility(0).isAbilityBeingUsed())
+		if (weapon.getAbility(0) != null && weapon.getAbility(0).isAbilityBeingUsed())
 			weapon.getAbility(0).getAnimation(directionToIndex).runAnimation();
 		// Using second ability
-		else if (weapon.getAbility(1).isAbilityBeingUsed())
+		else if (weapon.getAbility(1) != null && weapon.getAbility(1).isAbilityBeingUsed())
 			weapon.getAbility(1).getAnimation(directionToIndex).runAnimation();
+		// Using third ability
+		else if (weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed())
+			weapon.getAbility(2).getAnimation(directionToIndex).runAnimation();
 		// Idle
 		else if (velX == 0)
 			animationHandler.getIdleAnimation().runAnimation();
@@ -318,11 +326,13 @@ public class Player extends Creature {
 		int directionToIndex = animationHandler.getIndexFromDirection();
 
 		// Using first ability
-		if (weapon.getAbility(0).isAbilityBeingUsed())
+		if (weapon.getAbility(0) != null && weapon.getAbility(0).isAbilityBeingUsed())
 			weapon.getAbility(0).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		// Using second ability
-		else if (weapon.getAbility(1).isAbilityBeingUsed())
+		else if (weapon.getAbility(1) != null && weapon.getAbility(1).isAbilityBeingUsed())
 			weapon.getAbility(1).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		else if (weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed())
+			weapon.getAbility(2).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		// Jumping
 		else if (jumping) {
 			// Going up

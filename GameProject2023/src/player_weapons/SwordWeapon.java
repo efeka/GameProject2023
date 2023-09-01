@@ -9,6 +9,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import game_objects.SwordProjectile;
 import items.Item;
 import items.SwordItem;
 import window.Animation;
@@ -26,7 +27,7 @@ public class SwordWeapon extends Weapon {
 
 	@Override
 	protected void setupAbilities() {
-		abilities = new WeaponAbility[2];
+		abilities = new WeaponAbility[3];
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
 		// Regular attack
@@ -44,13 +45,21 @@ public class SwordWeapon extends Weapon {
 		Animation stabLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStab, -1),
 				stabDelay, true);
 		abilities[1] = new WeaponAbility(1500, 35, new Animation[] {stabRightAnim, stabLeftAnim});
+		
+		// Sword throw
+		int throwDelay = 7;
+		Animation throwRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordThrow, 1),
+				throwDelay, true);
+		Animation throwLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordThrow, -1),
+				throwDelay, true);
+		abilities[2] = new WeaponAbility(500, 35, new Animation[] {throwRightAnim, throwLeftAnim});
 	}
 
 	@Override
 	public void useAbility(int index) {
 		if (!isAbilityIndexValid(index))
-			throw new IndexOutOfBoundsException("Index " + index + " is invalid for " + getClass());
-
+			return;
+		
 		WeaponAbility ability = abilities[index];
 		if (ability.getAnimation(0).isPlayedOnce() || ability.getAnimation(1).isPlayedOnce()) {
 			if (ability.isOnCooldown())
@@ -60,6 +69,9 @@ public class SwordWeapon extends Weapon {
 		}
 
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		int currentAnimFrame1 = ability.getAnimation(0).getCurrentFrame();
+		int currentAnimFrame2 = ability.getAnimation(1).getCurrentFrame();
+		
 		switch (index) {
 		case 0:
 			// Attack
@@ -81,8 +93,6 @@ public class SwordWeapon extends Weapon {
 		case 1:
 			// Stab
 			player.setVelX(0);
-			int currentAnimFrame1 = ability.getAnimation(0).getCurrentFrame();
-			int currentAnimFrame2 = ability.getAnimation(1).getCurrentFrame();
 			if (currentAnimFrame1 != 4 && currentAnimFrame1 != 5 && currentAnimFrame2 != 4 && currentAnimFrame2 != 5)
 				break;
 
@@ -98,6 +108,25 @@ public class SwordWeapon extends Weapon {
 					}
 				}
 			}
+			break;
+			
+		case 2:
+			// Throw
+			player.setVelX(0);
+			if (currentAnimFrame1 != 2 && currentAnimFrame2 != 2)
+				break;
+
+			float projectileVelX = 5f * player.getDirection();
+			float projectileX;
+			if (player.getDirection() == 1)
+				projectileX = player.getX() + player.getWidth() / 2;
+			else
+				projectileX = player.getX() - player.getWidth() / 2;
+			
+			player.setWeapon(new FisticuffsWeapon(objectHandler));
+			objectHandler.addObject(new SwordProjectile(projectileX, player.getY(),
+					projectileVelX, 0f, abilities[index].getDamage(),
+					objectHandler), ObjectHandler.MIDDLE_LAYER);
 			break;
 		}
 	}

@@ -8,6 +8,7 @@ import abstract_objects.GameObject;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
+import framework.GameConstants.ScaleConstants;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.Player;
@@ -22,8 +23,8 @@ public abstract class Item extends GameObject {
 	private boolean jumping = true;
 	private float velY = -3f;
 
-	public Item(float x, float y, int width, int height, ObjectHandler objectHandler, Name objectName) {
-		super(x, y, width, height, new ObjectId(Category.Item, objectName));
+	public Item(float x, float y, ObjectHandler objectHandler, Name objectName) {
+		super(x, y, ScaleConstants.PLAYER_WIDTH, ScaleConstants.PLAYER_HEIGHT, new ObjectId(Category.Item, objectName));
 		this.objectHandler = objectHandler;
 	}
 	
@@ -97,10 +98,12 @@ public abstract class Item extends GameObject {
 		
 		// Drop the player's current weapon in Item form
 		// so that it can be picked up again later
+		
 		float itemX = player.getX() + player.getWidth() / 2 - width / 2;
 		float itemY = player.getY() - height / 2;
 		Item oldItem = oldWeapon.createItemFromWeapon(itemX, itemY);
-		objectHandler.addObject(oldItem, ObjectHandler.MIDDLE_LAYER);
+		if (oldItem.getObjectId().getName() != Name.FisticuffsItem)
+			objectHandler.addObject(oldItem, ObjectHandler.MIDDLE_LAYER);
 	}
 
 }

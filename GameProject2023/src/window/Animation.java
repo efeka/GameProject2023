@@ -51,10 +51,9 @@ public class Animation {
 
 		frameIndex = delayCounter = 0;
 		frameCount = onlyPlayOnce ? sprites.length + 1 : sprites.length;
-		
-		// If onlyPlayOnce is true, the last frame needs to be played twice.
-		// Without this adjustment, the delay cannot be applied to the last frame
-		// resulting in it being skipped immediately. 
+
+		// If onlyPlayOnce is true, the last frame has to be played twice so that
+		// the frame delay can be applied to it. Otherwise it gets skipped instantly.
 		images = new BufferedImage[frameCount];
 		for (int i = 0; i < frameCount; i++) {
 			if (onlyPlayOnce && i == frameCount - 1)

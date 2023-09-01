@@ -20,6 +20,7 @@ public class TextureLoader {
 		PlayerSwordRun,
 		PlayerSwordAttack,
 		PlayerSwordStab,
+		PlayerSwordThrow,
 		
 		PlayerHammerIdle,
 		PlayerHammerRun,
@@ -42,6 +43,9 @@ public class TextureLoader {
 		FisticuffsItem,
 		SwordItem,
 		HammerItem,
+		
+		SwordProjectile,
+		ArrowProjectile,
 	}
 
 	private BufferedImage playerSheet = null;
@@ -55,7 +59,7 @@ public class TextureLoader {
 			playerSheet = fileIO.loadSheet("player_sheet_64x64.png");
 			enemySheet = fileIO.loadSheet("enemy_sheet_64x64.png");
 			blockSheet = fileIO.loadSheet("block_sheet_16x16.png");
-			itemSheet = fileIO.loadSheet("item_sheet_64x64.png");
+			itemSheet = fileIO.loadSheet("item_sheet_32x32.png");
 		} 
 		catch(IOException e) {
 			System.err.println("Failed to load an image file from the /res folder.");
@@ -73,6 +77,9 @@ public class TextureLoader {
 		BufferedImage[] textures = null;
 
 		switch (textureName) {
+		case Missing:
+			textures = new BufferedImage[] {blockSheet.getSubimage(222, 1, 16, 16)};
+			break;
 		case PlayerIdle:
 			textures = new BufferedImage[20];
 			for (int i = 0; i < 10; i++) {
@@ -220,21 +227,34 @@ public class TextureLoader {
 		case FisticuffsItem:
 			textures = new BufferedImage[10];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 65, 1, 64, 64);
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 1, 32, 32);
 			break;
 		case SwordItem:
 			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 65, 66, 64, 64);
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 34, 32, 32);
 			break;
 		case HammerItem:
 			textures = new BufferedImage[6];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 65, 131, 64, 64);
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 67, 32, 32);
 			break;
-		case Missing:
-		default:
-			textures = new BufferedImage[] {blockSheet.getSubimage(222, 1, 16, 16)};
+		case SwordProjectile:
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 100, 32, 32);
+			break;
+		case PlayerSwordThrow:
+			textures = new BufferedImage[6];
+			for (int i = 0; i < 3; i++) {
+				textures[i] = playerSheet.getSubimage(1 + i * 65, 651, 64, 64);
+				textures[i + 3] = playerSheet.getSubimage(1 + i * 65, 716, 64, 64);
+			}
+			break;
+		case ArrowProjectile:
+			textures = new BufferedImage[3];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 133, 32, 32);
 			break;
 		}
 
