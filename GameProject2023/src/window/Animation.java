@@ -138,5 +138,9 @@ public class Animation {
 	public int getCurrentFrame() {
 		return frameIndex;
 	}
+	
+	public int getFrameCount() {
+		return frameCount;
+	}
 
 }

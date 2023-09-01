@@ -34,6 +34,10 @@ public class TextureLoader {
 		BasicEnemyIdle,
 		BasicEnemyJump,
 		
+		ArcherEnemyIdle,
+		ArcherEnemyShootTorso,
+		ArcherEnemyShootLegs,
+		
 		StoneTiles,
 		GrassTiles,
 		RockTiles,
@@ -255,6 +259,25 @@ public class TextureLoader {
 			textures = new BufferedImage[3];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 33, 133, 32, 32);
+			break;
+		case ArcherEnemyIdle:
+			textures = new BufferedImage[10];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = enemySheet.getSubimage(1 + i * 65, 1041, 64, 64);
+			break;
+		case ArcherEnemyShootTorso:
+			textures = new BufferedImage[18];
+			for (int i = 0; i < 9; i++) {
+				textures[i] = enemySheet.getSubimage(1 + i * 65, 1106, 64, 64);
+				textures[i + 9] = enemySheet.getSubimage(1 + i * 65, 1171, 64, 64);
+			}
+			break;
+		case ArcherEnemyShootLegs:
+			textures = new BufferedImage[18];
+			for (int i = 0; i < 9; i++) {
+				textures[i] = enemySheet.getSubimage(1 + i * 65, 1236, 64, 64);
+				textures[i + 9] = enemySheet.getSubimage(1 + i * 65, 1301, 64, 64);
+			}
 			break;
 		}
 

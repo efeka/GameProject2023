@@ -3,14 +3,15 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
-import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import abstract_objects.Creature;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import window.Animation;
 
 public class ArcherEnemy extends Creature {
 
@@ -18,6 +19,12 @@ public class ArcherEnemy extends Creature {
 
 	private final int shootCooldown = 2000;
 	private long lastShotTimer = shootCooldown;
+	private boolean isShotReady = false, didShoot = false;
+
+	private float shootVelX, shootVelY;
+
+	private Animation[] idleAnimation;
+	private Animation[] shootAnimationTorso, shootAnimationLegs;
 
 	public ArcherEnemy(int x, int y, ObjectHandler objectHandler) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, 70, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
@@ -25,42 +32,178 @@ public class ArcherEnemy extends Creature {
 
 		invulnerableDuration = 700;
 
-		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
+		setupAnimations();
+		texture = TextureLoader.getInstance().getTextures(TextureName.ArcherEnemyIdle)[0];
 	}
 
 	@Override
-	public void takeDamage(int damageAmount) {}
-
+	public void takeDamage(int damageAmount) {
+		if (invulnerable)
+			return;
+		
+		lastInvulnerableTimer = System.currentTimeMillis();
+		invulnerable = true;
+		
+		setHealth(health - damageAmount);
+		objectHandler.addObject(new DamageNumberPopup(x + width / 2, y, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
+		
+		if (health <= 0)
+			objectHandler.removeObject(this);
+	}
+	
 	@Override
-	public void applyKnockback(float velX, float velY) {}
+	public void applyKnockback(float velX, float velY) {
+		knockedBack = true;
+		this.velX = velX;
+		this.velY = velY;
+	}
 
 	@Override
 	public void tick() {
-		if (System.currentTimeMillis() - lastShotTimer >= shootCooldown) {
-			lastShotTimer = System.currentTimeMillis();
-			shootArrow(7f);
+		x += velX;
+		y += velY;
+
+		if (falling || jumping) {
+			velY += GRAVITY;
+
+			if (velY > TERMINAL_VELOCITY)
+				velY = TERMINAL_VELOCITY;
 		}
+
+		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
+			invulnerable = false;
+		
+		takeAim(8f);
+
+		if (System.currentTimeMillis() - lastShotTimer >= shootCooldown)
+			isShotReady = true;
+		if (isShotReady) {
+			int animationFrame1 = shootAnimationTorso[0].getCurrentFrame();
+			int animationFrame2 = shootAnimationTorso[1].getCurrentFrame();
+			if (!didShoot && (animationFrame1 == 7 || animationFrame2 == 7)) {
+				shootArrow(8f);
+				didShoot = true;
+			}
+
+			if (shootAnimationTorso[0].isPlayedOnce() || shootAnimationTorso[1].isPlayedOnce())
+				resetShootingSystem();
+		}
+
+		basicBlockCollision(objectHandler);
+		runAnimations();
 	}
 
-	private void shootArrow(float velX) {
+
+	@Override
+	public void render(Graphics g) {
+		drawAnimations(g);
+	}
+
+	/**
+	 * Aims at the center point of the player.
+	 * The purpose of this method is to set the shootVelX and shootVelY variables.
+	 * They are then used for shooting the arrow in the correct angle,
+	 * and rotating the animation using according to that angle.
+	 * @param speedX the horizontal speed of the arrow
+	 */
+	private void takeAim(float speedX) {
+		shootVelX = speedX;
 		Player player = objectHandler.getPlayer();
 		float distanceX = (float) player.getBounds().getCenterX() - x;
 		float distanceY = (float) player.getBounds().getCenterY() - y;
 
 		if (distanceX < 0)
-			velX = -velX;
+			shootVelX = Math.abs(shootVelX) * -1;
 
-		float timeToTargetX = distanceX / velX;
-		velX = distanceX / timeToTargetX;
-		velY = (distanceY - 0.5f * GRAVITY * timeToTargetX * timeToTargetX) / timeToTargetX;
+		if (shootVelX < 0)
+			direction = -1;
+		else
+			direction = 1;
 
-		objectHandler.addObject(new ArrowProjectile(x, y, velX, velY, 15, objectHandler), ObjectHandler.MIDDLE_LAYER);
+		float timeToTargetX = distanceX / shootVelX;
+		shootVelX = distanceX / timeToTargetX;
+		shootVelY = (distanceY - 0.5f * GRAVITY * timeToTargetX * timeToTargetX) / timeToTargetX;
 	}
 
-	@Override
-	public void render(Graphics g) {
-		g.setColor(Color.BLUE);
-		g.fillRect((int) x, (int) y, width, height);
+	// Shoot the arrow aimed at the center of the Player
+	private void shootArrow(float speedX) {
+		takeAim(speedX);
+		objectHandler.addObject(new ArrowProjectile(x, y, shootVelX, shootVelY, 15, objectHandler), ObjectHandler.MIDDLE_LAYER);
+	}
+
+	private void runAnimations() {
+		int animationIndex = getIndexFromDirection();
+		if (isShotReady) {
+			shootAnimationLegs[animationIndex].runAnimation();
+			shootAnimationTorso[animationIndex].runAnimation();
+		}
+		else
+			idleAnimation[animationIndex].runAnimation();
+	}
+
+	private void drawAnimations(Graphics g) {
+		int animationIndex = getIndexFromDirection();
+
+		if (isShotReady) {
+			float centerX = (float) getBounds().getCenterX();
+			float centerY = (float) getBounds().getCenterY();
+			
+			// Calculate the angle that this enemy will be rotated at
+			double rotationAngle;
+			if (shootVelX < 0)
+				rotationAngle = Math.atan2(shootVelY, shootVelX) + Math.PI;
+			else
+				rotationAngle = -Math.atan2(shootVelY, -shootVelX) + Math.PI * 3;
+
+			// Draw the legs, but dont rotate them
+			shootAnimationLegs[animationIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+			
+			// Rotate the torso
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.rotate(rotationAngle, centerX, centerY);
+			shootAnimationTorso[animationIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+			g2d.rotate(-rotationAngle, centerX, centerY);
+		}
+		else
+			idleAnimation[animationIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+	}
+
+	private void setupAnimations() {
+		TextureLoader textureLoader = TextureLoader.getInstance();
+
+		int idleDelay = 20;
+		idleAnimation = new Animation[2];
+		idleAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyIdle, 1),
+				idleDelay, false);
+		idleAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyIdle, -1),
+				idleDelay, false);
+
+		int shootDelay = 6;
+		shootAnimationTorso = new Animation[2];
+		shootAnimationTorso[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootTorso, 1),
+				shootDelay, true);
+		shootAnimationTorso[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootTorso, -1),
+				shootDelay, true);
+
+		shootAnimationLegs = new Animation[2];
+		shootAnimationLegs[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootLegs, 1),
+				shootDelay, true);
+		shootAnimationLegs[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootLegs, -1),
+				shootDelay, true);
+	}
+
+	private void resetShootingSystem() {
+		isShotReady = didShoot = false;
+		lastShotTimer = System.currentTimeMillis();
+
+		shootAnimationLegs[0].resetAnimation();
+		shootAnimationLegs[1].resetAnimation();
+		shootAnimationTorso[0].resetAnimation();
+		shootAnimationTorso[1].resetAnimation();
+	}
+
+	public int getIndexFromDirection() {
+		return (-direction + 1) / 2;
 	}
 
 }

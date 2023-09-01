@@ -6,6 +6,7 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import abstract_objects.Creature;
 import abstract_objects.GameObject;
 import abstract_objects.Projectile;
 import framework.ObjectHandler;
@@ -36,10 +37,13 @@ public class SwordProjectile extends Projectile {
 			GameObject other = midLayer.get(i);
 			if (other.equals(this))
 				continue;
-
-			// TODO enemy collision
-			if (other.getObjectId().getCategory() == ObjectId.Category.Block) {
+			
+			if (other.getObjectId().getCategory() == ObjectId.Category.Block ||
+					other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
 				if (getBounds().intersects(other.getBounds())) {
+					if (other.getObjectId().getCategory() == ObjectId.Category.Enemy)
+						((Creature) other).takeDamage(damage);
+					
 					SwordItem swordItem = null;
 					if (x < other.getX())
 						swordItem = new SwordItem(other.getX() - width * 2, y, objectHandler);

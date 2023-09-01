@@ -273,27 +273,6 @@ public class Player extends Creature {
 		}
 	}
 
-	private Rectangle getHorizontalBounds() {
-		float height = 3 * this.height / 5f;
-		float yOffset = this.height / 5f; 
-		return new Rectangle((int) (x + velX), (int) (y + yOffset), width, (int) height);
-	}
-
-	private Rectangle getTopBounds() {
-		float width = 3 * this.width / 5f;
-		float xOffset = (this.width - width) / 2;
-		float height = this.height / 5f;
-		return new Rectangle((int) (x + xOffset), (int) y, (int) width, (int) height);
-	}
-
-	private Rectangle getBottomBounds() {
-		float width = 3 * this.width / 5f;
-		float xOffset = (this.width - width) / 2;
-		float height = this.height / 5f;
-		float yOffset = 4 * this.height / 5f;
-		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
-	}
-	
 	private Rectangle getGroundCheckBounds() {
 		float width = 3 * this.width / 5f;
 		float xOffset = (this.width - width) / 2;

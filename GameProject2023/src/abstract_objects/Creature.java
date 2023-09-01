@@ -1,7 +1,11 @@
 package abstract_objects;
 
+import java.awt.Rectangle;
+
 import framework.GameConstants;
+import framework.ObjectHandler;
 import framework.ObjectId;
+import framework.ObjectId.Category;
 
 public abstract class Creature extends GameObject {
 
@@ -45,6 +49,78 @@ public abstract class Creature extends GameObject {
 	
 	public abstract void takeDamage(int damageAmount);
 	public abstract void applyKnockback(float velX, float velY);
+	
+	protected Rectangle getHorizontalBounds() {
+		float height = 3 * this.height / 5f;
+		float yOffset = this.height / 5f; 
+		return new Rectangle((int) (x + velX), (int) (y + yOffset), width, (int) height);
+	}
+
+	protected Rectangle getTopBounds() {
+		float width = 3 * this.width / 5f;
+		float xOffset = (this.width - width) / 2;
+		float height = this.height / 5f;
+		return new Rectangle((int) (x + xOffset), (int) y, (int) width, (int) height);
+	}
+
+	protected Rectangle getBottomBounds() {
+		float width = 3 * this.width / 5f;
+		float xOffset = (this.width - width) / 2;
+		float height = this.height / 5f;
+		float yOffset = 4 * this.height / 5f;
+		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
+	}
+	
+	protected Rectangle getGroundAttackBounds() {
+		int attackX;
+		if (direction == 1)
+			attackX = (int) x + width / 2;
+		else
+			attackX = (int) x - width / 2;
+		return new Rectangle(attackX, (int) y, width, height);
+	}
+	
+	protected void basicBlockCollision(ObjectHandler objectHandler) {
+		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
+			// Collision with Blocks
+			if (other.getObjectId().getCategory() == Category.Block) {
+				Rectangle otherBounds = other.getBounds();
+
+				// Bottom collision
+				if (getBottomBounds().intersects(otherBounds)) {
+					y = other.getY() - height;
+					velY = 0;
+					falling = false;
+					jumping = false;
+					
+					// Reset knock back after hitting the ground
+					if (knockedBack) {
+						knockedBack = false;
+						velX = 0;
+					}
+				}
+				else
+					falling = true;
+
+				// Horizontal collision
+				if (getHorizontalBounds().intersects(otherBounds)) {
+					int xDiff = (int) (x - other.getX());
+					// Creature is to the left of the object
+					if (xDiff < 0)
+						x = other.getX() - width;
+					// Creature is to the right of the object
+					else
+						x = other.getX() + other.getWidth();
+				}
+
+				// Top collision
+				if (getTopBounds().intersects(otherBounds)) {
+					y = other.getY() + other.getHeight();
+					velY = 0;
+				}
+			}
+		}
+	}
 	
 	public int getMaxHealth() {
 		return maxHealth;

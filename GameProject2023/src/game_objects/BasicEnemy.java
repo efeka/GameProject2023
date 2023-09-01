@@ -64,7 +64,7 @@ public class BasicEnemy extends Creature {
 		//if (!knockedBack)
 		//handleMovement();
 		handleAttacking();
-		handleCollision();
+		basicBlockCollision(objectHandler);
 		
 		runAnimations();
 	}
@@ -72,51 +72,6 @@ public class BasicEnemy extends Creature {
 	@Override
 	public void render(Graphics g) {
 		drawAnimations(g);
-	}
-	
-	private void handleCollision() {
-		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
-			// Collision with Blocks
-			if (other.getObjectId().getCategory() == Category.Block)
-				checkBlockCollision(other);
-		}
-	}
-
-	private void checkBlockCollision(GameObject other) {
-		Rectangle otherBounds = other.getBounds();
-
-		// Bottom collision
-		if (getBottomBounds().intersects(otherBounds)) {
-			y = other.getY() - height;
-			velY = 0;
-			falling = false;
-			jumping = false;
-			
-			// Reset knock back after hitting the ground
-			if (knockedBack) {
-				knockedBack = false;
-				velX = 0;
-			}
-		}
-		else
-			falling = true;
-
-		// Horizontal collision
-		if (getHorizontalBounds().intersects(otherBounds)) {
-			int xDiff = (int) (x - other.getX());
-			// Player is to the left of the object
-			if (xDiff < 0)
-				x = other.getX() - width;
-			// Player is to the right of the object
-			else
-				x = other.getX() + other.getWidth();
-		}
-
-		// Top collision
-		if (getTopBounds().intersects(otherBounds)) {
-			y = other.getY() + other.getHeight();
-			velY = 0;
-		}
 	}
 	
 	private void handleAttacking() {
@@ -171,36 +126,6 @@ public class BasicEnemy extends Creature {
 		knockedBack = true;
 		this.velX = velX;
 		this.velY = velY;
-	}
-	
-	private Rectangle getHorizontalBounds() {
-		float height = 3 * this.height / 5f;
-		float yOffset = this.height / 5f; 
-		return new Rectangle((int) (x + velX), (int) (y + yOffset), width, (int) height);
-	}
-
-	private Rectangle getTopBounds() {
-		float width = 3 * this.width / 5f;
-		float xOffset = (this.width - width) / 2;
-		float height = this.height / 5f;
-		return new Rectangle((int) (x + xOffset), (int) y, (int) width, (int) height);
-	}
-
-	private Rectangle getBottomBounds() {
-		float width = 3 * this.width / 5f;
-		float xOffset = (this.width - width) / 2;
-		float height = this.height / 5f;
-		float yOffset = 4 * this.height / 5f;
-		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
-	}
-	
-	private Rectangle getGroundAttackBounds() {
-		int attackX;
-		if (direction == 1)
-			attackX = (int) x + width / 2;
-		else
-			attackX = (int) x - width / 2;
-		return new Rectangle(attackX, (int) y, width, height);
 	}
 	
 	private void setupAnimations() {
