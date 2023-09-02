@@ -35,10 +35,12 @@ public class Player extends Creature {
 	private Weapon weapon;
 
 	private float runningSpeed = 3f;
-	private float jumpingSpeed = -8.5f;
+	private float jumpingSpeed = 8.5f;
+	private float dodgingSpeed = 5f;
 
 	private int availableJumps = 2;
 	private boolean doubleJumping = false;
+	private boolean dodging = false;
 
 	private boolean canInteract = true;
 	private long lastInteractTimer;
@@ -84,12 +86,6 @@ public class Player extends Creature {
 
 		handleMovement();
 		handleObjectInteraction();
-		
-		// Reset double jump if the animation is over
-		if (doubleJumping && animationHandler.isDoubleJumpAnimationFinished()) {
-			animationHandler.resetDoubleJumpAnimations();
-			doubleJumping = false;
-		}
 
 		// Handle ability usage
 		if (mouseInput.isAttackButtonPressed() || 
@@ -152,21 +148,35 @@ public class Player extends Creature {
 		if (knockedBack)
 			return;
 
-		if (velX > 0)
-			direction = 1;
-		else if (velX < 0)
+		if (velX < 0)
 			direction = -1;
+		else if (velX > 0)
+			direction = 1;
 
 		// Horizontal movement
-		boolean rightPressed = keyInput.isMoveRightKeyPressed();
-		boolean leftPressed = keyInput.isMoveLeftKeyPressed();
+		if (!dodging) {
+			boolean rightPressed = keyInput.isMoveRightKeyPressed();
+			boolean leftPressed = keyInput.isMoveLeftKeyPressed();
+			if (rightPressed && !leftPressed)
+				velX = runningSpeed;
+			else if (leftPressed && !rightPressed)
+				velX = -runningSpeed;
+			else if ((rightPressed && leftPressed) || (!rightPressed && !leftPressed))
+				velX = 0;
+		}
 
-		if (rightPressed && !leftPressed)
-			velX = runningSpeed;
-		else if (leftPressed && !rightPressed)
-			velX = -runningSpeed;
-		else if ((rightPressed && leftPressed) || (!rightPressed && !leftPressed))
-			velX = 0;
+		// Dodging
+		if (!dodging && keyInput.isDodgeKeyPressed()) {
+			if (!falling) {
+				dodging = true;
+				velX = dodgingSpeed * direction;
+			}
+		}
+		// Reset the dodge if the animation is over
+		if (dodging && animationHandler.isDodgeAnimationFinished()) {
+			animationHandler.resetDodgeAnimations();
+			dodging = false;
+		}
 
 		// Jump / Double jump
 		// Allows the player to do multiple jumps without touching the ground.
@@ -177,7 +187,7 @@ public class Player extends Creature {
 			if (!falling && !jumping && availableJumps == 2) {
 				availableJumps = 1;
 				jumping = true;
-				velY = jumpingSpeed;
+				velY = -jumpingSpeed;
 
 				// This is set to false so that the user has to press the jump key
 				// a second time to perform the double jump.
@@ -187,21 +197,25 @@ public class Player extends Creature {
 			else if (falling && !jumping && availableJumps == 2) {
 				availableJumps = 0;
 				doubleJumping = true;
-				velY = jumpingSpeed;
+				velY = -jumpingSpeed;
 			}
 			// If the player performed 1 jump and is still mid air
 			else if (falling && jumping && availableJumps == 1) {
 				availableJumps = 0;
 				doubleJumping = true;
-				velY = jumpingSpeed;
+				velY = -jumpingSpeed;
 			}
-
+		}
+		// Reset double jump if the animation is over
+		if (doubleJumping && animationHandler.isDoubleJumpAnimationFinished()) {
+			animationHandler.resetDoubleJumpAnimations();
+			doubleJumping = false;
 		}
 	}
 
 	@Override
 	public void takeDamage(int damageAmount) {
-		if (invulnerable)
+		if (invulnerable || dodging)
 			return;
 
 		lastInvulnerableTimer = System.currentTimeMillis();
@@ -213,7 +227,7 @@ public class Player extends Creature {
 
 	@Override
 	public void applyKnockback(float velX, float velY) {
-		if (knockedBack && invulnerable)
+		if ((knockedBack && invulnerable) || dodging)
 			return;
 
 		knockedBack = true;
@@ -324,6 +338,7 @@ public class Player extends Creature {
 		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
 	}
 
+	// TODO Should be moved into PlayerAnimationHandler
 	private void runAnimations() {
 		int directionToIndex = animationHandler.getIndexFromDirection();
 
@@ -336,6 +351,10 @@ public class Player extends Creature {
 		// Using third ability
 		else if (weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed())
 			weapon.getAbility(2).getAnimation(directionToIndex).runAnimation();
+		else if (dodging) {
+			animationHandler.getDodgeAnimation(1).runAnimation();
+			animationHandler.getDodgeAnimation(-1).runAnimation();
+		}
 		else if (doubleJumping) {
 			animationHandler.getDoubleJumpAnimation(1).runAnimation();
 			animationHandler.getDoubleJumpAnimation(-1).runAnimation();
@@ -348,6 +367,7 @@ public class Player extends Creature {
 			animationHandler.getRunAnimation().runAnimation();
 	}
 
+	// TODO Should be moved into PlayerAnimationHandler
 	private void drawAnimations(Graphics g) {
 		int directionToIndex = animationHandler.getIndexFromDirection();
 
@@ -359,6 +379,8 @@ public class Player extends Creature {
 			weapon.getAbility(1).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		else if (weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed())
 			weapon.getAbility(2).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		else if (dodging)
+			animationHandler.getDodgeAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		// Jumping
 		else if (jumping || doubleJumping) {
 			if (!doubleJumping) {

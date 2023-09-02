@@ -39,10 +39,10 @@ public abstract class Item extends GameObject {
 		y += velY;
 
 		if (jumping) {
-			velY += GameConstants.CreatureConstants.GRAVITY;
+			velY += GameConstants.PhysicsConstants.GRAVITY;
 
-			if (velY > GameConstants.CreatureConstants.TERMINAL_VELOCITY)
-				velY = GameConstants.CreatureConstants.TERMINAL_VELOCITY;
+			if (velY > GameConstants.PhysicsConstants.TERMINAL_VELOCITY)
+				velY = GameConstants.PhysicsConstants.TERMINAL_VELOCITY;
 		}
 		
 		checkGroundCollision();

@@ -37,7 +37,7 @@ public class ArrowProjectile extends Projectile {
 		
 		x += velX;
 		y += velY;
-		velY += GameConstants.CreatureConstants.GRAVITY;
+		velY += GameConstants.PhysicsConstants.GRAVITY;
 		
 		checkCollisions();
 		

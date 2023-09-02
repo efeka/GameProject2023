@@ -11,6 +11,7 @@ public class KeyInput extends KeyAdapter {
 	private boolean moveLeftKeyPressed = false;
 	private boolean jumpKeyPressed = false;
 	private boolean crouchKeyPressed = false;
+	private boolean dodgeKeyPressed = false;
 	// Player ability keys
 	private boolean firstAbilityKeyPressed = false;
 	private boolean secondAbilityKeyPressed = false;
@@ -58,6 +59,9 @@ public class KeyInput extends KeyAdapter {
 			break;
 		case KeyEvent.VK_F:
 			interactKeyPressed = true;
+			break;
+		case KeyEvent.VK_SHIFT:
+			dodgeKeyPressed = true;
 			break;
 		// Debug
 		case KeyEvent.VK_ESCAPE:
@@ -120,6 +124,9 @@ public class KeyInput extends KeyAdapter {
 			break;
 		case KeyEvent.VK_F:
 			interactKeyPressed = false;
+			break;
+		case KeyEvent.VK_SHIFT:
+			dodgeKeyPressed = false;
 			break;
 		// Debug
 		case KeyEvent.VK_CONTROL:
@@ -188,5 +195,9 @@ public class KeyInput extends KeyAdapter {
 	
 	public boolean isInteractKeyPressed() {
 		return interactKeyPressed;
+	}
+	
+	public boolean isDodgeKeyPressed() {
+		return dodgeKeyPressed;
 	}
 }

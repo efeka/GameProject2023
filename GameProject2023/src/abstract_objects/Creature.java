@@ -9,8 +9,8 @@ import framework.ObjectId.Category;
 
 public abstract class Creature extends GameObject {
 
-	protected final float GRAVITY = GameConstants.CreatureConstants.GRAVITY;
-	protected final int TERMINAL_VELOCITY = GameConstants.CreatureConstants.TERMINAL_VELOCITY;
+	protected final float GRAVITY = GameConstants.PhysicsConstants.GRAVITY;
+	protected final int TERMINAL_VELOCITY = GameConstants.PhysicsConstants.TERMINAL_VELOCITY;
 	
 	protected boolean falling, jumping, knockedBack, invulnerable;
 	

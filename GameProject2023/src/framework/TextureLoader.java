@@ -18,6 +18,7 @@ public class TextureLoader {
 		PlayerUppercut,
 		PlayerJump,
 		PlayerDoubleJump,
+		PlayerDodge,
 		
 		PlayerSwordIdle,
 		PlayerSwordRun,
@@ -130,6 +131,13 @@ public class TextureLoader {
 			for (int i = 0; i < 6; i++) {
 				textures[i] = playerSheet.getSubimage(586 + i * 65, 261, 64, 64);
 				textures[i + 6] = playerSheet.getSubimage(586 + i * 65, 326, 64, 64);
+			}
+			break;
+		case PlayerDodge:
+			textures = new BufferedImage[14];
+			for (int i = 0; i < 7; i++) {
+				textures[i] = playerSheet.getSubimage(521 + i * 65, 521, 64, 64);
+				textures[i + 7] = playerSheet.getSubimage(521 + i * 65, 586, 64, 64);
 			}
 			break;
 		case PlayerSwordIdle:
