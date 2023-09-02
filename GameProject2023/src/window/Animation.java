@@ -122,7 +122,11 @@ public class Animation {
 	public void resume() {
 		paused = false;
 	}
-
+	
+	public BufferedImage getCurrentImage() {
+		return currentImage;
+	}
+	
 	public boolean isPlayedOnce() {
 		return playedOnce;
 	}

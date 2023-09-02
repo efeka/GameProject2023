@@ -22,6 +22,10 @@ public class ArrowProjectile extends Projectile {
 	
 	private Animation arrowAnimation;
 	
+	private int lifetimeAfterLandingMillis = 10000;
+	private long landingTime;
+	private boolean landed = false;
+	
 	public ArrowProjectile(float x, float y, float velX, float velY, int damage, ObjectHandler objectHandler) {
 		super(x, y, PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2, velX, velY, damage, objectHandler);
 		
@@ -32,6 +36,15 @@ public class ArrowProjectile extends Projectile {
 
 	@Override
 	public void tick() {
+		// If the arrow landed on the ground, wait for a certain amount
+		// of time and then remove it from the game.
+		if (landed) {
+			if (System.currentTimeMillis() - landingTime >= lifetimeAfterLandingMillis) {
+				objectHandler.removeObject(this);
+				return;
+			}
+		}
+		
 		if (stopUpdating)
 			return;
 		
@@ -60,9 +73,14 @@ public class ArrowProjectile extends Projectile {
 			if (other.equals(this))
 				continue;
 
-			if (other.getObjectId().getCategory() == ObjectId.Category.Block)
-				if (getBounds().intersects(other.getBounds()))
+			if (other.getObjectId().getCategory() == ObjectId.Category.Block) {
+				if (getBounds().intersects(other.getBounds())) {
 					stopUpdating = true;
+					
+					landingTime = System.currentTimeMillis();
+					landed = true;
+				}
+			}
 		}
 	}
 
