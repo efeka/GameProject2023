@@ -10,6 +10,8 @@ public class TextureLoader {
 
 	public enum TextureName {
 		Missing,
+		
+		// Player / Weapons
 		PlayerIdle,
 		PlayerRun,
 		PlayerAttack,
@@ -29,6 +31,7 @@ public class TextureLoader {
 		PlayerHammerSwing,
 		PlayerHammerProjectile,
 		
+		// Enemies
 		BasicEnemyRun,
 		BasicEnemyAttack,
 		BasicEnemyIdle,
@@ -38,16 +41,22 @@ public class TextureLoader {
 		ArcherEnemyShootTorso,
 		ArcherEnemyShootLegs,
 		
+		BullEnemyRun,
+		BullEnemyStunned,
+		
+		// Tiles
 		StoneTiles,
 		GrassTiles,
 		RockTiles,
 		DiagonalStoneTiles,
 		WoodJumpThroughTiles,
 		
+		// Items
 		FisticuffsItem,
 		SwordItem,
 		HammerItem,
 		
+		// Projectiles
 		SwordProjectile,
 		ArrowProjectile,
 	}
@@ -278,6 +287,25 @@ public class TextureLoader {
 				textures[i] = enemySheet.getSubimage(1 + i * 65, 1236, 64, 64);
 				textures[i + 9] = enemySheet.getSubimage(1 + i * 65, 1301, 64, 64);
 			}
+			break;
+		case BullEnemyRun:
+			textures = new BufferedImage[16];
+			for (int i = 0; i < 8; i++) {
+				textures[i] = enemySheet.getSubimage(1 + i * 65, 1366, 64, 64);
+				textures[i + 8] = enemySheet.getSubimage(1 + i * 65, 1431, 64, 64);
+			}
+			break;
+			// TODO
+		case BullEnemyStunned:
+			textures = new BufferedImage[36];
+			for (int i = 0; i < 10; i++)
+				textures[i] = enemySheet.getSubimage(1 + i * 65, 1496, 64, 64);
+			for (int i = 0; i < 8; i++)
+				textures[i + 10] = enemySheet.getSubimage(1 + i * 65, 1561, 64, 64);
+			for (int i = 0; i < 10; i++)
+				textures[i + 18] = enemySheet.getSubimage(1 + i * 65, 1626, 64, 64);
+			for (int i = 0; i < 8; i++)
+				textures[i + 28] = enemySheet.getSubimage(1 + i * 65, 1691, 64, 64);
 			break;
 		}
 

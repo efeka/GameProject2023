@@ -52,7 +52,7 @@ public class Player extends Creature {
 
 		weapon = new SwordWeapon(objectHandler);
 
-		invulnerableDuration = 500;
+		invulnerableDuration = 700;
 		
 		animationHandler = new PlayerAnimationHandler(this);
 		jumpSprites = TextureLoader.getInstance().getTextures(TextureName.PlayerJump);
@@ -173,10 +173,14 @@ public class Player extends Creature {
 		invulnerable = true;
 
 		setHealth(health - damageAmount);
+		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
 	}
 
 	@Override
 	public void applyKnockback(float velX, float velY) {
+		if (knockedBack && invulnerable)
+			return;
+		
 		knockedBack = true;
 		this.velX = velX;
 		this.velY = velY;

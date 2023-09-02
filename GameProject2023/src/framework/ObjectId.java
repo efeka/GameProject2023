@@ -33,9 +33,11 @@ public class ObjectId {
 	 */
 	public enum Name {
 		Missing(-1),
+		
 		Player(1),
 		BasicEnemy(2),
 		ArcherEnemy(3),
+		BullEnemy(4),
 
 		HUD(500),
 

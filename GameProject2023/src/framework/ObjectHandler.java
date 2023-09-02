@@ -12,6 +12,7 @@ import abstract_objects.TileOrientation;
 import framework.ObjectId.Name;
 import game_objects.ArcherEnemy;
 import game_objects.BasicEnemy;
+import game_objects.BullEnemy;
 import game_objects.DiagonalStoneTileBlock;
 import game_objects.GrassTileBlock;
 import game_objects.Player;
@@ -59,7 +60,7 @@ public class ObjectHandler {
 		this.mouseInput = mouseInput;
 
 		FileIO fileIO = new FileIO();
-		int[][] objectUIDs = fileIO.loadLevel("levels.txt", 0);
+		int[][] objectUIDs = fileIO.loadLevel("levels.txt", 1);
 		
 		for (int i = 0; i < TILE_ROWS; i++) {
 			for (int j = 0; j < TILE_COLUMNS; j++) {
@@ -187,6 +188,9 @@ public class ObjectHandler {
 			break;
 		case ArcherEnemy:
 			gameObject = new ArcherEnemy(x, y, this);
+			break;
+		case BullEnemy:
+			gameObject = new BullEnemy(x, y, this);
 			break;
 		case HUD:
 			gameObject = new HUD(x, y, TILE_SIZE * 3, TILE_SIZE / 2, player);

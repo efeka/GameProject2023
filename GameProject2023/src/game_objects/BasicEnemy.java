@@ -4,14 +4,11 @@ import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import abstract_objects.Creature;
-import abstract_objects.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
-import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import window.Animation;
@@ -25,9 +22,6 @@ public class BasicEnemy extends Creature {
 	private int attackCooldown = 2000;
 	private long lastAttackTimer = attackCooldown;
 
-	private int invulnerableDuration = 700;
-	private long lastInvulnerableTimer = invulnerableDuration; 
-	
 //	private float runningSpeed = 3f;
 //	private float jumpingSpeed = -9f;
 	
@@ -115,7 +109,7 @@ public class BasicEnemy extends Creature {
 		invulnerable = true;
 		
 		setHealth(health - damageAmount);
-		objectHandler.addObject(new DamageNumberPopup(x + width / 2, y, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
+		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
 		
 		if (health <= 0)
 			objectHandler.removeObject(this);
