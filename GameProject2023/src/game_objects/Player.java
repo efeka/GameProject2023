@@ -36,7 +36,10 @@ public class Player extends Creature {
 
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = -8.5f;
-	
+
+	private int availableJumps = 2;
+	private boolean doubleJumping = false;
+
 	private boolean canInteract = true;
 	private long lastInteractTimer;
 
@@ -53,7 +56,7 @@ public class Player extends Creature {
 		weapon = new SwordWeapon(objectHandler);
 
 		invulnerableDuration = 700;
-		
+
 		animationHandler = new PlayerAnimationHandler(this);
 		jumpSprites = TextureLoader.getInstance().getTextures(TextureName.PlayerJump);
 		texture = TextureLoader.getInstance().getTextures(TextureName.PlayerIdle)[0];
@@ -82,6 +85,12 @@ public class Player extends Creature {
 		handleMovement();
 		handleObjectInteraction();
 		
+		// Reset double jump if the animation is over
+		if (doubleJumping && animationHandler.isDoubleJumpAnimationFinished()) {
+			animationHandler.resetDoubleJumpAnimations();
+			doubleJumping = false;
+		}
+
 		// Handle ability usage
 		if (mouseInput.isAttackButtonPressed() || 
 				(weapon.getAbility(0) != null && weapon.getAbility(0).isAbilityBeingUsed()))
@@ -92,7 +101,7 @@ public class Player extends Creature {
 		if (keyInput.isSecondAbilityKeyPressed() ||
 				(weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed()))
 			weapon.useAbility(2);
-		
+
 		runAnimations();
 	}
 
@@ -105,7 +114,7 @@ public class Player extends Creature {
 			int consoleX = 180, consoleY = 10;
 			g.setFont(new Font("Calibri", Font.PLAIN, 15));
 			g.setColor(new Color(0, 0, 0, 150));
-			g.fillRect(consoleX - 5, consoleY, 170, 195);
+			g.fillRect(consoleX - 5, consoleY, 170, 235);
 
 			g.setColor(new Color(220, 80, 80));
 			g.drawString("Health......................" + (int) health, consoleX, consoleY += 20);
@@ -119,9 +128,11 @@ public class Player extends Creature {
 			g.setColor(Color.white);
 			g.drawString("Falling....................." + falling, consoleX, consoleY += 20);
 			g.drawString("Jumping.................." + jumping, consoleX, consoleY += 20);
+			g.drawString("Double Jumping......." + doubleJumping, consoleX, consoleY += 20);
 			g.drawString("Invulnerable............" + invulnerable, consoleX, consoleY += 20);
 			g.drawString("Knocked back.........." + knockedBack, consoleX, consoleY += 20);
-			g.drawString("Can Interact............" + canInteract, consoleX, consoleY += 20);
+			g.drawString("Can Interact............." + canInteract, consoleX, consoleY += 20);
+			g.drawString("Available Jumps.........." + availableJumps, consoleX, consoleY += 20);
 
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setColor(Color.white);
@@ -157,10 +168,34 @@ public class Player extends Creature {
 		else if ((rightPressed && leftPressed) || (!rightPressed && !leftPressed))
 			velX = 0;
 
-		// Vertical movement
-		if (!jumping && keyInput.isJumpKeyPressed()) {
-			velY = jumpingSpeed;
-			jumping = true;
+		// Jump / Double jump
+		// Allows the player to do multiple jumps without touching the ground.
+		// Available jump count is reset when the player hits the ground.
+		// This is handled during the block collision check.
+		if (keyInput.isJumpKeyPressed()) {
+			// If the player is grounded and did not perform a jump yet
+			if (!falling && !jumping && availableJumps == 2) {
+				availableJumps = 1;
+				jumping = true;
+				velY = jumpingSpeed;
+
+				// This is set to false so that the user has to press the jump key
+				// a second time to perform the double jump.
+				keyInput.setJumpKeyPressed(false);
+			}
+			// If the player did not perform a jump but is mid air (e.g. walking off from a cliff).
+			else if (falling && !jumping && availableJumps == 2) {
+				availableJumps = 0;
+				doubleJumping = true;
+				velY = jumpingSpeed;
+			}
+			// If the player performed 1 jump and is still mid air
+			else if (falling && jumping && availableJumps == 1) {
+				availableJumps = 0;
+				doubleJumping = true;
+				velY = jumpingSpeed;
+			}
+
 		}
 	}
 
@@ -180,16 +215,17 @@ public class Player extends Creature {
 	public void applyKnockback(float velX, float velY) {
 		if (knockedBack && invulnerable)
 			return;
-		
+
 		knockedBack = true;
 		this.velX = velX;
 		this.velY = velY;
 	}
 
+	// Handles collision with other objects and item pick ups.
 	private void handleObjectInteraction() {
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		falling = true;
-		
+
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 			if (other.equals(this))
@@ -200,12 +236,12 @@ public class Player extends Creature {
 				checkBlockCollision(other);
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
-			
+
 			// Check Item Pickup
 			if (canInteract && keyInput.isInteractKeyPressed() && other.getObjectId().getCategory() == Category.Item) {
 				if (getBounds().intersects(other.getBounds())) {
 					((Item) other).pickupItem();
-					
+
 					canInteract = false;
 					lastInteractTimer = System.currentTimeMillis();
 				}
@@ -219,14 +255,17 @@ public class Player extends Creature {
 		// Check if the player is grounded or not
 		if (getGroundCheckBounds().intersects(otherBounds))
 			falling = false;
-		
+
 		// Bottom collision
 		if (getBottomBounds().intersects(otherBounds)) {
 			y = other.getY() - height;
 			velY = 0;
 			jumping = false;
+			// Reset available jump count after hitting the ground
+			availableJumps = 2;
+			doubleJumping = false;
 
-			// Reset knock back after hitting the ground
+			// Reset knock back status after hitting the ground
 			if (knockedBack) {
 				knockedBack = false;
 				velX = 0;
@@ -297,6 +336,10 @@ public class Player extends Creature {
 		// Using third ability
 		else if (weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed())
 			weapon.getAbility(2).getAnimation(directionToIndex).runAnimation();
+		else if (doubleJumping) {
+			animationHandler.getDoubleJumpAnimation(1).runAnimation();
+			animationHandler.getDoubleJumpAnimation(-1).runAnimation();
+		}
 		// Idle
 		else if (velX == 0)
 			animationHandler.getIdleAnimation().runAnimation();
@@ -317,13 +360,17 @@ public class Player extends Creature {
 		else if (weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed())
 			weapon.getAbility(2).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		// Jumping
-		else if (jumping) {
-			// Going up
-			if (velY <= 0)
-				g.drawImage(jumpSprites[directionToIndex * 2], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
-			// Going down
-			else if (velY > 0)
-				g.drawImage(jumpSprites[directionToIndex * 2 + 1], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);	
+		else if (jumping || doubleJumping) {
+			if (!doubleJumping) {
+				// Going up
+				if (velY <= 0)
+					g.drawImage(jumpSprites[directionToIndex * 2], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
+				// Going down
+				else if (velY > 0)
+					g.drawImage(jumpSprites[directionToIndex * 2 + 1], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
+			}
+			else
+				animationHandler.getDoubleJumpAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		}
 		// Idle
 		else if (velX == 0)
@@ -332,7 +379,7 @@ public class Player extends Creature {
 		else if (velX != 0)
 			animationHandler.getRunAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 	}
-	
+
 	public Weapon getWeapon() {
 		return weapon;
 	}

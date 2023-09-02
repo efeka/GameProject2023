@@ -158,6 +158,10 @@ public class KeyInput extends KeyAdapter {
 		return jumpKeyPressed;
 	}
 	
+	public void setJumpKeyPressed(boolean isPressed) {
+		jumpKeyPressed = isPressed;
+	}
+	
 	public boolean isCrouchKeyPressed() {
 		return crouchKeyPressed;
 	}
