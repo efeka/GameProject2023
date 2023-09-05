@@ -19,6 +19,7 @@ import game_objects.Player;
 import game_objects.RockTileBlock;
 import game_objects.StoneTileBlock;
 import game_objects.WoodJumpThroughTileBlock;
+import items.Coin;
 import items.FisticuffsItem;
 import items.HammerItem;
 import items.SwordItem;
@@ -332,6 +333,9 @@ public class ObjectHandler {
 			break;
 		case WoodJumpThroughTileBlock_OuterRight:
 			gameObject = new WoodJumpThroughTileBlock(x, y, objectName, TileOrientation.OuterRight);
+			break;
+		case Coin:
+			gameObject = new Coin(x, y, this);
 			break;
 		case FisticuffsItem:
 			gameObject = new FisticuffsItem(x, y, this);

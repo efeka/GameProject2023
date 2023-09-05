@@ -6,34 +6,37 @@ import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
+import framework.ObjectId.Name;
 
 public abstract class Creature extends GameObject {
 
 	protected final float GRAVITY = GameConstants.PhysicsConstants.GRAVITY;
 	protected final int TERMINAL_VELOCITY = GameConstants.PhysicsConstants.TERMINAL_VELOCITY;
-	
+
+	private ObjectHandler objectHandler; 
+
 	protected boolean falling, jumping, knockedBack, invulnerable;
-	
 	// 1 for right, -1 for left
 	protected int direction = 1;
 	protected float velX, velY;
-	
+
 	protected int damage;
 	protected int maxHealth, maxStamina;
 	protected float health, stamina;
 	protected float staminaRegen;
-	
-	protected int invulnerableDuration = 500;
+
+	protected int invulnerableDuration = 700;
 	protected long lastInvulnerableTimer = 0; 
-	
-	public Creature(int x, int y, int width, int height, int damage, int maxHealth, int maxStamina, ObjectId objectId) {
+
+	public Creature(int x, int y, int width, int height, int damage, int maxHealth, int maxStamina, ObjectHandler objectHandler, ObjectId objectId) {
 		super(x, y, width, height, objectId);
+		this.objectHandler = objectHandler; 
 		
 		health = this.maxHealth = maxHealth;
 		stamina = this.maxStamina = maxStamina;
 		staminaRegen = (int) (stamina / 200f);
 		this.damage = damage;
-		
+
 		falling = true;
 		jumping = false;
 		knockedBack = false;
@@ -46,10 +49,17 @@ public abstract class Creature extends GameObject {
 		if (stamina > maxStamina)
 			stamina = maxStamina;
 	}
-	
-	public abstract void takeDamage(int damageAmount);
+
+	public abstract void takeDamage(int damageAmount, boolean activateInvulnerablilty);
 	public abstract void applyKnockback(float velX, float velY);
-	
+
+	public void die() {
+		objectHandler.removeObject(this);
+		int coinDrop = (int) (Math.random() * 6) + 1;
+		for (int i = 0; i < coinDrop; i++)
+			objectHandler.addObject(objectHandler.createObjectByName(Name.Coin, (int) x, (int) y), ObjectHandler.MIDDLE_LAYER);
+	}
+
 	protected Rectangle getHorizontalBounds() {
 		float height = 3 * this.height / 5f;
 		float yOffset = this.height / 5f; 
@@ -70,7 +80,7 @@ public abstract class Creature extends GameObject {
 		float yOffset = 4 * this.height / 5f;
 		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
 	}
-	
+
 	protected Rectangle getGroundAttackBounds() {
 		int attackX;
 		if (direction == 1)
@@ -79,7 +89,7 @@ public abstract class Creature extends GameObject {
 			attackX = (int) x - width / 2;
 		return new Rectangle(attackX, (int) y, width, height);
 	}
-	
+
 	protected void basicBlockCollision(ObjectHandler objectHandler) {
 		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
 			// Collision with Blocks
@@ -92,7 +102,7 @@ public abstract class Creature extends GameObject {
 					velY = 0;
 					falling = false;
 					jumping = false;
-					
+
 					// Reset knock back after hitting the ground
 					if (knockedBack) {
 						knockedBack = false;
@@ -121,7 +131,7 @@ public abstract class Creature extends GameObject {
 			}
 		}
 	}
-	
+
 	public int getMaxHealth() {
 		return maxHealth;
 	}
@@ -153,7 +163,7 @@ public abstract class Creature extends GameObject {
 	public void setStamina(float stamina) {
 		this.stamina = clamp(0f, stamina, maxStamina);
 	}
-	
+
 	public boolean isFalling() {
 		return falling;
 	}

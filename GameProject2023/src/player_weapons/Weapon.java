@@ -2,19 +2,8 @@ package player_weapons;
 
 import framework.ObjectHandler;
 import game_objects.Player;
-import items.Item;
+import items.WeaponItem;
 import window.Animation;
-
-/*
- * Sword-shield parry
- * Sword-shield warcry buff
- * 
- * Trident throw and teleport
- * Trident projectile block/reflect
- * 
- * Shuriken and sai/claw
- * 		geri ziplayip asagi dogru 3 5 shuriken
- */
 
 public abstract class Weapon {
 	
@@ -70,6 +59,6 @@ public abstract class Weapon {
 	 * @param y the y coordinate of the Item
 	 * @return the Item object
 	 */
-	public abstract Item createItemFromWeapon(float x, float y);
+	public abstract WeaponItem createItemFromWeapon(float x, float y);
 	
 }

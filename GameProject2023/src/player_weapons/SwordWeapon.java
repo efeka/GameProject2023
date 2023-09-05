@@ -10,7 +10,7 @@ import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.SwordProjectile;
-import items.Item;
+import items.WeaponItem;
 import items.SwordItem;
 import window.Animation;
 
@@ -18,6 +18,8 @@ public class SwordWeapon extends Weapon {
 
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
+	
+	private int stabCount = 0;
 
 	public SwordWeapon(ObjectHandler objectHandler) {
 		super(objectHandler);
@@ -36,15 +38,15 @@ public class SwordWeapon extends Weapon {
 				attackDelay, true);
 		Animation attackLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordAttack, -1),
 				attackDelay, true);
-		abilities[0] = new WeaponAbility(500, 20, new Animation[] {attackRightAnim, attackLeftAnim});
+		abilities[0] = new WeaponAbility(500, 15000, new Animation[] {attackRightAnim, attackLeftAnim});
 
 		// Sword stab
 		int stabDelay = 6;
-		Animation stabRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStab, 1),
+		Animation stabRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStabCombo, 1),
 				stabDelay, true);
-		Animation stabLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStab, -1),
+		Animation stabLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStabCombo, -1),
 				stabDelay, true);
-		abilities[1] = new WeaponAbility(1500, 35, new Animation[] {stabRightAnim, stabLeftAnim});
+		abilities[1] = new WeaponAbility(2500, 14, new Animation[] {stabRightAnim, stabLeftAnim});
 		
 		// Sword throw
 		int throwDelay = 7;
@@ -69,8 +71,8 @@ public class SwordWeapon extends Weapon {
 		}
 
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
-		int currentAnimFrame1 = ability.getAnimation(0).getCurrentFrame();
-		int currentAnimFrame2 = ability.getAnimation(1).getCurrentFrame();
+		int animIndex = player.getDirection() == 1 ? 0 : 1;
+		int currentAnimFrame = ability.getAnimation(animIndex).getCurrentFrame();
 		
 		switch (index) {
 		case 0:
@@ -81,7 +83,7 @@ public class SwordWeapon extends Weapon {
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
 					if (getAttackBounds().intersects(other.getBounds())) {
 						Creature otherCreature = (Creature) other;
-						otherCreature.takeDamage(abilities[index].getDamage());
+						otherCreature.takeDamage(abilities[index].getDamage(), true);
 						float knockbackVelX = 2f * player.getDirection();
 						float knockbackVelY = -1f;
 						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
@@ -93,17 +95,27 @@ public class SwordWeapon extends Weapon {
 		case 1:
 			// Stab
 			player.setVelX(0);
-			if (currentAnimFrame1 != 4 && currentAnimFrame1 != 5 && currentAnimFrame2 != 4 && currentAnimFrame2 != 5)
+			if (currentAnimFrame == abilities[index].getAnimation(animIndex).getFrameCount() - 2)
+				stabCount = 0;
+			
+			if (currentAnimFrame == 4 && stabCount == 0)
+				stabCount++;
+			else if (currentAnimFrame == 8 && stabCount == 1)
+				stabCount++;
+			else if (currentAnimFrame == 11 && stabCount == 2)
+				stabCount++;
+			else
 				break;
-
+			
+			
 			for (int i = midLayer.size() - 1; i >= 0; i--) {
 				GameObject other = midLayer.get(i);
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
 					if (getStabBounds().intersects(other.getBounds())) {
 						Creature otherCreature = (Creature) other;
-						otherCreature.takeDamage(abilities[index].getDamage());
-						float knockbackVelX = 5f * player.getDirection();
-						float knockbackVelY = -2f;
+						otherCreature.takeDamage(abilities[index].getDamage(), false);
+						float knockbackVelX = 2f * player.getDirection();
+						float knockbackVelY = 0f;
 						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
 					}
 				}
@@ -113,7 +125,7 @@ public class SwordWeapon extends Weapon {
 		case 2:
 			// Throw
 			player.setVelX(0);
-			if (currentAnimFrame1 != 2 && currentAnimFrame2 != 2)
+			if (currentAnimFrame != 2)
 				break;
 
 			float projectileVelX = 5f * player.getDirection();
@@ -192,7 +204,7 @@ public class SwordWeapon extends Weapon {
 	}
 
 	@Override
-	public Item createItemFromWeapon(float x, float y) {
+	public WeaponItem createItemFromWeapon(float x, float y) {
 		return new SwordItem(x, y, objectHandler);
 	}
 

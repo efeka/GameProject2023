@@ -10,7 +10,7 @@ import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import items.HammerItem;
-import items.Item;
+import items.WeaponItem;
 import window.Animation;
 
 public class HammerWeapon extends Weapon {
@@ -76,7 +76,7 @@ public class HammerWeapon extends Weapon {
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
 					if (getAttackBounds().intersects(other.getBounds())) {
 						Creature otherCreature = (Creature) other;
-						otherCreature.takeDamage(abilities[index].getDamage());
+						otherCreature.takeDamage(abilities[index].getDamage(), true);
 						float knockbackVelX = 2f * player.getDirection();
 						float knockbackVelY = -1f;
 						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
@@ -141,7 +141,7 @@ public class HammerWeapon extends Weapon {
 	}
 
 	@Override
-	public Item createItemFromWeapon(float x, float y) {
+	public WeaponItem createItemFromWeapon(float x, float y) {
 		return new HammerItem(x, y, objectHandler);
 	}
 

@@ -8,7 +8,7 @@ import player_weapons.SwordWeapon;
 import player_weapons.Weapon;
 import window.Animation;
 
-public class SwordItem extends Item {
+public class SwordItem extends WeaponItem {
 
 	public SwordItem(float x, float y, ObjectHandler objectHandler) {
 		super(x, y, objectHandler, Name.SwordItem);

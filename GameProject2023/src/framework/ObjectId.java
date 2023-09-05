@@ -8,6 +8,7 @@ public class ObjectId {
 	 * This approach simplifies processes such as collision detection.
 	 */
 	public enum Category {
+		Missing,
 		Player,
 		Block,
 		JumpThroughBlock,
@@ -15,6 +16,7 @@ public class ObjectId {
 		Enemy,
 		Menu,
 		Item,
+		WeaponItem,
 		Projectile,
 	}
 	
@@ -93,7 +95,8 @@ public class ObjectId {
 		WoodJumpThroughTileBlock_Center(2005),
 		WoodJumpThroughTileBlock_OuterRight(2006),
 		
-		// Weapon items
+		// Items
+		Coin(2999),
 		FisticuffsItem(3000),
 		SwordItem(3001),
 		HammerItem(3002),

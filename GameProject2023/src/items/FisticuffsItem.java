@@ -8,7 +8,7 @@ import player_weapons.FisticuffsWeapon;
 import player_weapons.Weapon;
 import window.Animation;
 
-public class FisticuffsItem extends Item {
+public class FisticuffsItem extends WeaponItem {
 
 	public FisticuffsItem(float x, float y, ObjectHandler objectHandler) {
 		super(x, y, objectHandler, Name.FisticuffsItem);

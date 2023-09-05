@@ -8,7 +8,7 @@ import player_weapons.HammerWeapon;
 import player_weapons.Weapon;
 import window.Animation;
 
-public class HammerItem extends Item {
+public class HammerItem extends WeaponItem {
 
 	public HammerItem(float x, float y, ObjectHandler objectHandler) {
 		super(x, y, objectHandler, Name.HammerItem);

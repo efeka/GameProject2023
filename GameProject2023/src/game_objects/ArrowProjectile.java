@@ -60,8 +60,8 @@ public class ArrowProjectile extends Projectile {
 	private void checkCollisions() {
 		// Player collision
 		Player player = objectHandler.getPlayer();
-		if (getBounds().intersects(player.getBounds())) {
-			player.takeDamage(damage);
+		if (getBounds().intersects(player.getBounds()) && !player.isDodging()) {
+			player.takeDamage(damage, true);
 			player.applyKnockback(velX / 2, -3f);
 			objectHandler.removeObject(this);
 		}

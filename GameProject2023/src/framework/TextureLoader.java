@@ -23,7 +23,7 @@ public class TextureLoader {
 		PlayerSwordIdle,
 		PlayerSwordRun,
 		PlayerSwordAttack,
-		PlayerSwordStab,
+		PlayerSwordStabCombo,
 		PlayerSwordThrow,
 		
 		PlayerHammerIdle,
@@ -54,6 +54,7 @@ public class TextureLoader {
 		WoodJumpThroughTiles,
 		
 		// Items
+		Coin,
 		FisticuffsItem,
 		SwordItem,
 		HammerItem,
@@ -61,6 +62,9 @@ public class TextureLoader {
 		// Projectiles
 		SwordProjectile,
 		ArrowProjectile,
+		
+		// Effects
+		SparkleEffect,
 	}
 
 	private BufferedImage playerSheet = null;
@@ -161,11 +165,11 @@ public class TextureLoader {
 				textures[i + 6] = playerSheet.getSubimage(1 + i * 65, 716, 64, 64);
 			}
 			break;
-		case PlayerSwordStab:
-			textures = new BufferedImage[14];
-			for (int i = 0; i < 7; i++) {
+		case PlayerSwordStabCombo:
+			textures = new BufferedImage[28];
+			for (int i = 0; i < 14; i++) {
 				textures[i] = playerSheet.getSubimage(1 + i * 65, 781, 64, 64);
-				textures[i + 7] = playerSheet.getSubimage(1 + i * 65, 846, 64, 64);
+				textures[i + 14] = playerSheet.getSubimage(1 + i * 65, 846, 64, 64);
 			}
 			break;
 		case PlayerHammerIdle:
@@ -253,6 +257,11 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = blockSheet.getSubimage(1 + i * 17, 69, 16, 16);
 			break;
+		case Coin:
+			textures = new BufferedImage[6];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 166, 32, 32);
+			break;
 		case FisticuffsItem:
 			textures = new BufferedImage[10];
 			for (int i = 0; i < textures.length; i++)
@@ -321,6 +330,11 @@ public class TextureLoader {
 				textures[i + 18] = enemySheet.getSubimage(1 + i * 65, 1626, 64, 64);
 			for (int i = 0; i < 8; i++)
 				textures[i + 28] = enemySheet.getSubimage(1 + i * 65, 1691, 64, 64);
+			break;
+		case SparkleEffect:
+			textures = new BufferedImage[5];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 199, 32, 32);
 			break;
 		}
 

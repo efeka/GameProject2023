@@ -29,11 +29,10 @@ public class BullEnemy extends Creature {
 	private Animation[] stunAnimation;
 	
 	public BullEnemy(int x, int y, ObjectHandler objectHandler) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 150, 70, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BullEnemy));		
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 150, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BullEnemy));		
 		this.objectHandler = objectHandler;
 		player = objectHandler.getPlayer();
-		
-		invulnerableDuration = 700;
+
 		velX = -runningSpeed;
 		
 		texture = TextureLoader.getInstance().getTextures(TextureName.BullEnemyRun)[0];
@@ -79,7 +78,7 @@ public class BullEnemy extends Creature {
 
 	private void handleAttacking() {
 		if (getBounds().intersects(player.getBounds())) {
-			player.takeDamage(25);
+			player.takeDamage(25, true);
 			player.applyKnockback(direction * runningSpeed / 2, -7f);
 		}
 	}
@@ -122,18 +121,20 @@ public class BullEnemy extends Creature {
 	}
 	
 	@Override
-	public void takeDamage(int damageAmount) {
+	public void takeDamage(int damageAmount, boolean activateInvulnerability) {
 		if (invulnerable)
 			return;
 		
-		lastInvulnerableTimer = System.currentTimeMillis();
-		invulnerable = true;
-		
+		if (activateInvulnerability) {
+			lastInvulnerableTimer = System.currentTimeMillis();
+			invulnerable = true;
+		}
+
 		setHealth(health - damageAmount);
 		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
 		
 		if (health <= 0)
-			objectHandler.removeObject(this);
+			die();
 	}
 	
 	// This enemy cannot be knocked back.

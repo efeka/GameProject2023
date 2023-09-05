@@ -42,7 +42,7 @@ public class SwordProjectile extends Projectile {
 					other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
 				if (getBounds().intersects(other.getBounds())) {
 					if (other.getObjectId().getCategory() == ObjectId.Category.Enemy)
-						((Creature) other).takeDamage(damage);
+						((Creature) other).takeDamage(damage, true);
 					
 					SwordItem swordItem = null;
 					if (x < other.getX())

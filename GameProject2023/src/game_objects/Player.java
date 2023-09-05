@@ -21,6 +21,7 @@ import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import items.Item;
+import items.WeaponItem;
 import player_weapons.SwordWeapon;
 import player_weapons.Weapon;
 import window.KeyInput;
@@ -49,7 +50,7 @@ public class Player extends Creature {
 	private BufferedImage[] jumpSprites;
 
 	public Player(int x, int y, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, new ObjectId(Category.Player, Name.Player));
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 		this.mouseInput = mouseInput;
@@ -214,16 +215,22 @@ public class Player extends Creature {
 	}
 
 	@Override
-	public void takeDamage(int damageAmount) {
+	public void takeDamage(int damageAmount, boolean activateInvulnerability) {
 		if (invulnerable || dodging)
 			return;
 
-		lastInvulnerableTimer = System.currentTimeMillis();
-		invulnerable = true;
+		if (activateInvulnerability) {
+			lastInvulnerableTimer = System.currentTimeMillis();
+			invulnerable = true;
+		}
 
 		setHealth(health - damageAmount);
 		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
 	}
+	
+	// TODO
+	@Override
+	public void die() {}
 
 	@Override
 	public void applyKnockback(float velX, float velY) {
@@ -251,15 +258,20 @@ public class Player extends Creature {
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
 
-			// Check Item Pickup
-			if (canInteract && keyInput.isInteractKeyPressed() && other.getObjectId().getCategory() == Category.Item) {
+			// Check Weapon Item Pickup
+			if (canInteract && keyInput.isInteractKeyPressed() && other.getObjectId().getCategory() == Category.WeaponItem) {
 				if (getBounds().intersects(other.getBounds())) {
-					((Item) other).pickupItem();
+					((WeaponItem) other).pickupItem();
 
 					canInteract = false;
 					lastInteractTimer = System.currentTimeMillis();
 				}
 			}
+			
+			// Check other items
+			if (other.getObjectId().getCategory() == Category.Item)
+				if (getBounds().intersects(other.getBounds()))
+					((Item) other).pickupItem();
 		}
 	}
 
@@ -408,6 +420,10 @@ public class Player extends Creature {
 
 	public void setWeapon(Weapon weapon) {
 		this.weapon = weapon;
+	}
+	
+	public boolean isDodging() {
+		return dodging;
 	}
 
 }

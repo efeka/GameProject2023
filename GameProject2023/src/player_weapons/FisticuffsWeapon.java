@@ -10,7 +10,7 @@ import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import items.FisticuffsItem;
-import items.Item;
+import items.WeaponItem;
 import window.Animation;
 
 public class FisticuffsWeapon extends Weapon {
@@ -74,7 +74,7 @@ public class FisticuffsWeapon extends Weapon {
 				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
 					if (getAttackBounds().intersects(other.getBounds())) {
 						Creature otherCreature = (Creature) other;
-						otherCreature.takeDamage(abilities[index].getDamage());
+						otherCreature.takeDamage(abilities[index].getDamage(), true);
 						float knockbackVelX = 3f * player.getDirection();
 						float knockbackVelY = -1f;
 						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
@@ -95,7 +95,7 @@ public class FisticuffsWeapon extends Weapon {
 						float knockbackVelX = player.getVelX();
 						float knockbackVelY = -10f;
 						if (!otherCreature.isKnockedBack()) {
-							otherCreature.takeDamage(abilities[index].getDamage());
+							otherCreature.takeDamage(abilities[index].getDamage(), true);
 							otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
 						}
 						if (!playerIsLaunchedUp) {
@@ -173,7 +173,7 @@ public class FisticuffsWeapon extends Weapon {
 	}
 
 	@Override
-	public Item createItemFromWeapon(float x, float y) {
+	public WeaponItem createItemFromWeapon(float x, float y) {
 		return new FisticuffsItem(x, y, objectHandler);
 	}
 

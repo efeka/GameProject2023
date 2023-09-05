@@ -1,0 +1,32 @@
+WEAPON TYPES
+=============
+Trident
+Sword-shield
+Sword-magical offhand
+Sword-dagger or sword-sword
+Sai/Claw-shuriken
+
+WEAPON TRANSFORMATIONS
+=========================
+Weapons will have transformations. After they have been unlocked in the base camp, they can be changed into different variations of
+the same weapon. Each transformation must resemble the original weapon, but each one should have a vastly different playstyle.
+
+1) Sword-offhand
+	The sword can have a base ability which stays the same for all variations. And the offhand can introduce two or more abilities.
+	1.1) Magical offhand
+			Projectile ability
+			Teleportation
+	1.2) Shield
+			Shield bash
+			Parry
+
+WEAPON SKILL TREES
+==================
+Each weapon could have a skill tree. Players can choose skills from this skill tree during their run. But they are run spesific and will all be
+lost when the player dies. Skill points can be earned by killing difficult optional bosses, or can be bought for an expensive price from the in game shop.
+The price could increase with each buy.
+
+IN-GAME SHOP
+=============
+Contains consumables such as health pots/food, bombs, temporary buffs, and skill points. 
+
