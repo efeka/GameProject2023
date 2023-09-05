@@ -18,9 +18,24 @@ public class Coin extends Item {
 		velY = (float) (Math.random() * -1 * 5);
 		
 		TextureLoader textureLoader = TextureLoader.getInstance();
-		texture = textureLoader.getTextures(TextureName.Coin)[0];
+		texture = textureLoader.getTextures(TextureName.GoldCoin)[0];
+		
+		/*
+		 * Bronze is worth the least 45% chance to appear
+		 * Gold is worth the most, 20% chance to appear
+		 * Silver has 35% chance to appear
+		 */
+		int randomCoin = (int) (Math.random() * 100);
+		TextureName textureName;
+		if (randomCoin < 45)
+			textureName = TextureName.BronzeCoin;
+		else if (randomCoin >= 45 && randomCoin < 80)
+			textureName = TextureName.SilverCoin;
+		else
+			textureName = TextureName.GoldCoin;
+		
 		int spinDelay = 7;
-		animation = new Animation(textureLoader.getTextures(TextureName.Coin), spinDelay, false);
+		animation = new Animation(textureLoader.getTextures(textureName), spinDelay, false);
 	}
 
 	@Override

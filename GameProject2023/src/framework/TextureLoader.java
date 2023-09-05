@@ -54,7 +54,9 @@ public class TextureLoader {
 		WoodJumpThroughTiles,
 		
 		// Items
-		Coin,
+		BronzeCoin,
+		SilverCoin,
+		GoldCoin,
 		FisticuffsItem,
 		SwordItem,
 		HammerItem,
@@ -257,10 +259,20 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = blockSheet.getSubimage(1 + i * 17, 69, 16, 16);
 			break;
-		case Coin:
+		case BronzeCoin:
 			textures = new BufferedImage[6];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 33, 166, 32, 32);
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 232, 32, 32);
+			break;
+		case SilverCoin:
+			textures = new BufferedImage[6];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(199 + i * 33, 232, 32, 32);
+			break;
+		case GoldCoin:
+			textures = new BufferedImage[6];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(199 + i * 33, 166, 32, 32);
 			break;
 		case FisticuffsItem:
 			textures = new BufferedImage[10];

@@ -55,8 +55,8 @@ public abstract class Creature extends GameObject {
 
 	public void die() {
 		objectHandler.removeObject(this);
-		int coinDrop = (int) (Math.random() * 6) + 1;
-		for (int i = 0; i < coinDrop; i++)
+		int coinsToDrop = (int) (Math.random() * 6) + 1;
+		for (int i = 0; i < coinsToDrop; i++)
 			objectHandler.addObject(objectHandler.createObjectByName(Name.Coin, (int) x, (int) y), ObjectHandler.MIDDLE_LAYER);
 	}
 
