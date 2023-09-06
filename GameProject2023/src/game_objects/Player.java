@@ -260,7 +260,6 @@ public class Player extends Creature {
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
 				
-
 			// Check Weapon Item Pickup
 			if (canInteract && keyInput.isInteractKeyPressed() && other.getObjectId().getCategory() == Category.WeaponItem) {
 				if (getBounds().intersects(other.getBounds())) {

@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -21,6 +22,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import abstract_objects.GameObject;
@@ -38,6 +40,7 @@ public class OptionsPanel extends JPanel {
 		void onBackgroundColorSelected(Color color);
 		void onGridToggle(boolean toggle);
 		void onLayerSelect(int index);
+		void onTransparencySelect(float transparency);
 		void clearLayer();
 		void saveDesign();
 	}
@@ -61,9 +64,16 @@ public class OptionsPanel extends JPanel {
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
 		
+		JPanel titlePanel = new JPanel();
+		titlePanel.setLayout(new BorderLayout());
 		JLabel titleLabel = new JLabel("Options", SwingConstants.CENTER);
-		titleLabel.setFont(new Font("Calibri", Font.BOLD, 20));
-		topPanel.add(titleLabel, BorderLayout.NORTH);
+		titleLabel.setFont(new Font("Calibri", Font.BOLD, 25));
+		titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+		titlePanel.add(titleLabel, BorderLayout.NORTH);
+		
+		JSeparator titleSeparator = new JSeparator(SwingConstants.HORIZONTAL);
+		titlePanel.add(titleSeparator, BorderLayout.SOUTH);
+		topPanel.add(titlePanel, BorderLayout.NORTH);
 		
 		JPanel selectionGroupPanel = new JPanel();
 		selectionGroupPanel.setLayout(new BorderLayout());
@@ -77,18 +87,36 @@ public class OptionsPanel extends JPanel {
 		});
 		selectionGroupPanel.add(toggleGridCheckBox, BorderLayout.NORTH);
 		
-		JComboBox<String> layerComboBox = new JComboBox<>(new String[] {"Background Layer", "Middle Layer", "Foreground Layer", "All Layers"});
+		JPanel layerSelectionPanel = new JPanel();
+		layerSelectionPanel.setLayout(new FlowLayout());
+		JLabel layerSelectionLabel = new JLabel("Selected Layer: ");
+		JComboBox<String> layerComboBox = new JComboBox<>(new String[] {"Background Layer", "Middle Layer", "Foreground Layer", "All Layers (Read only)"});
         layerComboBox.setSelectedIndex(1);
 		layerComboBox.addActionListener(e -> {
         	if (optionSelectionListener != null)
 				optionSelectionListener.onLayerSelect(layerComboBox.getSelectedIndex());
         });
-		selectionGroupPanel.add(layerComboBox, BorderLayout.CENTER);
+		layerSelectionPanel.add(layerSelectionLabel);
+		layerSelectionPanel.add(layerComboBox);
+		selectionGroupPanel.add(layerSelectionPanel, BorderLayout.CENTER);
+		
+		JPanel transparencyPanel = new JPanel();
+		transparencyPanel.setLayout(new FlowLayout());
+		JLabel transparencyLabel = new JLabel("Non-Selected Layer Transparency: ");
+		JComboBox<Float> transparencyComboBox = new JComboBox<>(new Float[] {0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f});
+		transparencyComboBox.setSelectedIndex(4);
+		transparencyComboBox.addActionListener(e -> {
+        	if (optionSelectionListener != null)
+				optionSelectionListener.onTransparencySelect((float) transparencyComboBox.getSelectedItem());
+        });
+		transparencyPanel.add(transparencyLabel);
+		transparencyPanel.add(transparencyComboBox);
+		selectionGroupPanel.add(transparencyPanel, BorderLayout.SOUTH);
 		topPanel.add(selectionGroupPanel, BorderLayout.CENTER);
 		
 		JPanel colorPanel = new JPanel();
 		colorPanel.setLayout(new FlowLayout());
-		colorPanel.add(new JLabel("Choose Background Color: "));
+		colorPanel.add(new JLabel("Background Color: "));
 		JButton colorPickerButton = new JButton();
 		colorPickerButton.setPreferredSize(new Dimension(25, 25));
 		colorPickerButton.setBackground(new Color(51, 51, 51));
@@ -129,7 +157,7 @@ public class OptionsPanel extends JPanel {
 		Name[] enumValues = Name.values();
 
 		int columnCount = 5;
-		int buttonSize = (getWidth() - 10) / columnCount;
+		int buttonSize = (getWidth() - 15) / columnCount;
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		for (int i = 0, gridBagIndex = 0; i < enumValues.length; i++) {
