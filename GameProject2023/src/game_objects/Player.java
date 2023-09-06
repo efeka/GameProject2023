@@ -255,8 +255,11 @@ public class Player extends Creature {
 			// Check Collisions
 			if (other.getObjectId().getCategory() == Category.Block)
 				checkBlockCollision(other);
+			if (other.getObjectId().getCategory() == Category.JumpThroughBlock && velY >= 0)
+				checkBlockCollision(other);
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
+				
 
 			// Check Weapon Item Pickup
 			if (canInteract && keyInput.isInteractKeyPressed() && other.getObjectId().getCategory() == Category.WeaponItem) {
