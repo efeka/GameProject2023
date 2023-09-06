@@ -71,20 +71,37 @@ public class ObjectId {
 		GrassTileBlock_InnerTopRight(1023),
 		GrassTileBlock_InnerBottomLeft(1024),
 		GrassTileBlock_InnerBottomRight(1025),
+		GrassTileBlock_StandaloneLeft(1026),
+		GrassTileBlock_StandaloneCenter(1027),
+		GrassTileBlock_StandaloneRight(1028),
 		
-		RockTileBlock_OuterTopLeft(1026),
-		RockTileBlock_OuterTop(1027),
-		RockTileBlock_OuterTopRight(1028),
-		RockTileBlock_OuterLeft(1029),
-		RockTileBlock_Center(1030),
-		RockTileBlock_OuterRight(1031),
-		RockTileBlock_OuterBottomLeft(1032),
-		RockTileBlock_OuterBottom(1033),
-		RockTileBlock_OuterBottomRight(1034),
-		RockTileBlock_InnerTopLeft(1035),
-		RockTileBlock_InnerTopRight(1036),
-		RockTileBlock_InnerBottomLeft(1037),
-		RockTileBlock_InnerBottomRight(1038),
+		RockTileBlock_OuterTopLeft(1029),
+		RockTileBlock_OuterTop(1030),
+		RockTileBlock_OuterTopRight(1031),
+		RockTileBlock_OuterLeft(1032),
+		RockTileBlock_Center(1033),
+		RockTileBlock_OuterRight(1034),
+		RockTileBlock_OuterBottomLeft(1035),
+		RockTileBlock_OuterBottom(1036),
+		RockTileBlock_OuterBottomRight(1037),
+		RockTileBlock_InnerTopLeft(1038),
+		RockTileBlock_InnerTopRight(1039),
+		RockTileBlock_InnerBottomLeft(1040),
+		RockTileBlock_InnerBottomRight(1041),
+		
+		GrassBackgroundTileBlock_OuterTopLeft(1042),
+		GrassBackgroundTileBlock_OuterTop(1043),
+		GrassBackgroundTileBlock_OuterTopRight(1044),
+		GrassBackgroundTileBlock_OuterLeft(1045),
+		GrassBackgroundTileBlock_Center(1046),
+		GrassBackgroundTileBlock_OuterRight(1047),
+		GrassBackgroundTileBlock_OuterBottomLeft(1048),
+		GrassBackgroundTileBlock_OuterBottom(1049),
+		GrassBackgroundTileBlock_OuterBottomRight(1050),
+		GrassBackgroundTileBlock_InnerTopLeft(1051),
+		GrassBackgroundTileBlock_InnerTopRight(1052),
+		GrassBackgroundTileBlock_InnerBottomLeft(1053),
+		GrassBackgroundTileBlock_InnerBottomRight(1054),
 		
 		DiagonalStoneTileBlock_OuterTopLeft(2000),
 		DiagonalStoneTileBlock_OuterTopRight(2001),
@@ -139,9 +156,9 @@ public class ObjectId {
 	// Used for easily copying and pasting new entries into the Name enum.
 	/*
 	public static void main(String[] args) {
-		String objectName = "RockTileBlock";
+		String objectName = "GrassBackgroundTileBlock";
 		TileOrientation[] orientations = TileOrientation.values();
-		int baseUID = 1026;
+		int baseUID = 1042;
 		
 		for (TileOrientation o : orientations)	
 			System.out.println(objectName + "_" + o.toString() + "(" + baseUID++ + "),");

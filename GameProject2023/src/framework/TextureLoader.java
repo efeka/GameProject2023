@@ -49,6 +49,7 @@ public class TextureLoader {
 		// Tiles
 		StoneTiles,
 		GrassTiles,
+		GrassBackgroundTiles,
 		RockTiles,
 		DiagonalStoneTiles,
 		WoodJumpThroughTiles,
@@ -240,9 +241,14 @@ public class TextureLoader {
 				textures[i] = blockSheet.getSubimage(1 + i * 17, 52, 16, 16);
 			break;
 		case GrassTiles:
-			textures = new BufferedImage[13];
+			textures = new BufferedImage[16];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = blockSheet.getSubimage(1 + i * 17, 18, 16, 16);
+			break;
+		case GrassBackgroundTiles:
+			textures = new BufferedImage[13];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = blockSheet.getSubimage(1 + i * 17, 86, 16, 16);
 			break;
 		case RockTiles:
 			textures = new BufferedImage[13];

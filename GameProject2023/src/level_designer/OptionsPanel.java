@@ -17,6 +17,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -36,7 +37,8 @@ public class OptionsPanel extends JPanel {
 		void onGameObjectSelected(BufferedImage selectedImage, Name objectName);
 		void onBackgroundColorSelected(Color color);
 		void onGridToggle(boolean toggle);
-		void clearDesign();
+		void onLayerSelect(int index);
+		void clearLayer();
 		void saveDesign();
 	}
 	
@@ -63,6 +65,9 @@ public class OptionsPanel extends JPanel {
 		titleLabel.setFont(new Font("Calibri", Font.BOLD, 20));
 		topPanel.add(titleLabel, BorderLayout.NORTH);
 		
+		JPanel selectionGroupPanel = new JPanel();
+		selectionGroupPanel.setLayout(new BorderLayout());
+		
 		JCheckBox toggleGridCheckBox = new JCheckBox("Toggle Grid");
 		toggleGridCheckBox.setHorizontalAlignment(SwingConstants.CENTER);
 		toggleGridCheckBox.setSelected(true);
@@ -70,7 +75,16 @@ public class OptionsPanel extends JPanel {
 			if (optionSelectionListener != null)
 				optionSelectionListener.onGridToggle(toggleGridCheckBox.isSelected());
 		});
-		topPanel.add(toggleGridCheckBox, BorderLayout.CENTER);
+		selectionGroupPanel.add(toggleGridCheckBox, BorderLayout.NORTH);
+		
+		JComboBox<String> layerComboBox = new JComboBox<>(new String[] {"Background Layer", "Middle Layer", "Foreground Layer", "All Layers"});
+        layerComboBox.setSelectedIndex(1);
+		layerComboBox.addActionListener(e -> {
+        	if (optionSelectionListener != null)
+				optionSelectionListener.onLayerSelect(layerComboBox.getSelectedIndex());
+        });
+		selectionGroupPanel.add(layerComboBox, BorderLayout.CENTER);
+		topPanel.add(selectionGroupPanel, BorderLayout.CENTER);
 		
 		JPanel colorPanel = new JPanel();
 		colorPanel.setLayout(new FlowLayout());
@@ -98,7 +112,7 @@ public class OptionsPanel extends JPanel {
 		JButton clearButton = new JButton("Delete Design");
 		clearButton.addActionListener(e -> {
 			if (optionSelectionListener != null)
-				optionSelectionListener.clearDesign();
+				optionSelectionListener.clearLayer();
 		});
 		
 		JButton saveButton = new JButton("Save Design");

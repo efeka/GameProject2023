@@ -19,7 +19,10 @@ public enum TileOrientation {
 	InnerTopLeft(9),
 	InnerTopRight(10),
 	InnerBottomLeft(11),
-	InnerBottomRight(12);
+	InnerBottomRight(12),
+	StandaloneLeft(13),
+	StandaloneCenter(14),
+	StandaloneRight(15);
 
 	private int value;
 

@@ -22,8 +22,9 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	private boolean leftMousePressed = false;
 	private boolean rightMousePressed = false;
 
-	private LevelGrid levelGrid;
+	private LevelGrid[] levelGrids;
 	private boolean showGrid = true;
+	private int selectedLayer = 1;
 
 	private BufferedImage selectedImage = null;
 	private Name selectedObjectName = null;
@@ -40,12 +41,15 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	}
 
 	private void setupGrid() {
-		levelGrid = new LevelGrid(0, 0, getWidth(), getHeight());
+		levelGrids = new LevelGrid[3];
+		for (int i = 0; i < levelGrids.length; i++)
+			levelGrids[i] = new LevelGrid(0, 0, getWidth(), getHeight());
 
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				levelGrid.resizeGrid(getWidth(), getHeight());
+				for (int i = 0; i < levelGrids.length; i++)
+					levelGrids[i].resizeGrid(getWidth(), getHeight());
 				repaint();
 			}
 		});
@@ -57,10 +61,10 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
 		// Grid background
 		g.setColor(selectedBackgroundColor);
-		int cellSize = levelGrid.cellSize;
-		g.fillRect(levelGrid.xOffset, levelGrid.yOffset, levelGrid.cols * cellSize, levelGrid.rows * cellSize);
+		int cellSize = levelGrids[0].cellSize;
+		g.fillRect(levelGrids[0].xOffset, levelGrids[0].yOffset, levelGrids[0].cols * cellSize, levelGrids[0].rows * cellSize);
 
-		// Grid cells
+		// Grid cell frames
 		int backgroundColorAverage = (selectedBackgroundColor.getRed() +
 				selectedBackgroundColor.getGreen() +
 				selectedBackgroundColor.getBlue()) / 3;
@@ -68,20 +72,49 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 				new Color(150, 150, 150) :
 				new Color(51, 51, 51);
 		
+		// Grid cells
 		g.setColor(cellBorderColor);
-		GridCell[][] grid = levelGrid.getGrid();
-		for (int i = 0; i < grid.length; i++) {
-			for (int j = 0; j < grid[i].length; j++) {
-				GridCell cell = grid[i][j];
+		// Draw all layers
+		if (selectedLayer == 3) {
+			GridCell[][] gridBg = levelGrids[0].getGrid();
+			GridCell[][] grid = levelGrids[1].getGrid();
+			GridCell[][] gridFg = levelGrids[2].getGrid();
+			
+			for (int i = 0; i < grid.length; i++) {
+				for (int j = 0; j < grid[i].length; j++) {
+					GridCell cellBg = gridBg[i][j];
+					GridCell cell = grid[i][j];
+					GridCell cellFg = gridFg[i][j];
 
-				if (cell.image != null)
-					g.drawImage(cell.image, cell.x, cell.y, cell.size, cell.size, null);
+					if (cellBg.image != null)
+						g.drawImage(cellBg.image, cellBg.x, cellBg.y, cellBg.size, cellBg.size, null);
+					if (cell.image != null)
+						g.drawImage(cell.image, cell.x, cell.y, cell.size, cell.size, null);
+					if (cellFg.image != null)
+						g.drawImage(cellFg.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
+					
+					if (showGrid)
+						g.drawRect(cell.x, cell.y, cell.size, cell.size);	
+				}
+			}	
+		}
+		// Only draw the selected layer
+		else {
+			GridCell[][] grid = levelGrids[selectedLayer].getGrid();
+			for (int i = 0; i < grid.length; i++) {
+				for (int j = 0; j < grid[i].length; j++) {
+					GridCell cell = grid[i][j];
 
-				if (showGrid)
-					g.drawRect(cell.x, cell.y, cell.size, cell.size);	
-			}
+					if (cell.image != null)
+						g.drawImage(cell.image, cell.x, cell.y, cell.size, cell.size, null);
+
+					if (showGrid)
+						g.drawRect(cell.x, cell.y, cell.size, cell.size);	
+				}
+			}	
 		}
 		
+		// Display the selected objects name
 		if (selectedObjectName != null) {
 			g.setColor(Color.BLACK);
 			g.drawString(selectedObjectName.toString(), 5, getHeight() - 5);
@@ -106,42 +139,73 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		showGrid = toggle;
 		repaint();
 	}
+	
+	// TODO
+	@Override
+	public void onLayerSelect(int index) {
+		selectedLayer = index;
+		repaint();
+	}
 
 	@Override
-	public void clearDesign() {
-		GridCell[][] grid = levelGrid.getGrid();
-		for (int i = 0; i < levelGrid.rows; i++)
-			for (int j = 0; j < levelGrid.cols; j++)
-				grid[i][j].clear();
+	public void clearLayer() {
+		// Clear all layers
+		if (selectedLayer == 3) {
+			for (int i = 0; i < levelGrids.length; i++) {
+				GridCell[][] grid = levelGrids[i].getGrid();
+				for (int j = 0; j < grid.length; j++)
+					for (int k = 0; k < grid[j].length; k++)
+						grid[j][k].clear();
+			}
+		}
+		// Only clear the selected layer
+		else {
+			GridCell[][] grid = levelGrids[selectedLayer].getGrid();
+			for (int j = 0; j < grid.length; j++)
+				for (int k = 0; k < grid[j].length; k++)
+					grid[j][k].clear();
+		}
 		repaint();
 	}
 
 	/**
-	 * Saves the contents of the drawing area into the levels file.
+	 * Saves the contents of the drawing area into the txt files.
 	 */
 	@Override
 	public void saveDesign() {
-		int rows = levelGrid.rows;
-		int cols = levelGrid.cols;
+		int rows = levelGrids[0].rows;
+		int cols = levelGrids[0].cols;
 
-		int[][] objectUIDs = new int[rows][cols];
-		GridCell[][] grid = levelGrid.getGrid();
-
+		int[][][] objectUIDs = new int[3][rows][cols];
+		GridCell[][] gridBg = levelGrids[0].getGrid();
+		GridCell[][] grid = levelGrids[1].getGrid();
+		GridCell[][] gridFg = levelGrids[2].getGrid();
+		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
+				Name objectNameBg = gridBg[i][j].objectName;
 				Name objectName = grid[i][j].objectName;
-				int uid = objectName != null ? objectName.getUID() : 0;
-				objectUIDs[i][j] = uid;
+				Name objectNameFg = gridFg[i][j].objectName;
+
+				objectUIDs[0][i][j] = objectNameBg != null ? objectNameBg.getUID() : 0;
+				objectUIDs[1][i][j] = objectName != null ? objectName.getUID() : 0;
+				objectUIDs[2][i][j] = objectNameFg != null ? objectNameFg.getUID() : 0;
 			}
 		}
 
-		new FileIO().saveLevel("levels.txt", objectUIDs);
+		new FileIO().saveLevel("levels_bg.txt", objectUIDs[0]);
+		new FileIO().saveLevel("levels.txt", objectUIDs[1]);
+		new FileIO().saveLevel("levels_fg.txt", objectUIDs[2]);
 
 		JOptionPane.showMessageDialog(this, "Save successful");
+		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if (selectedLayer == 3)
+			return;
+		
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			leftMousePressed = true;
 			rightMousePressed = false;
@@ -153,19 +217,19 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		else
 			return;
 
-		int cellRow = (e.getY() - levelGrid.yOffset) / levelGrid.cellSize;
-		int cellCol = (e.getX() - levelGrid.xOffset) / levelGrid.cellSize;
+		int cellRow = (e.getY() - levelGrids[selectedLayer].yOffset) / levelGrids[selectedLayer].cellSize;
+		int cellCol = (e.getX() - levelGrids[selectedLayer].xOffset) / levelGrids[selectedLayer].cellSize;
 
 		if (!isValidPosition(cellRow, cellCol))
 			return;
 
 		if (leftMousePressed) {
-			levelGrid.getGrid()[cellRow][cellCol].image = selectedImage;
-			levelGrid.getGrid()[cellRow][cellCol].objectName = selectedObjectName;
+			levelGrids[selectedLayer].getGrid()[cellRow][cellCol].image = selectedImage;
+			levelGrids[selectedLayer].getGrid()[cellRow][cellCol].objectName = selectedObjectName;
 		}
 		else if (rightMousePressed) {
-			levelGrid.getGrid()[cellRow][cellCol].image = null;
-			levelGrid.getGrid()[cellRow][cellCol].objectName = null;
+			levelGrids[selectedLayer].getGrid()[cellRow][cellCol].image = null;
+			levelGrids[selectedLayer].getGrid()[cellRow][cellCol].objectName = null;
 		}
 
 		repaint();
@@ -173,22 +237,24 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		if (selectedLayer == 3)
+			return;
 		if (!leftMousePressed && !rightMousePressed)
 			return;
 
-		int cellRow = (e.getY() - levelGrid.yOffset) / levelGrid.cellSize;
-		int cellCol = (e.getX() - levelGrid.xOffset) / levelGrid.cellSize;
+		int cellRow = (e.getY() - levelGrids[selectedLayer].yOffset) / levelGrids[selectedLayer].cellSize;
+		int cellCol = (e.getX() - levelGrids[selectedLayer].xOffset) / levelGrids[selectedLayer].cellSize;
 
 		if (!isValidPosition(cellRow, cellCol))
 			return;
 
 		if (leftMousePressed) {
-			levelGrid.getGrid()[cellRow][cellCol].image = selectedImage;
-			levelGrid.getGrid()[cellRow][cellCol].objectName = selectedObjectName;
+			levelGrids[selectedLayer].getGrid()[cellRow][cellCol].image = selectedImage;
+			levelGrids[selectedLayer].getGrid()[cellRow][cellCol].objectName = selectedObjectName;
 		}
 		else if (rightMousePressed) {
-			levelGrid.getGrid()[cellRow][cellCol].image = null;
-			levelGrid.getGrid()[cellRow][cellCol].objectName = null;
+			levelGrids[selectedLayer].getGrid()[cellRow][cellCol].image = null;
+			levelGrids[selectedLayer].getGrid()[cellRow][cellCol].objectName = null;
 		}
 
 		repaint();
@@ -196,9 +262,9 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
 	private boolean isValidPosition(int row, int col) {
 		return row >= 0 &&
-				row < levelGrid.rows &&
+				row < levelGrids[selectedLayer].rows &&
 				col >= 0 &&
-				col < levelGrid.cols;
+				col < levelGrids[selectedLayer].cols;
 	}
 
 	@Override

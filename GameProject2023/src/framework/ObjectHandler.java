@@ -14,6 +14,7 @@ import game_objects.ArcherEnemy;
 import game_objects.BasicEnemy;
 import game_objects.BullEnemy;
 import game_objects.DiagonalStoneTileBlock;
+import game_objects.GrassBackgroundTileBlock;
 import game_objects.GrassTileBlock;
 import game_objects.Player;
 import game_objects.RockTileBlock;
@@ -61,19 +62,31 @@ public class ObjectHandler {
 		this.mouseInput = mouseInput;
 
 		FileIO fileIO = new FileIO();
-		int[][] objectUIDs = fileIO.loadLevel("levels.txt", 1);
+		int[][] objectUIDsBottomLayer = fileIO.loadLevel("levels_bg.txt", 0);
+		int[][] objectUIDsMiddleLayer = fileIO.loadLevel("levels.txt", 0);
+		int[][] objectUIDsTopLayer = fileIO.loadLevel("levels_fg.txt", 0);
 		
 		for (int i = 0; i < TILE_ROWS; i++) {
 			for (int j = 0; j < TILE_COLUMNS; j++) {
-				Name objectName = ObjectId.Name.getByUID(objectUIDs[i][j]);
-				if (objectName == null)
-					continue;
-				
+				Name objectNameBL = ObjectId.Name.getByUID(objectUIDsBottomLayer[i][j]);
+				Name objectNameML = ObjectId.Name.getByUID(objectUIDsMiddleLayer[i][j]);
+				Name objectNameTL = ObjectId.Name.getByUID(objectUIDsTopLayer[i][j]);
+
 				int x = j * TILE_SIZE;
 				int y = i * TILE_SIZE;
 				
-				GameObject gameObject = createObjectByName(objectName, x, y);
-				addObject(gameObject, MIDDLE_LAYER);
+				if (objectNameBL != null) {
+					GameObject gameObject = createObjectByName(objectNameBL, x, y);
+					addObject(gameObject, BOTTOM_LAYER);
+				}
+				if (objectNameML != null) {
+					GameObject gameObject = createObjectByName(objectNameML, x, y);
+					addObject(gameObject, MIDDLE_LAYER);
+				}
+				if (objectNameTL != null) {
+					GameObject gameObject = createObjectByName(objectNameTL, x, y);
+					addObject(gameObject, TOP_LAYER);
+				}
 			}
 		}
 		
@@ -286,6 +299,15 @@ public class ObjectHandler {
 		case GrassTileBlock_OuterTopRight:
 			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
 			break;
+		case GrassTileBlock_StandaloneLeft:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.StandaloneLeft);
+			break;
+		case GrassTileBlock_StandaloneCenter:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.StandaloneCenter);
+			break;
+		case GrassTileBlock_StandaloneRight:
+			gameObject = new GrassTileBlock(x, y, objectName, TileOrientation.StandaloneRight);
+			break;
 		case RockTileBlock_Center:
 			gameObject = new RockTileBlock(x, y, objectName, TileOrientation.Center);
 			break;
@@ -348,10 +370,49 @@ public class ObjectHandler {
 			break;
 		case Missing:
 			break;
+		case GrassBackgroundTileBlock_Center:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.Center);
+			break;
+		case GrassBackgroundTileBlock_InnerBottomLeft:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.InnerBottomLeft);
+			break;
+		case GrassBackgroundTileBlock_InnerBottomRight:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.InnerBottomRight);
+			break;
+		case GrassBackgroundTileBlock_InnerTopLeft:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.InnerTopLeft);
+			break;
+		case GrassBackgroundTileBlock_InnerTopRight:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.InnerTopRight);
+			break;
+		case GrassBackgroundTileBlock_OuterBottom:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterBottom);
+			break;
+		case GrassBackgroundTileBlock_OuterBottomLeft:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterBottomLeft);
+			break;
+		case GrassBackgroundTileBlock_OuterBottomRight:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterBottomRight);
+			break;
+		case GrassBackgroundTileBlock_OuterLeft:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterLeft);
+			break;
+		case GrassBackgroundTileBlock_OuterRight:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterRight);
+			break;
+		case GrassBackgroundTileBlock_OuterTop:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterTop);
+			break;
+		case GrassBackgroundTileBlock_OuterTopLeft:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterTopLeft);
+			break;
+		case GrassBackgroundTileBlock_OuterTopRight:
+			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
+			break;
 		}
 		
 		if (gameObject == null)
-			System.err.println("Could not create game object with the name: " + objectName);
+			System.err.println("ObjectHandler: Could not create game object with the name: " + objectName);
 		
 		return gameObject;
 	}
