@@ -26,6 +26,7 @@ public class TextureLoader {
 		PlayerSwordStab,
 		PlayerSwordThrow,
 		PlayerSwordSwing,
+		PlayerSwordDash,
 		
 		PlayerHammerIdle,
 		PlayerHammerRun,
@@ -183,6 +184,11 @@ public class TextureLoader {
 				textures[i] = playerSheet.getSubimage(456 + i * 65, 651, 64, 64);
 				textures[i + 6] = playerSheet.getSubimage(456 + i * 65, 716, 64, 64);
 			}
+			break;
+		case PlayerSwordDash:
+			textures = new BufferedImage[4];
+			for (int i = 0; i < textures.length; i++) 
+				textures[i] = playerSheet.getSubimage(716 + i * 65, 391, 64, 64);
 			break;
 		case PlayerHammerIdle:
 			textures = new BufferedImage[14];

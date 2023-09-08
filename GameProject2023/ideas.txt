@@ -20,11 +20,19 @@ the same weapon. Each transformation must resemble the original weapon, but each
 			Shield bash
 			Parry
 
+WEAPON DROPS and SKILL POOLS
+============================
+Each weapon gets assigned random abilities from its own ability pool. These abilities can be rerolled in special rooms with increasing cost.
+Weapon rarity can effect weapon damage and the power of its abilities.
+
+
+/*
 WEAPON SKILL TREES
 ==================
 Each weapon could have a skill tree. Players can choose skills from this skill tree during their run. But they are run spesific and will all be
 lost when the player dies. Skill points can be earned by killing difficult optional bosses, or can be bought for an expensive price from the in game shop.
 The price could increase with each buy.
+*/
 
 IN-GAME SHOP
 =============

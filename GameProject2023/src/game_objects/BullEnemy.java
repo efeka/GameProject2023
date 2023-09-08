@@ -78,8 +78,8 @@ public class BullEnemy extends Creature {
 
 	private void handleAttacking() {
 		if (getBounds().intersects(player.getBounds())) {
-			player.takeDamage(25, player.getDefaultInvulnerabilityDuration());
 			player.applyKnockback(direction * runningSpeed / 2, -7f);
+			player.takeDamage(25, player.getDefaultInvulnerabilityDuration());
 		}
 	}
 	

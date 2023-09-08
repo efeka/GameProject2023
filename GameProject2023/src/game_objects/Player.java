@@ -41,6 +41,8 @@ public class Player extends Creature {
 	private int availableJumps = 2;
 	private boolean doubleJumping = false;
 	private boolean dodging = false;
+	
+	private boolean lockMovementInputs = false; 
 
 	private final int defaultInvulnerabilityDuration = 700;
 	
@@ -85,7 +87,8 @@ public class Player extends Creature {
 		if (!canInteract && (now - lastInteractTimer >= 1000))
 			canInteract = true;
 
-		handleMovement();
+		if (!lockMovementInputs)
+			handleMovement();
 		weapon.tick();
 		handleObjectInteraction();
 
@@ -172,8 +175,6 @@ public class Player extends Creature {
 
 		// Jump / Double jump
 		// Allows the player to do multiple jumps without touching the ground.
-		// Available jump count is reset when the player hits the ground.
-		// This is handled during the block collision check.
 		if (keyInput.isJumpKeyPressed()) {
 			// If the player is grounded and did not perform a jump yet
 			if (!falling && !jumping && availableJumps == 2) {
@@ -230,7 +231,7 @@ public class Player extends Creature {
 
 	@Override
 	public void applyKnockback(float velX, float velY) {
-		if ((knockedBack && invulnerable) || dodging)
+		if (invulnerable || dodging)
 			return;
 
 		knockedBack = true;
@@ -413,4 +414,8 @@ public class Player extends Creature {
 		return defaultInvulnerabilityDuration;
 	}
 
+	public void setLockMovementInputs(boolean lockMovementInputs) {
+		this.lockMovementInputs = lockMovementInputs;
+	}
+	
 }

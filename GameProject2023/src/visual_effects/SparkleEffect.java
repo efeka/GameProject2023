@@ -6,7 +6,7 @@ import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import window.Animation;
 
-public class SparkleEffect extends VisualEffect {
+public class SparkleEffect extends OneTimeAnimationEffect {
 
 	public SparkleEffect(float x, float y, ObjectHandler objectHandler) {
 		super(x, y, GameConstants.ScaleConstants.TILE_SIZE, GameConstants.ScaleConstants.TILE_SIZE, objectHandler);

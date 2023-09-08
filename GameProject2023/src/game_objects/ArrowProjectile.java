@@ -3,6 +3,7 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import window.Animation;
 public class ArrowProjectile extends Projectile {
 
 	private boolean stopUpdating = false;
+	private float alpha = 1;
+	private float fadingRate = 0.01f;
 	
 	private Animation arrowAnimation;
 	
@@ -40,7 +43,10 @@ public class ArrowProjectile extends Projectile {
 		// of time and then remove it from the game.
 		if (landed) {
 			if (System.currentTimeMillis() - landingTime >= lifetimeAfterLandingMillis) {
-				objectHandler.removeObject(this);
+				if (alpha > fadingRate) 
+					alpha -= fadingRate;
+				else
+					objectHandler.removeObject(this);
 				return;
 			}
 		}
@@ -61,8 +67,8 @@ public class ArrowProjectile extends Projectile {
 		// Player collision
 		Player player = objectHandler.getPlayer();
 		if (getBounds().intersects(player.getBounds()) && !player.isDodging()) {
-			player.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
 			player.applyKnockback(velX / 2, -3f);
+			player.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
 			objectHandler.removeObject(this);
 		}
 		
@@ -89,11 +95,18 @@ public class ArrowProjectile extends Projectile {
 	    float centerX = (float) getBounds().getCenterX();
 	    float centerY = (float) getBounds().getCenterY();
 	    double rotationAngle = Math.atan2(velY, velX);
-
+	    
 	    Graphics2D g2d = (Graphics2D) g;
 	    g2d.rotate(rotationAngle, centerX, centerY);
+	    g2d.setComposite(makeTransparent(alpha));
 	    arrowAnimation.drawAnimation(g2d, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+	    g2d.setComposite(makeTransparent(1));
 	    g2d.rotate(-rotationAngle, centerX, centerY);
+	}
+	
+	private AlphaComposite makeTransparent(float alpha) {
+		int type = AlphaComposite.SRC_OVER;
+		return(AlphaComposite.getInstance(type, alpha));
 	}
 
 }

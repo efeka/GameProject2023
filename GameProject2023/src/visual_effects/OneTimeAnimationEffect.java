@@ -9,12 +9,12 @@ import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import window.Animation;
 
-public abstract class VisualEffect extends GameObject {
+public abstract class OneTimeAnimationEffect extends GameObject {
 
 	private ObjectHandler objectHandler;
 	private Animation animation;
 	
-	public VisualEffect(float x, float y, int width, int height, ObjectHandler objectHandler) {
+	public OneTimeAnimationEffect(float x, float y, int width, int height, ObjectHandler objectHandler) {
 		super(x, y, width, height, new ObjectId(Category.Missing, Name.Missing));
 		this.objectHandler = objectHandler;
 	}

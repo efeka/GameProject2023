@@ -92,8 +92,8 @@ public class BasicEnemy extends Creature {
 			
 			// Damage the player
 			if (attacking) {
-				player.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
 				player.applyKnockback(4 * direction, -5);
+				player.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
 			}
 		}
 	}
