@@ -2,7 +2,7 @@ package visual_effects;
 
 import java.awt.Graphics;
 
-import abstract_objects.GameObject;
+import abstract_templates.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;

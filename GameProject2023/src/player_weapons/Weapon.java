@@ -1,64 +1,64 @@
 package player_weapons;
 
+import java.awt.Graphics;
+
+import abstract_templates.GameObject;
 import framework.ObjectHandler;
+import framework.ObjectId;
+import framework.ObjectId.Category;
+import framework.ObjectId.Name;
 import game_objects.Player;
 import items.WeaponItem;
 import window.Animation;
+import window.KeyInput;
+import window.MouseInput;
 
-public abstract class Weapon {
-	
+public abstract class Weapon extends GameObject {
+
 	protected ObjectHandler objectHandler;
 	protected Player player;
+	protected KeyInput keyInput;
+	protected MouseInput mouseInput;
 	
-	/**
-	 * The abilities for this weapon.
-	 * The ability on index 0 should always be the regular attack.
-	 */
-	protected WeaponAbility[] abilities;
+	protected Animation[] idleAnimation = new Animation[2];
+	protected Animation[] runAnimation = new Animation[2];
 	
-	public Weapon(ObjectHandler objectHandler) {
+	public Weapon(ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
+		super(0, 0, 0, 0, new ObjectId(Category.Missing, Name.Missing));
 		this.objectHandler = objectHandler;
 		player = objectHandler.getPlayer();
+		this.keyInput = keyInput;
+		this.mouseInput = mouseInput;
+		
+		setupAnimations();
 	}
 	
+	public abstract void tick();
+
+	@Override
+	public void render(Graphics g) {}
+	
 	/**
-	 * All abilities related to this weapon should be initialized inside this method.
+	 * Checks whether an ability of this weapon is being used or not.
+	 * @return true if an ability is currently being used.
 	 */
-	protected abstract void setupAbilities();
+	public abstract boolean isUsingAbility();
+	
+	public abstract Animation getCurrentAnimation();
 	
 	/**
-	 * Use the weapon ability at the given index.
-	 * The functionality of the ability should be implemented here.
-	 * 
-	 * This method should be called constantly until the abilities
-	 * animation is done playing.
-	 * @param index the index of the ability to be used
-	 */
-	public abstract void useAbility(int index);
-	
-	public WeaponAbility getAbility(int index) {
-		if (!isAbilityIndexValid(index))
-			return null;
-		return abilities[index];
-	}
-	
-	/**
-	 * The idle and run animations should be initialized inside this method.
+	 * Initialize the idle and run animations.
 	 */
 	protected abstract void setupAnimations();
-	public abstract Animation[] getIdleAnimation();
-	public abstract Animation[] getRunAnimation();
 	
-	protected boolean isAbilityIndexValid(int index) {
-		return index >= 0 && index < abilities.length && abilities[index] != null;
+	public Animation[] getIdleAnimation() {
+		return idleAnimation;
 	}
 	
-	/**
-	 * Create the Item object corresponding to this wepon.
-	 * @param x the x coordinate of the Item
-	 * @param y the y coordinate of the Item
-	 * @return the Item object
-	 */
+	public Animation[] getRunAnimation() {
+		return runAnimation;
+	}
+	
 	public abstract WeaponItem createItemFromWeapon(float x, float y);
 	
 }

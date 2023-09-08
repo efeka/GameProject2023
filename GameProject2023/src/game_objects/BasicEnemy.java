@@ -6,7 +6,7 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import abstract_objects.Creature;
+import abstract_templates.Creature;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
@@ -92,18 +92,19 @@ public class BasicEnemy extends Creature {
 			
 			// Damage the player
 			if (attacking) {
-				player.takeDamage(damage, true);
+				player.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
 				player.applyKnockback(4 * direction, -5);
 			}
 		}
 	}
 
 	@Override
-	public void takeDamage(int damageAmount, boolean activateInvulnerability) {
+	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
 		if (invulnerable)
 			return;
+		invulnerableDuration = invulnerabilityDuration; 
 		
-		if (activateInvulnerability) {
+		if (invulnerableDuration != 0) {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}
@@ -117,6 +118,9 @@ public class BasicEnemy extends Creature {
 	
 	@Override
 	public void applyKnockback(float velX, float velY) {
+		if (invulnerable)
+			return;
+		
 		knockedBack = true;
 		this.velX = velX;
 		this.velY = velY;

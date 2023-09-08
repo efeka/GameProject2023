@@ -1,4 +1,4 @@
-package abstract_objects;
+package abstract_templates;
 
 import java.awt.Rectangle;
 
@@ -50,7 +50,20 @@ public abstract class Creature extends GameObject {
 			stamina = maxStamina;
 	}
 
-	public abstract void takeDamage(int damageAmount, boolean activateInvulnerablilty);
+	/**
+	 * Reduces this creatures health by the given damage amount.
+	 * @param damageAmount the amount of health to be reduced on this creature.
+	 * @param invulnerabilityDuration duration of the invulnerability state after the damage is taken.
+	 */
+	public abstract void takeDamage(int damageAmount, int invulnerabilityDuration);
+	
+	/**
+	 * Applies force in the given direction to this creature.
+	 * Important: Depending on the implementation, it might be necessary
+	 * to call this method BEFORE {@code takeDamage} because of invulerability.
+	 * @param velX the x component of the force.
+	 * @param velY the y component of the force.
+	 */
 	public abstract void applyKnockback(float velX, float velY);
 
 	public void die() {

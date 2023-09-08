@@ -4,14 +4,15 @@ import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import player_weapons.FisticuffsWeapon;
 import player_weapons.Weapon;
 import window.Animation;
+import window.KeyInput;
+import window.MouseInput;
 
 public class FisticuffsItem extends WeaponItem {
 
-	public FisticuffsItem(float x, float y, ObjectHandler objectHandler) {
-		super(x, y, objectHandler, Name.FisticuffsItem);
+	public FisticuffsItem(float x, float y, KeyInput keyInput, MouseInput mouseInput, ObjectHandler objectHandler) {
+		super(x, y, keyInput, mouseInput, objectHandler, Name.FisticuffsItem);
 		
 		TextureLoader textureLoader = TextureLoader.getInstance();
 		texture = textureLoader.getTextures(TextureName.FisticuffsItem)[0];
@@ -20,9 +21,11 @@ public class FisticuffsItem extends WeaponItem {
 		animation = new Animation(textureLoader.getTextures(TextureName.FisticuffsItem), animDelay, false);
 	}
 
+	// TODO
 	@Override
 	protected Weapon createWeaponFromItem() {
-		return new FisticuffsWeapon(objectHandler);
+		//return new FisticuffsWeapon(objectHandler, keyInput, MouseInput);
+		return null;
 	}
 	
 }

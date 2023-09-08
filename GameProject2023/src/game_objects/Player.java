@@ -11,9 +11,9 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import abstract_objects.Creature;
-import abstract_objects.DiagonalTileBlock;
-import abstract_objects.GameObject;
+import abstract_templates.Creature;
+import abstract_templates.DiagonalTileBlock;
+import abstract_templates.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
@@ -31,18 +31,19 @@ public class Player extends Creature {
 
 	private ObjectHandler objectHandler;
 	private KeyInput keyInput;
-	private MouseInput mouseInput;
-
-	private Weapon weapon;
 
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = 8.5f;
 	private float dodgingSpeed = 5f;
 
+	private Weapon weapon;
+	
 	private int availableJumps = 2;
 	private boolean doubleJumping = false;
 	private boolean dodging = false;
 
+	private final int defaultInvulnerabilityDuration = 700;
+	
 	private boolean canInteract = true;
 	private long lastInteractTimer;
 
@@ -53,10 +54,9 @@ public class Player extends Creature {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
-		this.mouseInput = mouseInput;
 		objectHandler.setPlayer(this);
 
-		weapon = new SwordWeapon(objectHandler);
+		weapon = new SwordWeapon(objectHandler, keyInput, mouseInput);
 
 		invulnerableDuration = 700;
 
@@ -86,18 +86,8 @@ public class Player extends Creature {
 			canInteract = true;
 
 		handleMovement();
+		weapon.tick();
 		handleObjectInteraction();
-
-		// Handle ability usage
-		if (mouseInput.isAttackButtonPressed() || 
-				(weapon.getAbility(0) != null && weapon.getAbility(0).isAbilityBeingUsed()))
-			weapon.useAbility(0);
-		if (keyInput.isFirstAbilityKeyPressed() ||
-				(weapon.getAbility(1) != null && weapon.getAbility(1).isAbilityBeingUsed()))
-			weapon.useAbility(1);
-		if (keyInput.isSecondAbilityKeyPressed() ||
-				(weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed()))
-			weapon.useAbility(2);
 
 		runAnimations();
 	}
@@ -105,6 +95,7 @@ public class Player extends Creature {
 	@Override
 	public void render(Graphics g) {
 		drawAnimations(g);
+		weapon.render(g);
 
 		// Debug
 		if (keyInput.debugPressed) {
@@ -215,17 +206,22 @@ public class Player extends Creature {
 	}
 
 	@Override
-	public void takeDamage(int damageAmount, boolean activateInvulnerability) {
+	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
 		if (invulnerable || dodging)
 			return;
 
-		if (activateInvulnerability) {
+		if (invulnerabilityDuration != 0) {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}
-
+		
 		setHealth(health - damageAmount);
 		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
+	
+		/* TODO
+		if (health <= 0)
+			die();
+		*/
 	}
 	
 	// TODO
@@ -354,17 +350,8 @@ public class Player extends Creature {
 
 	// TODO Should be moved into PlayerAnimationHandler
 	private void runAnimations() {
-		int directionToIndex = animationHandler.getIndexFromDirection();
-
-		// Using first ability
-		if (weapon.getAbility(0) != null && weapon.getAbility(0).isAbilityBeingUsed())
-			weapon.getAbility(0).getAnimation(directionToIndex).runAnimation();
-		// Using second ability
-		else if (weapon.getAbility(1) != null && weapon.getAbility(1).isAbilityBeingUsed())
-			weapon.getAbility(1).getAnimation(directionToIndex).runAnimation();
-		// Using third ability
-		else if (weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed())
-			weapon.getAbility(2).getAnimation(directionToIndex).runAnimation();
+		if (weapon.isUsingAbility() && weapon.getCurrentAnimation() != null)
+			weapon.getCurrentAnimation().runAnimation();
 		else if (dodging) {
 			animationHandler.getDodgeAnimation(1).runAnimation();
 			animationHandler.getDodgeAnimation(-1).runAnimation();
@@ -385,14 +372,8 @@ public class Player extends Creature {
 	private void drawAnimations(Graphics g) {
 		int directionToIndex = animationHandler.getIndexFromDirection();
 
-		// Using first ability
-		if (weapon.getAbility(0) != null && weapon.getAbility(0).isAbilityBeingUsed())
-			weapon.getAbility(0).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		// Using second ability
-		else if (weapon.getAbility(1) != null && weapon.getAbility(1).isAbilityBeingUsed())
-			weapon.getAbility(1).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		else if (weapon.getAbility(2) != null && weapon.getAbility(2).isAbilityBeingUsed())
-			weapon.getAbility(2).getAnimation(directionToIndex).drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		if (weapon.isUsingAbility() && weapon.getCurrentAnimation() != null)
+			weapon.getCurrentAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		else if (dodging)
 			animationHandler.getDodgeAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
 		// Jumping
@@ -426,6 +407,10 @@ public class Player extends Creature {
 	
 	public boolean isDodging() {
 		return dodging;
+	}
+	
+	public int getDefaultInvulnerabilityDuration() {
+		return defaultInvulnerabilityDuration;
 	}
 
 }

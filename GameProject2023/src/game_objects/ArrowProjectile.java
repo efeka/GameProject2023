@@ -7,8 +7,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
-import abstract_objects.GameObject;
-import abstract_objects.Projectile;
+import abstract_templates.GameObject;
+import abstract_templates.Projectile;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -61,7 +61,7 @@ public class ArrowProjectile extends Projectile {
 		// Player collision
 		Player player = objectHandler.getPlayer();
 		if (getBounds().intersects(player.getBounds()) && !player.isDodging()) {
-			player.takeDamage(damage, true);
+			player.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
 			player.applyKnockback(velX / 2, -3f);
 			objectHandler.removeObject(this);
 		}

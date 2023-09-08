@@ -3,8 +3,8 @@ package game_objects;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import abstract_objects.TileBlock;
-import abstract_objects.TileOrientation;
+import abstract_templates.TileBlock;
+import abstract_templates.TileOrientation;
 import framework.ObjectId.Name;
 import framework.TextureLoader.TextureName;
 import framework.TextureLoader;

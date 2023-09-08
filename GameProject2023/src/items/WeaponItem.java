@@ -4,27 +4,34 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import abstract_objects.GameObject;
+import abstract_templates.GameObject;
 import framework.GameConstants;
+import framework.GameConstants.ScaleConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
-import framework.GameConstants.ScaleConstants;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.Player;
 import player_weapons.Weapon;
 import window.Animation;
+import window.KeyInput;
+import window.MouseInput;
 
 public abstract class WeaponItem extends GameObject {
 
+	protected KeyInput keyInput;
+	protected MouseInput mouseInput;
+	
 	protected Animation animation = null;
 	protected ObjectHandler objectHandler;
 	
 	private boolean jumping = true;
 	private float velY = -3f;
 
-	public WeaponItem(float x, float y, ObjectHandler objectHandler, Name objectName) {
+	public WeaponItem(float x, float y, KeyInput keyInput, MouseInput mouseInput, ObjectHandler objectHandler, Name objectName) {
 		super(x, y, ScaleConstants.PLAYER_WIDTH, ScaleConstants.PLAYER_HEIGHT, new ObjectId(Category.WeaponItem, objectName));
+		this.keyInput = keyInput;
+		this.mouseInput = mouseInput;
 		this.objectHandler = objectHandler;
 	}
 	
@@ -103,7 +110,6 @@ public abstract class WeaponItem extends GameObject {
 		
 		// Drop the player's current weapon in Item form
 		// so that it can be picked up again later
-		
 		float itemX = player.getX() + player.getWidth() / 2 - width / 2;
 		float itemY = player.getY() - height / 2;
 		WeaponItem oldItem = oldWeapon.createItemFromWeapon(itemX, itemY);

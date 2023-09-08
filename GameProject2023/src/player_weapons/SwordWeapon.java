@@ -3,152 +3,122 @@ package player_weapons;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import abstract_objects.Creature;
-import abstract_objects.GameObject;
+import abstract_templates.Creature;
+import abstract_templates.GameObject;
 import framework.ObjectHandler;
-import framework.ObjectId;
+import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import game_objects.SwordProjectile;
-import items.WeaponItem;
 import items.SwordItem;
+import items.WeaponItem;
 import window.Animation;
+import window.KeyInput;
+import window.MouseInput;
 
 public class SwordWeapon extends Weapon {
 
-	private Animation[] idleAnimation;
-	private Animation[] runAnimation;
-	
-	private int stabCount = 0;
+	enum SwordState {
+		None,
+		AttackChain1,
+		AttackChain2,
+		Ability1,
+		Ability2,
+	}
+	private SwordState state = SwordState.None;
+	private Animation currentAnimation;
 
-	public SwordWeapon(ObjectHandler objectHandler) {
-		super(objectHandler);
-		setupAnimations();
+	private WeaponAbility[] abilities;
+
+	public SwordWeapon(ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
+		super(objectHandler, keyInput, mouseInput);
 		setupAbilities();
 	}
 
 	@Override
-	protected void setupAbilities() {
-		abilities = new WeaponAbility[3];
-		TextureLoader textureLoader = TextureLoader.getInstance();
-
-		// Regular attack
-		int attackDelay = 4;
-		Animation attackRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordAttack, 1),
-				attackDelay, true);
-		Animation attackLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordAttack, -1),
-				attackDelay, true);
-		abilities[0] = new WeaponAbility(500, 15000, new Animation[] {attackRightAnim, attackLeftAnim});
-
-		// Sword stab
-		int stabDelay = 6;
-		Animation stabRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStabCombo, 1),
-				stabDelay, true);
-		Animation stabLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordStabCombo, -1),
-				stabDelay, true);
-		abilities[1] = new WeaponAbility(2500, 14, new Animation[] {stabRightAnim, stabLeftAnim});
-		
-		// Sword throw
-		int throwDelay = 7;
-		Animation throwRightAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordThrow, 1),
-				throwDelay, true);
-		Animation throwLeftAnim = new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordThrow, -1),
-				throwDelay, true);
-		abilities[2] = new WeaponAbility(500, 35, new Animation[] {throwRightAnim, throwLeftAnim});
+	public void tick() {
+		switch (state) {
+		case None:
+			currentAnimation = null;
+			for (WeaponAbility weaponAbility : abilities) {
+				if (!weaponAbility.isOnCooldown())
+					weaponAbility.resetAnimations();
+			}
+			
+			if (mouseInput.isAttackButtonPressed() && !abilities[0].isOnCooldown())
+				state = SwordState.AttackChain1;
+			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[0].isOnCooldown())
+				state = SwordState.Ability1;
+			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[0].isOnCooldown())
+				state = SwordState.Ability2;
+			break;
+		case AttackChain1:
+			currentAnimation = abilities[0].getAnimations()[getIndexFromDirection()];
+			if (currentAnimation.isPlayedOnce()) {
+				if (mouseInput.isAttackButtonPressed()) {
+					state = SwordState.AttackChain2;
+					break;
+				}
+				else {
+					abilities[0].startCooldown();
+					state = SwordState.None;
+					break;
+				}
+			}
+			
+			if (currentAnimation.getCurrentFrame() == 2 || currentAnimation.getCurrentFrame() == 3)
+				checkEnemyCollision(getChainAttackBounds(), abilities[0].getDamage(), 0, 0, 400);
+			player.setVelX(0);
+			break;
+		case AttackChain2:
+			currentAnimation = abilities[1].getAnimations()[getIndexFromDirection()];
+			if (currentAnimation.isPlayedOnce()) {
+				abilities[0].startCooldown();
+				state = SwordState.None;
+				break;
+			}
+			
+			if (currentAnimation.getCurrentFrame() == 4)
+				checkEnemyCollision(getChainAttackBounds(), abilities[1].getDamage(), 4 * player.getDirection(), -2f, 400);
+			player.setVelX(0);
+			break;
+		case Ability1:
+			currentAnimation = abilities[2].getAnimations()[getIndexFromDirection()];
+			if (currentAnimation.isPlayedOnce()) {
+				state = SwordState.None;
+				break;
+			}
+			break;
+		case Ability2:
+			currentAnimation = abilities[3].getAnimations()[getIndexFromDirection()];
+			if (currentAnimation.isPlayedOnce()) {
+				state = SwordState.None;
+				break;
+			}
+			break;
+		}
 	}
 
-	@Override
-	public void useAbility(int index) {
-		if (!isAbilityIndexValid(index))
-			return;
-		
-		WeaponAbility ability = abilities[index];
-		if (ability.getAnimation(0).isPlayedOnce() || ability.getAnimation(1).isPlayedOnce()) {
-			if (ability.isOnCooldown())
-				return;
-			else
-				ability.resetAbility();
-		}
-
+	private void checkEnemyCollision(Rectangle attackBounds, int damage, float knockbackVelX,
+			float knockbackVelY, int enemyInvulnerabilityDuration) {
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
-		int animIndex = player.getDirection() == 1 ? 0 : 1;
-		int currentAnimFrame = ability.getAnimation(animIndex).getCurrentFrame();
-		
-		switch (index) {
-		case 0:
-			// Attack
-			player.setVelX(0);
-			for (int i = midLayer.size() - 1; i >= 0; i--) {
-				GameObject other = midLayer.get(i);
-				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
-					if (getAttackBounds().intersects(other.getBounds())) {
-						Creature otherCreature = (Creature) other;
-						otherCreature.takeDamage(abilities[index].getDamage(), true);
-						float knockbackVelX = 2f * player.getDirection();
-						float knockbackVelY = -1f;
-						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
-					}
-				}
+		for (int i = midLayer.size() - 1; i >= 0; i--) {
+			GameObject other = midLayer.get(i);
+			
+			if (attackBounds.intersects(other.getBounds()) && other.getObjectId().getCategory() == Category.Enemy) {
+				Creature otherCreature = (Creature) other;
+				if (knockbackVelX != 0 || knockbackVelY != 0)
+					otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
+				otherCreature.takeDamage(damage, enemyInvulnerabilityDuration);
 			}
-			break;
-
-		case 1:
-			// Stab
-			player.setVelX(0);
-			if (currentAnimFrame == abilities[index].getAnimation(animIndex).getFrameCount() - 2)
-				stabCount = 0;
-			
-			if (currentAnimFrame == 4 && stabCount == 0)
-				stabCount++;
-			else if (currentAnimFrame == 8 && stabCount == 1)
-				stabCount++;
-			else if (currentAnimFrame == 11 && stabCount == 2)
-				stabCount++;
-			else
-				break;
-			
-			
-			for (int i = midLayer.size() - 1; i >= 0; i--) {
-				GameObject other = midLayer.get(i);
-				if (other.getObjectId().getCategory() == ObjectId.Category.Enemy) {
-					if (getStabBounds().intersects(other.getBounds())) {
-						Creature otherCreature = (Creature) other;
-						otherCreature.takeDamage(abilities[index].getDamage(), false);
-						float knockbackVelX = 2f * player.getDirection();
-						float knockbackVelY = 0f;
-						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
-					}
-				}
-			}
-			break;
-			
-		case 2:
-			// Throw
-			player.setVelX(0);
-			if (currentAnimFrame != 2)
-				break;
-
-			float projectileVelX = 5f * player.getDirection();
-			float projectileX;
-			if (player.getDirection() == 1)
-				projectileX = player.getX() + player.getWidth() / 2;
-			else
-				projectileX = player.getX() - player.getWidth() / 2;
-			
-			player.setWeapon(new FisticuffsWeapon(objectHandler));
-			objectHandler.addObject(new SwordProjectile(projectileX, player.getY(),
-					projectileVelX, 0f, abilities[index].getDamage(),
-					objectHandler), ObjectHandler.MIDDLE_LAYER);
-			break;
 		}
 	}
-
-	private Rectangle getAttackBounds() {
+	
+	private Rectangle getChainAttackBounds() {
 		int x = (int) player.getX();
 		int y = (int) player.getY();
 		int width = player.getWidth();
 		int height = player.getHeight();
-		
+
 		int attackX;
 		int attackWidth = (int) (4f * width / 5);
 		if (player.getDirection() == 1)
@@ -157,20 +127,15 @@ public class SwordWeapon extends Weapon {
 			attackX = (int) x - attackWidth / 2;
 		return new Rectangle(attackX, (int) y, attackWidth, height);
 	}
+	
+	@Override
+	public boolean isUsingAbility() {
+		return state != SwordState.None;
+	}
 
-	private Rectangle getStabBounds() {
-		int attackX;
-		int attackWidth = (int) (4f * player.getWidth() / 5);
-		int playerX = (int) player.getX();
-		int playerY = (int) player.getY();
-		int playerWidth = player.getWidth();
-		int playerHeight = player.getHeight();
-
-		if (player.getDirection() == 1)
-			attackX = playerX + playerWidth / 2;
-		else
-			attackX = (int) playerX - attackWidth / 2;
-		return new Rectangle(attackX, playerY, attackWidth, playerHeight);
+	@Override
+	public Animation getCurrentAnimation() {
+		return currentAnimation;
 	}
 
 	@Override
@@ -193,19 +158,47 @@ public class SwordWeapon extends Weapon {
 				runDelay, false);
 	}
 
-	@Override
-	public Animation[] getIdleAnimation() {
-		return idleAnimation;
-	}
+	private void setupAbilities() {
+		abilities = new WeaponAbility[4];
+		TextureLoader tex = TextureLoader.getInstance();
 
-	@Override
-	public Animation[] getRunAnimation() {
-		return runAnimation;
+		// Combo Chain 1
+		int attackDelay = 5;
+		Animation[] attackAnims = new Animation[] {
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordAttack, 1), attackDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordAttack, -1), attackDelay, true),
+		};
+		abilities[0] = new WeaponAbility(500, 15, attackAnims);
+		
+		// Combo Chain 2
+		int stabDelay = 5;
+		Animation[] stabAnims = new Animation[] {
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordStab, 1), stabDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordStab, -1), stabDelay, true),
+		};
+		abilities[1] = new WeaponAbility(1000, 20, stabAnims);
+		
+		// TODO Ability 1
+		Animation[] tempAnims = new Animation[] {
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerVerticalSlam, 1), stabDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerVerticalSlam, -1), stabDelay, true),
+		};
+		abilities[2] = new WeaponAbility(2000, 15, tempAnims);
+		// TODO Ability 2
+		Animation[] tempAnims2 = new Animation[] {
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
+		};
+		abilities[3] = new WeaponAbility(2000, 15, tempAnims2);
+	}
+	
+	private int getIndexFromDirection() {
+		return player.getDirection() == 1 ? 0 : 1;
 	}
 
 	@Override
 	public WeaponItem createItemFromWeapon(float x, float y) {
-		return new SwordItem(x, y, objectHandler);
+		return new SwordItem(x, y, keyInput, mouseInput, objectHandler);
 	}
 
 }

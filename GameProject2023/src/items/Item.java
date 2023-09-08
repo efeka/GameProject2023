@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import abstract_objects.GameObject;
+import abstract_templates.GameObject;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;

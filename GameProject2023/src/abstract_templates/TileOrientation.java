@@ -1,4 +1,4 @@
-package abstract_objects;
+package abstract_templates;
 
 /**
  * TextureLoader loads sprites in the same order as the values of this enum.

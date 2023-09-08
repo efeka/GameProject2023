@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
-import abstract_objects.GameObject;
+import abstract_templates.GameObject;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
@@ -74,25 +74,25 @@ public class HUD extends GameObject {
 		g.setFont(font);
 		g.drawString("Q", strX, strY);
 		
-		Weapon weapon = player.getWeapon();
-		int timeLeft = weapon.getAbility(0).timeLeftUntilReady();
-		int maxTime = weapon.getAbility(0).getCooldown();
-		if (timeLeft > 0) {
-			g.setColor(new Color(255, 255, 255, 80));
-			float cooldownRatio = (float) timeLeft / maxTime;
-			g.fillArc((int) x, 50, ovalSize, ovalSize, 90, (int) (-360 * cooldownRatio));
-		}
-		strX += 60;
-		g.setColor(Color.WHITE);
-		g.drawOval((int) x + 58, 50, ovalSize, ovalSize);
-		g.drawString("E", strX, strY);
-		timeLeft = weapon.getAbility(1).timeLeftUntilReady();
-		maxTime = weapon.getAbility(1).getCooldown();
-		if (timeLeft > 0) {
-			g.setColor(new Color(255, 255, 255, 80));
-			float cooldownRatio = (float) timeLeft / maxTime;
-			g.fillArc((int) x + 60, 50, ovalSize, ovalSize, 90, (int) (-360 * cooldownRatio));
-		}
+//		Weapon weapon = player.getWeapon();
+//		int timeLeft = weapon.getAbility(0).timeLeftUntilReady();
+//		int maxTime = weapon.getAbility(0).getCooldown();
+//		if (timeLeft > 0) {
+//			g.setColor(new Color(255, 255, 255, 80));
+//			float cooldownRatio = (float) timeLeft / maxTime;
+//			g.fillArc((int) x, 50, ovalSize, ovalSize, 90, (int) (-360 * cooldownRatio));
+//		}
+//		strX += 60;
+//		g.setColor(Color.WHITE);
+//		g.drawOval((int) x + 58, 50, ovalSize, ovalSize);
+//		g.drawString("E", strX, strY);
+//		timeLeft = weapon.getAbility(1).timeLeftUntilReady();
+//		maxTime = weapon.getAbility(1).getCooldown();
+//		if (timeLeft > 0) {
+//			g.setColor(new Color(255, 255, 255, 80));
+//			float cooldownRatio = (float) timeLeft / maxTime;
+//			g.fillArc((int) x + 60, 50, ovalSize, ovalSize, 90, (int) (-360 * cooldownRatio));
+//		}
 	}
 
 }

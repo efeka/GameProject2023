@@ -1,4 +1,4 @@
-package abstract_objects;
+package abstract_templates;
 
 import framework.ObjectHandler;
 import framework.ObjectId;

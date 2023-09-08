@@ -6,8 +6,8 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import abstract_objects.Creature;
-import abstract_objects.GameObject;
+import abstract_templates.Creature;
+import abstract_templates.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
@@ -78,7 +78,7 @@ public class BullEnemy extends Creature {
 
 	private void handleAttacking() {
 		if (getBounds().intersects(player.getBounds())) {
-			player.takeDamage(25, true);
+			player.takeDamage(25, player.getDefaultInvulnerabilityDuration());
 			player.applyKnockback(direction * runningSpeed / 2, -7f);
 		}
 	}
@@ -121,15 +121,16 @@ public class BullEnemy extends Creature {
 	}
 	
 	@Override
-	public void takeDamage(int damageAmount, boolean activateInvulnerability) {
+	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
 		if (invulnerable)
 			return;
+		invulnerableDuration = invulnerabilityDuration; 
 		
-		if (activateInvulnerability) {
+		if (invulnerableDuration != 0) {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}
-
+		
 		setHealth(health - damageAmount);
 		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
 		

@@ -7,8 +7,8 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
-import abstract_objects.GameObject;
-import abstract_objects.TileOrientation;
+import abstract_templates.GameObject;
+import abstract_templates.TileOrientation;
 import framework.ObjectId.Name;
 import game_objects.ArcherEnemy;
 import game_objects.BasicEnemy;
@@ -360,13 +360,13 @@ public class ObjectHandler {
 			gameObject = new Coin(x, y, this);
 			break;
 		case FisticuffsItem:
-			gameObject = new FisticuffsItem(x, y, this);
+			gameObject = new FisticuffsItem(x, y, keyInput, mouseInput, this);
 			break;
 		case SwordItem:
-			gameObject = new SwordItem(x, y, this); 
+			gameObject = new SwordItem(x, y, keyInput, mouseInput, this); 
 			break;
 		case HammerItem:
-			gameObject = new HammerItem(x, y, this);
+			gameObject = new HammerItem(x, y, keyInput, mouseInput, this);
 			break;
 		case Missing:
 			break;

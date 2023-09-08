@@ -6,74 +6,45 @@ public class WeaponAbility {
 
 	private int damage;
 	
-	private int cooldown;
+	private int cooldownMillis;
 	private long lastUsedTimer;
 	
-	private Animation[] animation;
+	private Animation[] animations;
 	
-	public WeaponAbility(int cooldownMillis, Animation[] animation) {
-		cooldown = cooldownMillis;
-		lastUsedTimer = -cooldownMillis;
-		this.animation = animation;
-		
-		if (animation[0].getOnlyPlayOnce())
-			animation[0].setPlayedOnce(true);
-		if (animation[1].getOnlyPlayOnce())
-			animation[1].setPlayedOnce(true);
-		
-		damage = 0;
-	}
-	
-	public WeaponAbility(int cooldownMillis, int damage, Animation[] animation) {
-		cooldown = cooldownMillis;
-		lastUsedTimer = -cooldownMillis;
-		this.animation = animation;
+	public WeaponAbility(int cooldownMillis, int damage, Animation[] animations) {
+		this.cooldownMillis = cooldownMillis;
+		lastUsedTimer = 0;
+		this.animations = animations;
 		this.damage = damage;
-		
-		if (animation[0].getOnlyPlayOnce())
-			animation[0].setPlayedOnce(true);
-		if (animation[1].getOnlyPlayOnce())
-			animation[1].setPlayedOnce(true);
 	}
 	
-	/**
-	 * Checks if enough time has passed to satisfy the cooldown condition.
-	 * @return if the ability is ready to be used again
-	 */
 	public boolean isOnCooldown() {
-		return System.currentTimeMillis() - lastUsedTimer < cooldown;
+		return System.currentTimeMillis() - lastUsedTimer < cooldownMillis;
 	}
 	
-	/**
-	 * Returns the animation at the given index.
-	 * @param index the index of the animation
-	 * 		  index = 0 should correspond to an animation that faces right
-	 * 		  index = 1 should correspond to an animation that faces left
-	 * @return the animation at the given index
-	 */
-	public Animation getAnimation(int index) {
-		return animation[index];
-	}
-	
-	public boolean isAbilityBeingUsed() {
-		return !animation[0].isPlayedOnce() && !animation[1].isPlayedOnce();
-	}
-	
-	/**
-	 * Resets the animation and the usage timer of the ability.
-	 */
-	public void resetAbility() {
+	public void startCooldown() {
 		lastUsedTimer = System.currentTimeMillis();
-		animation[0].resetAnimation();
-		animation[1].resetAnimation();
 	}
- 	
+	
+	public void resetCooldown() {
+		lastUsedTimer = -cooldownMillis;
+	}
+	
+	public Animation[] getAnimations() {
+		return animations;
+	}
+	
+	public void resetAnimations() {
+		for (Animation anim : animations)
+			anim.resetAnimation();
+	}
+	
 	public int timeLeftUntilReady() {
-		return (int) (cooldown - (System.currentTimeMillis() - lastUsedTimer)); 
+		return (int) (cooldownMillis - (System.currentTimeMillis() - lastUsedTimer)); 
 	}
 	
 	public int getCooldown() {
-		return cooldown;
+		return cooldownMillis;
 	}
 	
 	public int getDamage() {

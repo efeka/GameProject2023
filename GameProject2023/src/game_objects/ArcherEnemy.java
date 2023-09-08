@@ -6,7 +6,7 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
-import abstract_objects.Creature;
+import abstract_templates.Creature;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
@@ -35,11 +35,12 @@ public class ArcherEnemy extends Creature {
 	}
 
 	@Override
-	public void takeDamage(int damageAmount, boolean activateInvulnerability) {
+	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
 		if (invulnerable)
 			return;
+		invulnerableDuration = invulnerabilityDuration; 
 		
-		if (activateInvulnerability) {
+		if (invulnerableDuration != 0) {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}

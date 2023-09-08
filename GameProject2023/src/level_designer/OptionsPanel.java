@@ -25,7 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import abstract_objects.GameObject;
+import abstract_templates.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;

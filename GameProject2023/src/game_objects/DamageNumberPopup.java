@@ -3,7 +3,7 @@ package game_objects;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import abstract_objects.GameObject;
+import abstract_templates.GameObject;
 import framework.GameConstants;
 import framework.ObjectHandler;
 
