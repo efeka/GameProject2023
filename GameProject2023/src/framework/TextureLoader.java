@@ -71,6 +71,10 @@ public class TextureLoader {
 		
 		// Effects
 		SparkleEffect,
+		
+		SpikeAttack,
+		IceSword,
+		IceCircle,
 	}
 
 	private BufferedImage playerSheet = null;
@@ -373,6 +377,20 @@ public class TextureLoader {
 			textures = new BufferedImage[5];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 33, 199, 32, 32);
+			break;
+		case SpikeAttack:
+			textures = new BufferedImage[14];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 265, 32, 32);
+			break;
+		case IceSword:
+			textures = new BufferedImage[1];
+			textures[0] = itemSheet.getSubimage(298, 34, 32, 32);
+			break;
+		case IceCircle:
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 65, 298, 64, 64);
 			break;
 		}
 

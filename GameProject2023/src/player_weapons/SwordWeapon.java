@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import abstract_templates.Creature;
 import abstract_templates.GameObject;
+import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId.Category;
 import framework.TextureLoader;
@@ -17,14 +18,27 @@ import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
 
+import static framework.GameConstants.ScaleConstants.TILE_SIZE;
+
 public class SwordWeapon extends Weapon {
 
 	enum SwordState {
-		None,
-		AttackChain1,
-		AttackChain2,
-		SwordDash,
-		Ability2,
+		None(-1),
+		AttackChain1(0),
+		AttackChain2(1),
+		SwordDash(2),
+		SpikeChain(3),
+		IceSwords(4);
+		
+		private int index;
+		
+		private SwordState(int value) {
+			this.index = value;
+		}
+		
+		public int getIndex() {
+			return index;
+		}
 	}
 	private SwordState state = SwordState.None;
 	private Animation currentAnimation;
@@ -36,6 +50,9 @@ public class SwordWeapon extends Weapon {
 	private long dashStartTimer;
 	private int dashLengthMillis = 150;
 
+	private boolean spawnedSpikes = false;
+	private boolean spawnedIceSwords = false;
+	
 	public SwordWeapon(ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(objectHandler, keyInput, mouseInput);
 		setupAbilities();
@@ -55,48 +72,53 @@ public class SwordWeapon extends Weapon {
 				state = SwordState.AttackChain1;
 			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[2].isOnCooldown())
 				state = SwordState.SwordDash;
-			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[3].isOnCooldown())
-				state = SwordState.Ability2;
+//			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[3].isOnCooldown())
+//				state = SwordState.SpikeChain;
+			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[4].isOnCooldown())
+				state = SwordState.IceSwords;
 			break;
+			
 		case AttackChain1:
-			currentAnimation = abilities[0].getAnimations()[getIndexFromDirection()];
+			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
 				if (mouseInput.isAttackButtonPressed()) {
 					state = SwordState.AttackChain2;
 					break;
 				}
 				else {
-					abilities[0].startCooldown();
+					abilities[state.getIndex()].startCooldown();
 					state = SwordState.None;
 					break;
 				}
 			}
 			
 			if (currentAnimation.getCurrentFrame() == 2 || currentAnimation.getCurrentFrame() == 3)
-				checkEnemyCollision(getChainAttackBounds(), abilities[0].getDamage(), 0, 0, 400);
+				checkEnemyCollision(getChainAttackBounds(), abilities[state.getIndex()].getDamage(), 0, 0, 400);
 			player.setVelX(0);
 			break;
+			
 		case AttackChain2:
-			currentAnimation = abilities[1].getAnimations()[getIndexFromDirection()];
+			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
-				abilities[0].startCooldown();
+				abilities[SwordState.AttackChain1.getIndex()].startCooldown();
 				state = SwordState.None;
 				break;
 			}
 			
 			if (currentAnimation.getCurrentFrame() == 4)
-				checkEnemyCollision(getChainAttackBounds(), abilities[1].getDamage(), 4 * player.getDirection(), -2f, 400);
+				checkEnemyCollision(getChainAttackBounds(), abilities[state.getIndex()].getDamage(), 4 * player.getDirection(), -2f, 400);
 			player.setVelX(0);
 			break;
+			
 		case SwordDash:
-			currentAnimation = abilities[2].getAnimations()[getIndexFromDirection()];
+			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			// Dash started
 			if (!dashing) {
 				dashing = true;
 				dashStartTimer = System.currentTimeMillis();
 				player.setLockMovementInputs(true);
 				player.setVelX(dashSpeedX * player.getDirection());
-				abilities[2].startCooldown();
+				abilities[state.getIndex()].startCooldown();
 			}
 			// Dash ended or player got knocked back
 			if (player.isKnockedBack() || System.currentTimeMillis() - dashStartTimer > dashLengthMillis) {
@@ -107,7 +129,7 @@ public class SwordWeapon extends Weapon {
 			}
 			
 			player.setVelY(0f);
-			checkEnemyCollision(getSwordDashBounds(), abilities[2].getDamage(), 0f, 0f, 700);
+			checkEnemyCollision(getSwordDashBounds(), abilities[state.getIndex()].getDamage(), 0f, 0f, 700);
 			
 			// Add the dash trail effect
 			int dashTrailImageIndex = player.getDirection() == 1 ? 1 : 3;
@@ -117,11 +139,42 @@ public class SwordWeapon extends Weapon {
 			objectHandler.addObject(new FadingTrailEffect(player.getX() - playerWidth / 2, player.getY() - playerHeight / 2,
 					playerWidth * 2, playerHeight * 2, dashTrailImage, 0.05f, objectHandler), ObjectHandler.TOP_LAYER);
 			break;
-		case Ability2:
-			currentAnimation = abilities[3].getAnimations()[getIndexFromDirection()];
+			
+		case SpikeChain:
+			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
+				abilities[state.getIndex()].startCooldown();
 				state = SwordState.None;
+				spawnedSpikes = false;
 				break;
+			}
+			
+			if (!spawnedSpikes) {
+				spawnedSpikes = true;
+				objectHandler.addObject(new ChainSpikeAttack(player.getX(),
+						player.getY() + player.getHeight() - GameConstants.ScaleConstants.TILE_SIZE,
+						player.getDirection(), objectHandler),
+						ObjectHandler.MIDDLE_LAYER);
+			}
+			
+			break;
+			
+		case IceSwords:
+			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
+			if (currentAnimation.isPlayedOnce()) {
+				abilities[state.getIndex()].startCooldown();
+				state = SwordState.None;
+				spawnedIceSwords = false;
+				break;
+			}
+			
+			if (!spawnedIceSwords) {
+				spawnedIceSwords = true;
+				
+				int swordCount = 3;
+					objectHandler.addObject(new SwordIceAttack(objectHandler.getPlayer(),
+						abilities[state.getIndex()].getDamage(), swordCount, 1f, 80, (float) Math.PI / 80,
+						objectHandler), ObjectHandler.MIDDLE_LAYER);
 			}
 			break;
 		}
@@ -195,7 +248,7 @@ public class SwordWeapon extends Weapon {
 	}
 
 	private void setupAbilities() {
-		abilities = new WeaponAbility[4];
+		abilities = new WeaponAbility[5];
 		TextureLoader tex = TextureLoader.getInstance();
 
 		// Combo Chain 1
@@ -228,6 +281,13 @@ public class SwordWeapon extends Weapon {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
 		};
 		abilities[3] = new WeaponAbility(2000, 15, tempAnims2);
+		
+		// TODO Ice sword ability
+		Animation[] tempAnims3 = new Animation[] {
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
+		};
+		abilities[4] = new WeaponAbility(2000, 10, tempAnims3);
 	}
 	
 	private int getIndexFromDirection() {
