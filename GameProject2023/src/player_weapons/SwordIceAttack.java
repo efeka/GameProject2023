@@ -2,11 +2,11 @@ package player_weapons;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import abstract_templates.Creature;
 import abstract_templates.GameObject;
@@ -32,6 +32,10 @@ public class SwordIceAttack extends GameObject {
 	private int radius;
 	private float angleIncrement;
 	private float[] swordAngles;
+	
+	// Enemies hit by each sword is stored in this list.
+	// This is for preventing an enemy to get hit twice by the same sword in the same rotation.
+	private ArrayList<HashSet<GameObject>> enemiesHit;
 
 	/**
 	 * Creates swords that revolve around the given GameObject.
@@ -55,6 +59,11 @@ public class SwordIceAttack extends GameObject {
 		this.radius = radius;
 		this.angleIncrement = angleIncrement;
 		this.objectHandler = objectHandler;
+		
+		enemiesHit = new ArrayList<>();
+		for (int i = 0; i < swordCount; i++)
+			enemiesHit.add(new HashSet<GameObject>());
+		
 		texture = TextureLoader.getInstance().getTextures(TextureName.IceSword)[0];
 		iceCircleAnimation = new Animation(TextureLoader.getInstance().getTextures(TextureName.IceCircle), 10, false);		
 
@@ -67,10 +76,16 @@ public class SwordIceAttack extends GameObject {
 	public void tick() {
 		x = (float) centerObject.getBounds().getCenterX() - width / 2;
 		y = (float) centerObject.getBounds().getCenterY() - height / 2 - radius;
-
-		for (int i = 0; i < swordCount; i++)
+		
+		for (int i = 0; i < swordCount; i++) {
+			// Calculate the angle of rotation for each sword
 			swordAngles[i] = (float) ((swordAngles[i] + angleIncrement) % TWO_PI);
-
+			
+			// Reset the "hit-enemies set" if a sword completed a full rotation
+			if (swordAngles[i] <= 0.1f)
+				enemiesHit.get(i).clear();
+		}
+		
 		checkEnemyCollision();
 		
 		iceCircleAnimation.runAnimation();
@@ -97,10 +112,12 @@ public class SwordIceAttack extends GameObject {
 			
 			if (other.getObjectId().getCategory() == Category.Enemy) {
 				Rectangle[] swordBounds = getSwordBounds();
-				for (Rectangle bounds : swordBounds) {
-					if (bounds.intersects(other.getBounds())) {
+				for (int j = 0; j < swordCount; j++) {
+					Rectangle bounds = swordBounds[j];
+					if (!enemiesHit.get(j).contains(other) && bounds.intersects(other.getBounds())) {
+						enemiesHit.get(j).add(other);
 						Creature otherCreature = (Creature) other;
-						otherCreature.takeDamage(damage, 500);
+						otherCreature.takeDamage(damage, 0);
 					}
 				}
 			}

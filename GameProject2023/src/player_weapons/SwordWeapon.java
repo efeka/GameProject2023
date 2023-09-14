@@ -18,8 +18,6 @@ import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
 
-import static framework.GameConstants.ScaleConstants.TILE_SIZE;
-
 public class SwordWeapon extends Weapon {
 
 	enum SwordState {
@@ -172,9 +170,9 @@ public class SwordWeapon extends Weapon {
 				spawnedIceSwords = true;
 				
 				int swordCount = 3;
-					objectHandler.addObject(new SwordIceAttack(objectHandler.getPlayer(),
-						abilities[state.getIndex()].getDamage(), swordCount, 1f, 80, (float) Math.PI / 80,
-						objectHandler), ObjectHandler.MIDDLE_LAYER);
+					objectHandler.addObject(new SwordIceAttack(player,
+						abilities[state.getIndex()].getDamage(), swordCount, 1f, 70, (float) Math.PI / 90,
+						objectHandler), ObjectHandler.TOP_LAYER);
 			}
 			break;
 		}
@@ -282,12 +280,12 @@ public class SwordWeapon extends Weapon {
 		};
 		abilities[3] = new WeaponAbility(2000, 15, tempAnims2);
 		
-		// TODO Ice sword ability
+		// Ice sword ability
 		Animation[] tempAnims3 = new Animation[] {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
 		};
-		abilities[4] = new WeaponAbility(2000, 10, tempAnims3);
+		abilities[4] = new WeaponAbility(2000, 5, tempAnims3);
 	}
 	
 	private int getIndexFromDirection() {

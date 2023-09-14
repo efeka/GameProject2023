@@ -3,6 +3,7 @@ package framework;
 import static framework.GameConstants.ScaleConstants.TILE_COLUMNS;
 import static framework.GameConstants.ScaleConstants.TILE_ROWS;
 
+import java.lang.StringBuilder;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
