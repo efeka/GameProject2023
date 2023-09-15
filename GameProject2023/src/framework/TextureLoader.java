@@ -72,10 +72,14 @@ public class TextureLoader {
 		// Effects
 		SparkleEffect,
 		DarkSmokeEffect,
+		PoisonSmokeEffect,
 		
 		SpikeAttack,
 		IceSword,
 		IceCircle,
+		
+		PoisonRatSummon,
+		PoisonRatRun,
 	}
 
 	private BufferedImage playerSheet = null;
@@ -382,7 +386,12 @@ public class TextureLoader {
 		case DarkSmokeEffect:
 			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(199 + i * 33, 199, 32, 32);
+				textures[i] = itemSheet.getSubimage(265 + i * 33, 67, 32, 32);
+			break;
+		case PoisonSmokeEffect:
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(265 + i * 33, 100, 32, 32);
 			break;
 		case SpikeAttack:
 			textures = new BufferedImage[14];
@@ -397,6 +406,16 @@ public class TextureLoader {
 			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 65, 298, 64, 64);
+			break;
+		case PoisonRatSummon:
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 298, 32, 32);
+			break;
+		case PoisonRatRun:
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(265 + i * 33, 298, 32, 32);
 			break;
 		}
 

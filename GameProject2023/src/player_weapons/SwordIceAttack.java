@@ -25,8 +25,6 @@ public class SwordIceAttack extends GameObject {
 	private ObjectHandler objectHandler;
 	private GameObject centerObject;
 
-	private Animation iceCircleAnimation;
-
 	private int damage;
 	private int swordCount;
 	private int radius;
@@ -64,12 +62,11 @@ public class SwordIceAttack extends GameObject {
 		for (int i = 0; i < swordCount; i++)
 			enemiesHit.add(new HashSet<GameObject>());
 		
-		texture = TextureLoader.getInstance().getTextures(TextureName.IceSword)[0];
-		iceCircleAnimation = new Animation(TextureLoader.getInstance().getTextures(TextureName.IceCircle), 10, false);		
-
 		swordAngles = new float[swordCount];
 		for (int i = 0; i < swordCount; i++)
 			swordAngles[i] = i * (TWO_PI / swordCount);
+		
+		texture = TextureLoader.getInstance().getTextures(TextureName.IceSword)[0];
 	}
 
 	@Override
@@ -87,15 +84,11 @@ public class SwordIceAttack extends GameObject {
 		}
 		
 		checkEnemyCollision();
-		
-		iceCircleAnimation.runAnimation();
 	}
 
 	@Override
 	public void render(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
-		iceCircleAnimation.drawAnimation(g, getBounds().x, getBounds().y, getBounds().width, getBounds().height);
-
 		float centerX = (float) centerObject.getBounds().getCenterX();
 		float centerY = (float) centerObject.getBounds().getCenterY();
 		for (int i = 0; i < swordCount; i++) {

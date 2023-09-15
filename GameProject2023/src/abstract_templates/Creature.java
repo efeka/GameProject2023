@@ -13,7 +13,7 @@ public abstract class Creature extends GameObject {
 	protected final float GRAVITY = GameConstants.PhysicsConstants.GRAVITY;
 	protected final int TERMINAL_VELOCITY = GameConstants.PhysicsConstants.TERMINAL_VELOCITY;
 
-	private ObjectHandler objectHandler; 
+	protected ObjectHandler objectHandler; 
 
 	protected boolean falling, jumping, knockedBack, invulnerable;
 	// 1 for right, -1 for left
@@ -106,7 +106,8 @@ public abstract class Creature extends GameObject {
 	protected void basicBlockCollision(ObjectHandler objectHandler) {
 		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
 			// Collision with Blocks
-			if (other.getObjectId().getCategory() == Category.Block) {
+			if (other.getObjectId().getCategory() == Category.Block ||
+					(other.getObjectId().getCategory() == Category.JumpThroughBlock && getVelY() > 0)) {
 				Rectangle otherBounds = other.getBounds();
 
 				// Bottom collision
