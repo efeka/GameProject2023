@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import abstract_templates.Creature;
 import abstract_templates.GameObject;
 import abstract_templates.Projectile;
 import framework.GameConstants;
@@ -64,12 +65,18 @@ public class ArrowProjectile extends Projectile {
 	}
 	
 	private void checkCollisions() {
-		// Player collision
+		// Player or player summon collision
+		ArrayList<Creature> targetList = objectHandler.getSummonsList();
 		Player player = objectHandler.getPlayer();
-		if (getBounds().intersects(player.getBounds()) && !player.isDodging()) {
-			player.applyKnockback(velX / 2, -3f);
-			player.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
-			objectHandler.removeObject(this);
+		for (Creature target : targetList) {
+			if (getBounds().intersects(target.getBounds())) {
+				if (target.equals(player) && player.isDodging())
+					continue;
+				
+				target.applyKnockback(velX / 2, -3f);
+				target.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
+				objectHandler.removeObject(this);
+			}
 		}
 		
 		// Block collision

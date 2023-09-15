@@ -3,7 +3,6 @@ package main;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferStrategy;
 
 import framework.ObjectHandler;
@@ -117,7 +116,7 @@ public class Game extends Canvas implements Runnable {
 		Graphics g = bs.getDrawGraphics();
 
 		// Draw background
-		g.setColor(new Color(25, 51, 45));
+		g.setColor(new Color(51, 51, 51));
 		g.fillRect(0, 0, window.getWidth(), window.getHeight());
 		
 		if (shakeCamera && shakeDuration-- < 0)

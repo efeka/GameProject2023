@@ -5,6 +5,7 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 import abstract_templates.Creature;
 import framework.ObjectHandler;
@@ -35,31 +36,6 @@ public class ArcherEnemy extends Creature {
 	}
 
 	@Override
-	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
-		if (invulnerable)
-			return;
-		invulnerableDuration = invulnerabilityDuration; 
-		
-		if (invulnerableDuration != 0) {
-			lastInvulnerableTimer = System.currentTimeMillis();
-			invulnerable = true;
-		}
-		
-		setHealth(health - damageAmount);
-		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
-		
-		if (health <= 0)
-			die();
-	}
-	
-	@Override
-	public void applyKnockback(float velX, float velY) {
-		knockedBack = true;
-		this.velX = velX;
-		this.velY = velY;
-	}
-
-	@Override
 	public void tick() {
 		x += velX;
 		y += velY;
@@ -73,7 +49,7 @@ public class ArcherEnemy extends Creature {
 
 		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
 			invulnerable = false;
-		
+
 		takeAim(8f);
 
 		if (System.currentTimeMillis() - lastShotTimer >= shootCooldown)
@@ -90,7 +66,7 @@ public class ArcherEnemy extends Creature {
 				resetShootingSystem();
 		}
 
-		basicBlockCollision(objectHandler);
+		basicBlockCollision();
 		runAnimations();
 	}
 
@@ -100,8 +76,33 @@ public class ArcherEnemy extends Creature {
 		drawAnimations(g);
 	}
 
+	@Override
+	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
+		if (invulnerable)
+			return;
+		invulnerableDuration = invulnerabilityDuration; 
+
+		if (invulnerableDuration != 0) {
+			lastInvulnerableTimer = System.currentTimeMillis();
+			invulnerable = true;
+		}
+
+		setHealth(health - damageAmount);
+		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
+
+		if (health <= 0)
+			die();
+	}
+
+	@Override
+	public void applyKnockback(float velX, float velY) {
+		knockedBack = true;
+		this.velX = velX;
+		this.velY = velY;
+	}
+
 	/**
-	 * Aims at the center point of the player.
+	 * Aims at the center point of the player or one of their summons, depending on which one is closest.
 	 * The purpose of this method is to set the shootVelX and shootVelY variables.
 	 * They are then used for shooting the arrow in the correct angle,
 	 * and rotating the animation using according to that angle.
@@ -109,9 +110,9 @@ public class ArcherEnemy extends Creature {
 	 */
 	private void takeAim(float speedX) {
 		shootVelX = speedX;
-		Player player = objectHandler.getPlayer();
-		float distanceX = (float) player.getBounds().getCenterX() - x;
-		float distanceY = (float) player.getBounds().getCenterY() - y;
+		Creature target = getClosestTarget();
+		float distanceX = (float) target.getBounds().getCenterX() - x;
+		float distanceY = (float) target.getBounds().getCenterY() - y;
 
 		if (distanceX < 0)
 			shootVelX = Math.abs(shootVelX) * -1;
@@ -121,9 +122,30 @@ public class ArcherEnemy extends Creature {
 		else
 			direction = 1;
 
-		float timeToTargetX = distanceX / shootVelX;
-		shootVelX = distanceX / timeToTargetX;
-		shootVelY = (distanceY - 0.5f * GRAVITY * timeToTargetX * timeToTargetX) / timeToTargetX;
+		float divByZeroCheck = 0.001f; 
+		if (shootVelX < -divByZeroCheck || shootVelX > divByZeroCheck) {
+			float timeToTargetX = distanceX / shootVelX;
+			if (timeToTargetX < -divByZeroCheck || timeToTargetX > divByZeroCheck) {
+				shootVelX = distanceX / timeToTargetX;
+				shootVelY = (distanceY - 0.5f * GRAVITY * timeToTargetX * timeToTargetX) / timeToTargetX;
+			}
+		}
+	}
+
+	// Returns the closest possible target, which is either the player or one of their summons.
+	private Creature getClosestTarget() {
+		ArrayList<Creature> targetList = objectHandler.getSummonsList();
+		Creature closest = objectHandler.getPlayer();
+		int closestDistance = (int) (Math.abs(x - closest.getX()) + Math.abs(y - closest.getY()));
+		for (Creature target : targetList) {
+			int xDiff = (int) Math.abs(x - target.getX());
+			int yDiff = (int) Math.abs(y - target.getY());
+			if (xDiff + yDiff < closestDistance) {
+				closest = target;
+				closestDistance = xDiff + yDiff;
+			}
+		}
+		return closest;
 	}
 
 	// Shoot the arrow aimed at the center of the Player
@@ -148,7 +170,7 @@ public class ArcherEnemy extends Creature {
 		if (isShotReady) {
 			float centerX = (float) getBounds().getCenterX();
 			float centerY = (float) getBounds().getCenterY();
-			
+
 			// Calculate the angle that this enemy will be rotated at
 			double rotationAngle;
 			if (shootVelX < 0)
@@ -158,7 +180,7 @@ public class ArcherEnemy extends Creature {
 
 			// Draw the legs, but dont rotate them
 			shootAnimationLegs[animationIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			
+
 			// Rotate the torso
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.rotate(rotationAngle, centerX, centerY);

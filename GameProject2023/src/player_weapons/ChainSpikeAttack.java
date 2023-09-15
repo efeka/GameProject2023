@@ -2,7 +2,6 @@ package player_weapons;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;

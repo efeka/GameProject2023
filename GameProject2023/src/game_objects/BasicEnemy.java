@@ -5,6 +5,7 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import abstract_templates.Creature;
 import framework.ObjectHandler;
@@ -56,7 +57,7 @@ public class BasicEnemy extends Creature {
 		//if (!knockedBack)
 		//handleMovement();
 		handleAttacking();
-		basicBlockCollision(objectHandler);
+		basicBlockCollision();
 		
 		runAnimations();
 	}
@@ -83,19 +84,25 @@ public class BasicEnemy extends Creature {
 			attackAnimation[1].resetAnimation();
 		}
 		
-		Player player = objectHandler.getPlayer();
-		if (player.getBounds().intersects(getGroundAttackBounds())) {
-			if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
-				startedAttacking = true;
-				lastAttackTimer = System.currentTimeMillis();
-			}
+		// Try to attack the player or their summons
+		ArrayList<Creature> summonsList = objectHandler.getSummonsList();
+		for (int i = summonsList.size() - 1; i >= 0; i--) {
+			Creature otherCreature = summonsList.get(i);
 			
-			// Damage the player
-			if (attacking) {
-				player.applyKnockback(4 * direction, -5);
-				player.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
+			if (getGroundAttackBounds().intersects(otherCreature.getBounds())) {
+				if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
+					startedAttacking = true;
+					lastAttackTimer = System.currentTimeMillis();
+				}
+				
+				// Damage the player
+				if (attacking) {
+					otherCreature.applyKnockback(4 * direction, -5);
+					otherCreature.takeDamage(damage, 500);
+				}
 			}
 		}
+
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import framework.ObjectHandler;
 import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import game_objects.RatSummon;
+import game_objects.PoisonRat;
 import items.SwordItem;
 import items.WeaponItem;
 import visual_effects.FadingTrailEffect;
@@ -31,13 +31,13 @@ public class SwordWeapon extends Weapon {
 		SpikeChain(3),
 		IceSwords(4),
 		PoisonRatSummon(5);
-		
+
 		private int index;
-		
+
 		private SwordState(int value) {
 			this.index = value;
 		}
-		
+
 		public int getIndex() {
 			return index;
 		}
@@ -46,7 +46,7 @@ public class SwordWeapon extends Weapon {
 	private Animation currentAnimation;
 
 	private WeaponAbility[] abilities;
-	
+
 	private boolean dashing = false;
 	private float dashSpeedX = 10f;
 	private long dashStartTimer;
@@ -55,7 +55,8 @@ public class SwordWeapon extends Weapon {
 	private boolean spawnedSpikes = false;
 	private boolean spawnedIceSwords = false;
 	private boolean spawnedPoisonRats = false;
-	
+	private int ratCount = 2;
+
 	public SwordWeapon(ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(objectHandler, keyInput, mouseInput);
 		setupAbilities();
@@ -70,19 +71,19 @@ public class SwordWeapon extends Weapon {
 				if (!weaponAbility.isOnCooldown())
 					weaponAbility.resetAnimations();
 			}
-			
+
 			if (mouseInput.isAttackButtonPressed() && !abilities[0].isOnCooldown())
 				state = SwordState.AttackChain1;
-//			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[2].isOnCooldown())
-//				state = SwordState.SwordDash;
+			//			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[2].isOnCooldown())
+			//				state = SwordState.SwordDash;
 			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[5].isOnCooldown())
 				state = SwordState.PoisonRatSummon;
-//			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[3].isOnCooldown())
-//				state = SwordState.SpikeChain;
+			//			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[3].isOnCooldown())
+			//				state = SwordState.SpikeChain;
 			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[4].isOnCooldown())
 				state = SwordState.IceSwords;
 			break;
-			
+
 		case AttackChain1:
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
@@ -96,12 +97,12 @@ public class SwordWeapon extends Weapon {
 					break;
 				}
 			}
-			
+
 			if (currentAnimation.getCurrentFrame() == 2 || currentAnimation.getCurrentFrame() == 3)
 				checkEnemyCollision(getChainAttackBounds(), abilities[state.getIndex()].getDamage(), 0, 0, 400);
 			player.setVelX(0);
 			break;
-			
+
 		case AttackChain2:
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
@@ -109,12 +110,12 @@ public class SwordWeapon extends Weapon {
 				state = SwordState.None;
 				break;
 			}
-			
+
 			if (currentAnimation.getCurrentFrame() == 4)
 				checkEnemyCollision(getChainAttackBounds(), abilities[state.getIndex()].getDamage(), 4 * player.getDirection(), -2f, 400);
 			player.setVelX(0);
 			break;
-			
+
 		case SwordDash:
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			// Dash started
@@ -132,10 +133,10 @@ public class SwordWeapon extends Weapon {
 				player.setLockMovementInputs(false);
 				break;
 			}
-			
+
 			player.setVelY(0f);
 			checkEnemyCollision(getSwordDashBounds(), abilities[state.getIndex()].getDamage(), 0f, 0f, 700);
-			
+
 			// Add the dash trail effect
 			int dashTrailImageIndex = player.getDirection() == 1 ? 1 : 3;
 			int playerWidth = player.getWidth();
@@ -144,7 +145,7 @@ public class SwordWeapon extends Weapon {
 			objectHandler.addObject(new FadingTrailEffect(player.getX() - playerWidth / 2, player.getY() - playerHeight / 2,
 					playerWidth * 2, playerHeight * 2, dashTrailImage, 0.05f, objectHandler), ObjectHandler.TOP_LAYER);
 			break;
-			
+
 		case SpikeChain:
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
@@ -153,7 +154,7 @@ public class SwordWeapon extends Weapon {
 				spawnedSpikes = false;
 				break;
 			}
-			
+
 			if (!spawnedSpikes) {
 				spawnedSpikes = true;
 				objectHandler.addObject(new ChainSpikeAttack(player.getX(),
@@ -161,9 +162,9 @@ public class SwordWeapon extends Weapon {
 						player.getDirection(), objectHandler),
 						ObjectHandler.MIDDLE_LAYER);
 			}
-			
+
 			break;
-			
+
 		case IceSwords:
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
@@ -172,17 +173,17 @@ public class SwordWeapon extends Weapon {
 				spawnedIceSwords = false;
 				break;
 			}
-			
+
 			if (!spawnedIceSwords) {
 				spawnedIceSwords = true;
-				
+
 				int swordCount = 3;
-					objectHandler.addObject(new SwordIceAttack(player,
+				objectHandler.addObject(new SwordIceAttack(player,
 						abilities[state.getIndex()].getDamage(), swordCount, 1f, 70, (float) Math.PI / 90,
 						objectHandler), ObjectHandler.TOP_LAYER);
 			}
 			break;
-			
+
 			// TODO incomplete
 		case PoisonRatSummon:
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
@@ -192,13 +193,20 @@ public class SwordWeapon extends Weapon {
 				spawnedPoisonRats = false;
 				break;
 			}
-			
+
 			if (!spawnedPoisonRats) {
 				spawnedPoisonRats = true;
-				objectHandler.addObject(new RatSummon((int) player.getX() + TILE_SIZE * 3, (int) player.getY(), 
-						5, 30, objectHandler), ObjectHandler.MIDDLE_LAYER);
+
+				if (ratCount == 2) {
+					int ratX = (int) player.getX() + player.getWidth(); 
+					objectHandler.addObject(new PoisonRat(ratX, (int) player.getY(), 
+							1, 5, 20, 50, objectHandler), ObjectHandler.MIDDLE_LAYER);
+					ratX = (int) player.getX() - TILE_SIZE; 
+					objectHandler.addObject(new PoisonRat(ratX, (int) player.getY(), 
+							-1, 5, 20, 50, objectHandler), ObjectHandler.MIDDLE_LAYER);	
+				}
 			}
-			
+
 			break;
 		}
 	}
@@ -208,7 +216,7 @@ public class SwordWeapon extends Weapon {
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
-			
+
 			if (attackBounds.intersects(other.getBounds()) && other.getObjectId().getCategory() == Category.Enemy) {
 				Creature otherCreature = (Creature) other;
 				if (knockbackVelX != 0 || knockbackVelY != 0)
@@ -217,7 +225,7 @@ public class SwordWeapon extends Weapon {
 			}
 		}
 	}
-	
+
 	private Rectangle getChainAttackBounds() {
 		int x = (int) player.getX();
 		int y = (int) player.getY();
@@ -232,14 +240,14 @@ public class SwordWeapon extends Weapon {
 			attackX = (int) x - attackWidth / 2;
 		return new Rectangle(attackX, (int) y, attackWidth, height);
 	}
-	
+
 	private Rectangle getSwordDashBounds() {
 		int playerWidth = player.getWidth();
 		int playerHeight = player.getHeight();
 		return new Rectangle((int) (player.getX() - playerWidth / 2), (int) (player.getY() - playerHeight / 2),
 				playerWidth * 2, playerHeight * 2);
 	}
-	
+
 	@Override
 	public boolean isUsingAbility() {
 		return state != SwordState.None;
@@ -281,7 +289,7 @@ public class SwordWeapon extends Weapon {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordAttack, -1), attackDelay, true),
 		};
 		abilities[0] = new WeaponAbility(500, 15, attackAnims);
-		
+
 		// Combo Chain 2
 		int stabDelay = 5;
 		Animation[] stabAnims = new Animation[] {
@@ -289,7 +297,7 @@ public class SwordWeapon extends Weapon {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordStab, -1), stabDelay, true),
 		};
 		abilities[1] = new WeaponAbility(1000, 20, stabAnims);
-		
+
 		// Sword Dash
 		BufferedImage[] dashSprites = tex.getTextures(TextureName.PlayerSwordDash);
 		Animation[] dashAnims = new Animation[] {
@@ -297,21 +305,21 @@ public class SwordWeapon extends Weapon {
 				new Animation(5, false, dashSprites[2]),
 		};
 		abilities[2] = new WeaponAbility(2000, 15, dashAnims);
-		
+
 		// TODO Ability 2
 		Animation[] tempAnims2 = new Animation[] {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
 		};
 		abilities[3] = new WeaponAbility(2000, 15, tempAnims2);
-		
+
 		// Ice sword ability
 		Animation[] tempAnims3 = new Animation[] {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
 		};
 		abilities[4] = new WeaponAbility(2000, 5, tempAnims3);
-		
+
 		// TODO Poison Rat Summon Ability
 		Animation[] tempAnims4 = new Animation[] {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
@@ -319,7 +327,7 @@ public class SwordWeapon extends Weapon {
 		};
 		abilities[5] = new WeaponAbility(2000, 5, tempAnims4);
 	}
-	
+
 	private int getIndexFromDirection() {
 		return player.getDirection() == 1 ? 0 : 1;
 	}

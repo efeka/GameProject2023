@@ -16,7 +16,6 @@ import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import window.Animation;
 
 public class SwordIceAttack extends GameObject {
 

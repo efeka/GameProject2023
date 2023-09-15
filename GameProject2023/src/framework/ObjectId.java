@@ -18,6 +18,7 @@ public class ObjectId {
 		Item,
 		WeaponItem,
 		Projectile,
+		Summon,
 	}
 	
 	/**

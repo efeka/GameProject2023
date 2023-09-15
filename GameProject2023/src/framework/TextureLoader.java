@@ -80,6 +80,7 @@ public class TextureLoader {
 		
 		PoisonRatSummon,
 		PoisonRatRun,
+		PoisonRatAttack,
 	}
 
 	private BufferedImage playerSheet = null;
@@ -408,14 +409,21 @@ public class TextureLoader {
 				textures[i] = itemSheet.getSubimage(1 + i * 65, 298, 64, 64);
 			break;
 		case PoisonRatSummon:
-			textures = new BufferedImage[8];
-			for (int i = 0; i < textures.length; i++)
+			textures = new BufferedImage[16];
+			for (int i = 0; i < textures.length / 2; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 33, 298, 32, 32);
+			for (int i = textures.length / 2; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + (i - textures.length / 2) * 33, 364, 32, 32);
 			break;
 		case PoisonRatRun:
 			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(265 + i * 33, 298, 32, 32);
+			break;
+		case PoisonRatAttack:
+			textures = new BufferedImage[12];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 331, 32, 32);
 			break;
 		}
 

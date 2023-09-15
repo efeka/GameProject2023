@@ -7,8 +7,10 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import abstract_templates.Creature;
 import abstract_templates.GameObject;
 import abstract_templates.TileOrientation;
+import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.ArcherEnemy;
 import game_objects.BasicEnemy;
@@ -38,6 +40,7 @@ public class ObjectHandler {
 	public static final int MENU_LAYER = 3;
 	
 	private ArrayList<GameObject> bottomLayer, middleLayer, topLayer, menuLayer;
+	private ArrayList<Creature> summonsList;
 	
 	private KeyInput keyInput;
 	private MouseInput mouseInput;
@@ -51,6 +54,7 @@ public class ObjectHandler {
 		middleLayer = new ArrayList<GameObject>();
 		topLayer = new ArrayList<GameObject>();
 		menuLayer = new ArrayList<GameObject>();
+		summonsList = new ArrayList<Creature>();
 	}
 	
 	/**
@@ -140,6 +144,9 @@ public class ObjectHandler {
 			menuLayer.add(object);
 			break;
 		}
+		
+		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.Summon)
+			summonsList.add((Creature) object);
 	}
 
 	public void removeObject(GameObject object) {
@@ -151,6 +158,9 @@ public class ObjectHandler {
 			topLayer.remove(object);
 		else if (menuLayer.contains(object))
 			menuLayer.remove(object);
+		
+		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.Summon)
+			summonsList.remove((Creature) object);
 	}
 	
 	public void removeObjectFromLayer(GameObject object, int layer) {
@@ -172,6 +182,9 @@ public class ObjectHandler {
 				menuLayer.remove(object);
 			break;
 		}
+		
+		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.Summon)
+			summonsList.add((Creature) object);
 	}
 	
 	public ArrayList<GameObject> getLayer(int layer) {
@@ -189,6 +202,10 @@ public class ObjectHandler {
 		}
 	}
 	
+	public ArrayList<Creature> getSummonsList() {
+		return summonsList;
+	}
+	
 	public GameObject createObjectByName(Name objectName, int x, int y) {
 		GameObject gameObject = null;
 		
@@ -196,6 +213,7 @@ public class ObjectHandler {
 		case Player:
 			player = new Player(x, y, this, keyInput, mouseInput);
 			gameObject = player;
+			summonsList.add(player);
 			break;
 		case BasicEnemy:
 			gameObject = new BasicEnemy(x, y, this);

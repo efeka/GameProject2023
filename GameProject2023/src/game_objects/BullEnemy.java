@@ -5,6 +5,7 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import abstract_templates.Creature;
 import abstract_templates.GameObject;
@@ -77,9 +78,13 @@ public class BullEnemy extends Creature {
 	}
 
 	private void handleAttacking() {
-		if (getBounds().intersects(player.getBounds())) {
-			player.applyKnockback(direction * runningSpeed / 2, -7f);
-			player.takeDamage(25, player.getDefaultInvulnerabilityDuration());
+		ArrayList<Creature> targetList = objectHandler.getSummonsList();
+		for (int i = targetList.size() - 1; i >= 0; i--) {
+			Creature target = targetList.get(i);
+			if (getBounds().intersects(target.getBounds())) {
+				target.applyKnockback(direction * runningSpeed / 2, -7f);
+				target.takeDamage(25, player.getDefaultInvulnerabilityDuration());
+			}
 		}
 	}
 	

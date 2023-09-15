@@ -250,9 +250,8 @@ public class Player extends Creature {
 				continue;
 
 			// Check Collisions
-			if (other.getObjectId().getCategory() == Category.Block)
-				checkBlockCollision(other);
-			if (other.getObjectId().getCategory() == Category.JumpThroughBlock && velY >= 0)
+			if ((other.getObjectId().getCategory() == Category.Block) ||
+					other.getObjectId().getCategory() == Category.JumpThroughBlock && velY >= 0)
 				checkBlockCollision(other);
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
@@ -339,14 +338,6 @@ public class Player extends Creature {
 			velY = 0;
 			jumping = false;
 		}
-	}
-
-	private Rectangle getGroundCheckBounds() {
-		float width = 3 * this.width / 5f;
-		float xOffset = (this.width - width) / 2;
-		float height = this.height / 5f;
-		float yOffset = this.height;
-		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
 	}
 
 	// TODO Should be moved into PlayerAnimationHandler
