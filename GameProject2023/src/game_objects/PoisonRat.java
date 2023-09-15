@@ -2,9 +2,7 @@ package game_objects;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -17,7 +15,7 @@ import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import visual_effects.PoisonSmokeEffect;
+import visual_effects.OneTimeAnimation;
 import window.Animation;
 
 public class PoisonRat extends Creature {
@@ -209,7 +207,9 @@ public class PoisonRat extends Creature {
 		int smokeSize = (int) (TILE_SIZE * 2f);
 		int smokeX = (int) ((x + width / 2) - smokeSize / 2);
 		int smokeY = (int) ((y + height / 2) - smokeSize / 2);
-		objectHandler.addObject(new PoisonSmokeEffect(smokeX, smokeY, smokeSize, smokeSize, objectHandler), ObjectHandler.MIDDLE_LAYER);
+		OneTimeAnimation poisonSmokeAnimation = new OneTimeAnimation(smokeX, smokeY, smokeSize, smokeSize,
+				TextureName.PoisonSmokeEffect, 8, objectHandler);
+		objectHandler.addObject(poisonSmokeAnimation, ObjectHandler.MIDDLE_LAYER);
 	}
 
 	private Rectangle getJumpCheckBounds() {

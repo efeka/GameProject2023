@@ -6,7 +6,7 @@ import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import visual_effects.SparkleEffect;
+import visual_effects.OneTimeAnimation;
 import window.Animation;
 
 public class Coin extends Item {
@@ -41,10 +41,9 @@ public class Coin extends Item {
 	@Override
 	public void pickupItem() {
 		// TODO increase player's coin count
-		SparkleEffect sparkleEffect = new SparkleEffect(x, y, objectHandler);
-		sparkleEffect.setX(x - width / 2);
-		sparkleEffect.setY(y - height / 2);
-		objectHandler.addObject(sparkleEffect, ObjectHandler.MIDDLE_LAYER);
+		OneTimeAnimation sparkleAnimation = new OneTimeAnimation(x - width / 2, y - height / 2,
+				TextureName.SparkleEffect, 8, objectHandler);
+		objectHandler.addObject(sparkleAnimation, ObjectHandler.MIDDLE_LAYER);
 		objectHandler.removeObject(this);
 	}
 
