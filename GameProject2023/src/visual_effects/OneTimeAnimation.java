@@ -17,7 +17,12 @@ public class OneTimeAnimation extends GameObject {
 
 	private ObjectHandler objectHandler;
 	private Animation animation;
+	private boolean finished = false;
 
+	/**
+	 * Creates and runs an animation from the given TextureName and removes
+	 * itself from the game after the animation is finished playing.
+	 */
 	public OneTimeAnimation(float x, float y, int width, int height, TextureName textureName,
 			int animationDelay, ObjectHandler objectHandler) {
 		super(x, y, width, height, new ObjectId(Category.Missing, Name.Missing));
@@ -26,6 +31,11 @@ public class OneTimeAnimation extends GameObject {
 		animation = new Animation(TextureLoader.getInstance().getTextures(textureName), animationDelay, true);
 	}
 	
+	/**
+	 * Creates and runs an animation from the given TextureName and removes
+	 * itself from the game after the animation is finished playing.
+	 * Default width and height are set to TILE_SIZE.
+	 */
 	public OneTimeAnimation(float x, float y, TextureName textureName,
 			int animationDelay, ObjectHandler objectHandler) {
 		super(x, y, TILE_SIZE, TILE_SIZE, new ObjectId(Category.Missing, Name.Missing));
@@ -36,8 +46,10 @@ public class OneTimeAnimation extends GameObject {
 
 	@Override
 	public void tick() {
-		if (animation.isPlayedOnce())
+		if (animation.isPlayedOnce()) {
 			objectHandler.removeObject(this);
+			finished = true;
+		}
 		else
 			animation.runAnimation();
 	}
@@ -45,6 +57,10 @@ public class OneTimeAnimation extends GameObject {
 	@Override
 	public void render(Graphics g) {
 		animation.drawAnimation(g, (int) x, (int) y, width, height);
+	}
+	
+	public boolean isFinished() {
+		return finished;
 	}
 
 }

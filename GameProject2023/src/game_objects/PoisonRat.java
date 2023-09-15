@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import abstract_templates.Creature;
 import abstract_templates.GameObject;
@@ -31,6 +32,7 @@ public class PoisonRat extends Creature {
 	private float runningSpeed = 2f;
 	private float jumpingSpeed = -4.5f;
 
+	private HashSet<GameObject> enemiesHit;
 	private boolean attacking = false;
 	private int attackCooldown = 1000;
 	private long lastAttackTimer = 0;
@@ -39,7 +41,7 @@ public class PoisonRat extends Creature {
 		super(x, y, TILE_SIZE, TILE_SIZE, damage, maxHealth, 0, objectHandler, new ObjectId(Category.Summon, Name.Missing));
 		this.direction = direction;
 		this.explosionDamage = explosionDamage;
-
+		enemiesHit = new HashSet<>();
 		setupAnimations();
 	}
 
@@ -114,8 +116,10 @@ public class PoisonRat extends Creature {
 
 				if (isAttackReady()) {
 					int currentAnimFrame = direction == 1 ? attackAnimation[0].getCurrentFrame() : attackAnimation[1].getCurrentFrame();
-					if (attacking && currentAnimFrame == 3)
-						((Creature) other).takeDamage(damage, 400);
+					if (!enemiesHit.contains(other) && attacking && currentAnimFrame == 3) {
+						((Creature) other).takeDamage(damage, 0);
+						enemiesHit.add(other);
+					}
 					else
 						attacking = true;
 				}
@@ -209,7 +213,9 @@ public class PoisonRat extends Creature {
 		int smokeY = (int) ((y + height / 2) - smokeSize / 2);
 		OneTimeAnimation poisonSmokeAnimation = new OneTimeAnimation(smokeX, smokeY, smokeSize, smokeSize,
 				TextureName.PoisonSmokeEffect, 8, objectHandler);
-		objectHandler.addObject(poisonSmokeAnimation, ObjectHandler.MIDDLE_LAYER);
+		Explosion explosion = new Explosion(poisonSmokeAnimation, explosionDamage, 
+				new Category[] {Category.Enemy}, objectHandler);
+		objectHandler.addObject(explosion, ObjectHandler.MIDDLE_LAYER);
 	}
 
 	private Rectangle getJumpCheckBounds() {
@@ -271,7 +277,7 @@ public class PoisonRat extends Creature {
 	private void resetAnimations() {
 		attacking = false;
 		lastAttackTimer = System.currentTimeMillis();
-
+		enemiesHit.clear();
 		attackAnimation[0].resetAnimation();
 		attackAnimation[1].resetAnimation();
 		runAnimation[0].resetAnimation();
