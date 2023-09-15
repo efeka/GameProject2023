@@ -30,6 +30,9 @@ public class SwordIceAttack extends GameObject {
 	private float angleIncrement;
 	private float[] swordAngles;
 	
+	private int durationMillis;
+	private long startTime;
+	
 	// Enemies hit by each sword is stored in this list.
 	// This is for preventing an enemy to get hit twice by the same sword in the same rotation.
 	private ArrayList<HashSet<GameObject>> enemiesHit;
@@ -40,22 +43,26 @@ public class SwordIceAttack extends GameObject {
 	 * 
 	 * @param centerObject the object which the swords will revolve around
 	 * @param damage the damage that the swords will deal to enemies
+	 * @param duarionMillis the duration for how long the swords will stay active
 	 * @param swordCount the total number of swords in the sword circle
 	 * @param sizeScale the scale that will be multiplied by TILE_SIZE to determine the size of each sword
 	 * @param radius the radius of the sword circle
 	 * @param angleIncrement the angle that each sword will be rotated by after every tick
 	 * @param objectHandler reference to the ObjectHandler
 	 */
-	public SwordIceAttack(GameObject centerObject, int damage, int swordCount, float sizeScale, 
+	public SwordIceAttack(GameObject centerObject, int damage, int durationMillis, int swordCount, float sizeScale, 
 			int radius, float angleIncrement, ObjectHandler objectHandler) {
 		super(0, 0, (int) (TILE_SIZE * sizeScale), (int) (TILE_SIZE * sizeScale),
 				new ObjectId(Category.Missing, Name.Missing));
 		this.centerObject = centerObject;
 		this.swordCount = swordCount;
 		this.damage = damage;
+		this.durationMillis = durationMillis;
 		this.radius = radius;
 		this.angleIncrement = angleIncrement;
 		this.objectHandler = objectHandler;
+		
+		startTime = System.currentTimeMillis();
 		
 		enemiesHit = new ArrayList<>();
 		for (int i = 0; i < swordCount; i++)
@@ -70,6 +77,11 @@ public class SwordIceAttack extends GameObject {
 
 	@Override
 	public void tick() {
+		if (System.currentTimeMillis() - startTime >= durationMillis) {
+			objectHandler.removeObject(this);
+			return;
+		}
+		
 		x = (float) centerObject.getBounds().getCenterX() - width / 2;
 		y = (float) centerObject.getBounds().getCenterY() - height / 2 - radius;
 		

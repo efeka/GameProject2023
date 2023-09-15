@@ -70,9 +70,6 @@ public class ArrowProjectile extends Projectile {
 		Player player = objectHandler.getPlayer();
 		for (Creature target : targetList) {
 			if (getBounds().intersects(target.getBounds())) {
-				if (target.equals(player) && player.isDodging())
-					continue;
-				
 				target.applyKnockback(velX / 2, -3f);
 				target.takeDamage(damage, player.getDefaultInvulnerabilityDuration());
 				objectHandler.removeObject(this);

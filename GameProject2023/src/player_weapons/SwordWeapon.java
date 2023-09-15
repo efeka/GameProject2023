@@ -178,9 +178,8 @@ public class SwordWeapon extends Weapon {
 				spawnedIceSwords = true;
 
 				int swordCount = 3;
-				objectHandler.addObject(new SwordIceAttack(player,
-						abilities[state.getIndex()].getDamage(), swordCount, 1f, 70, (float) Math.PI / 90,
-						objectHandler), ObjectHandler.TOP_LAYER);
+				objectHandler.addObject(new SwordIceAttack(player, abilities[state.getIndex()].getDamage(), 
+						4000, swordCount, 1f, 70, (float) Math.PI / 90, objectHandler), ObjectHandler.TOP_LAYER);
 			}
 			break;
 
@@ -198,12 +197,15 @@ public class SwordWeapon extends Weapon {
 				spawnedPoisonRats = true;
 
 				if (ratCount == 2) {
-					int ratX = (int) player.getX() + player.getWidth(); 
+					int ratX = (int) player.getX() + player.getWidth();
+					int ratHealth = 40;
+					int ratDamage = 5;
+					int ratExplosionDamage = 20;
 					objectHandler.addObject(new PoisonRat(ratX, (int) player.getY(), 
-							1, 5, 20, 50, objectHandler), ObjectHandler.MIDDLE_LAYER);
+							1, ratDamage, ratExplosionDamage, ratHealth, objectHandler), ObjectHandler.MIDDLE_LAYER);
 					ratX = (int) player.getX() - TILE_SIZE; 
 					objectHandler.addObject(new PoisonRat(ratX, (int) player.getY(), 
-							-1, 5, 20, 50, objectHandler), ObjectHandler.MIDDLE_LAYER);	
+							-1, ratDamage, ratExplosionDamage, ratHealth, objectHandler), ObjectHandler.MIDDLE_LAYER);	
 				}
 			}
 
