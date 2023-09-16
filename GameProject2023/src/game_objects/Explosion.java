@@ -16,6 +16,7 @@ public class Explosion extends GameObject {
 
 	private ObjectHandler objectHandler;
 	private OneTimeAnimation oneTimeAnimation;
+	private int[] animationDamageFrames;
 	
 	private Category[] targets;
 	private HashSet<GameObject> targetsHit;
@@ -40,6 +41,29 @@ public class Explosion extends GameObject {
 		targetsHit = new HashSet<>();		
 		objectHandler.addObject(oneTimeAnimation, ObjectHandler.TOP_LAYER);
 	}
+	
+	/**
+	 * Creates an explosion with the given one time animation.
+	 * Only damages objects within the given categories.
+	 * @param oneTimeAnimation the OneTimeAnimation to be played for the explosion.
+	 *  	The explosion's coordinates and dimensions are inferred from this object.
+	 * @param animationDamageFrames the indices of the animation where this explosion will deal damage at.
+	 * @param damage the damage that the explosion will deal to its targets.
+	 * @param targetCategories the categories of the objects that will be effected by the explosion.
+	 * @param objectHandler reference to the ObjectHandler.
+	 */
+	public Explosion(OneTimeAnimation oneTimeAnimation, int[] animationDamageFrames,
+			int damage, Category[] targetCategories, ObjectHandler objectHandler) {
+		super(oneTimeAnimation.getX(), oneTimeAnimation.getY(), oneTimeAnimation.getWidth(), oneTimeAnimation.getHeight(),
+				new ObjectId(Category.Missing, Name.Missing));
+		this.objectHandler = objectHandler;
+		this.targets = targetCategories;
+		this.damage = damage;
+		this.oneTimeAnimation = oneTimeAnimation;
+		this.animationDamageFrames = animationDamageFrames;
+		targetsHit = new HashSet<>();		
+		objectHandler.addObject(oneTimeAnimation, ObjectHandler.TOP_LAYER);
+	}
 
 	@Override
 	public void tick() {
@@ -48,7 +72,24 @@ public class Explosion extends GameObject {
 			return;
 		}
 		
-		// Handle the explosion's collisions with the targets
+		// Check the animations current frame.
+		// If the current frame is not in the animationDamageFrame array, do not check collisions
+		// with targets to avoid dealing damage at the wrong time of the animation.
+		if (animationDamageFrames != null) {
+			int currentAnimFrame = oneTimeAnimation.getAnimation().getCurrentFrame();
+			boolean canDoDamage = false; 
+			for (Integer i : animationDamageFrames)
+				if (i == currentAnimFrame)
+					canDoDamage = true;
+			
+			if (!canDoDamage)
+				return;
+		}
+		
+		handleExplosionCollisions();
+	}
+	
+	private void handleExplosionCollisions() {
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
@@ -60,7 +101,7 @@ public class Explosion extends GameObject {
 				// Damage objects with the given category
 				if (other.getObjectId().getCategory() == category) {
 					if (getBounds().intersects(other.getBounds())) {
-						((Creature) other).takeDamage(damage, 500);
+						((Creature) other).takeDamage(damage, 0);
 						targetsHit.add(other);
 					}
 				}

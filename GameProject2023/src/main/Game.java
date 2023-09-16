@@ -116,7 +116,7 @@ public class Game extends Canvas implements Runnable {
 		Graphics g = bs.getDrawGraphics();
 
 		// Draw background
-		g.setColor(new Color(51, 51, 51));
+		g.setColor(new Color(41, 41, 41));
 		g.fillRect(0, 0, window.getWidth(), window.getHeight());
 		
 		if (shakeCamera && shakeDuration-- < 0)

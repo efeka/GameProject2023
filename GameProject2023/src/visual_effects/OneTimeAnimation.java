@@ -62,5 +62,9 @@ public class OneTimeAnimation extends GameObject {
 	public boolean isFinished() {
 		return finished;
 	}
+	
+	public Animation getAnimation() {
+		return animation;
+	}
 
 }

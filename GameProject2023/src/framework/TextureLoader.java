@@ -73,6 +73,7 @@ public class TextureLoader {
 		SparkleEffect,
 		DarkSmokeEffect,
 		PoisonSmokeEffect,
+		LightningEffect,
 		
 		SpikeAttack,
 		IceSword,
@@ -393,6 +394,11 @@ public class TextureLoader {
 			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(265 + i * 33, 100, 32, 32);
+			break;
+		case LightningEffect:
+			textures = new BufferedImage[13];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(1 + i * 33, 397, 32, 32);
 			break;
 		case SpikeAttack:
 			textures = new BufferedImage[14];

@@ -25,6 +25,14 @@ public class FadingTrailEffect extends GameObject {
 		this.fadingRate = fadingRate;
 		this.objectHandler = objectHandler;
 	}
+	
+	public FadingTrailEffect(float x, float y, int width, int height, BufferedImage image, float initialAlpha, float fadingRate, ObjectHandler objectHandler) {
+		super(x, y, width, height, new ObjectId(Category.Missing, Name.Missing));
+		this.image = image;
+		this.fadingRate = fadingRate;
+		this.objectHandler = objectHandler;
+		this.alpha = initialAlpha;
+	}
 
 	@Override
 	public void tick() {
