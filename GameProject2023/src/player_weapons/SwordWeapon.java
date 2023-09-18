@@ -78,19 +78,23 @@ public class SwordWeapon extends Weapon {
 					weaponAbility.resetAnimations();
 			}
 
-			if (mouseInput.isAttackButtonPressed() && !abilities[0].isOnCooldown())
+			if (mouseInput.isAttackButtonPressed() && !abilities[SwordState.AttackChain1.index].isOnCooldown())
 				state = SwordState.AttackChain1;
-			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[2].isOnCooldown())
-				state = SwordState.LightningDash;
-			//			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[5].isOnCooldown())
-			//				state = SwordState.PoisonRatSummon;
-			//			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[3].isOnCooldown())
+			//			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[SwordState.LightningDash.index].isOnCooldown())
+			//				state = SwordState.LightningDash;
+			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[SwordState.PoisonRatSummon.index].isOnCooldown())
+				state = SwordState.PoisonRatSummon;
+			//			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[SwordState.SpikeChain.index].isOnCooldown())
 			//				state = SwordState.SpikeChain;
-			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[4].isOnCooldown())
+			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[SwordState.IceSwords.index].isOnCooldown())
 				state = SwordState.IceSwords;
 			break;
 
 		case AttackChain1:
+			// First stage of the basic attack chain.
+			// The player deals damage to all enemies in a short range.
+			// Player cannot move while the ability is being cast.
+			
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
 				if (mouseInput.isAttackButtonPressed()) {
@@ -110,6 +114,10 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case AttackChain2:
+			// Second stage of the basic attack chain.
+			// The player deals damage to all enemies in a short range and knocks them back.
+			// Player cannot move while the ability is being cast.
+			
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
 				abilities[SwordState.AttackChain1.getIndex()].startCooldown();
@@ -124,6 +132,11 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case LightningDash:
+			// The player quickly dashes into the current direction and
+			// deals damage to enemies that it passes through.
+			// Then multiple lightning explosions happen in the dash path.
+			// Player moves in the dash direction while the ability is being cast.
+			
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			// Dash started
 			if (!dashing) {
@@ -185,6 +198,10 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case IceSwords:
+			// Spawns swords of ice that rotate around the player.
+			// The swords deal damage to enemies on contact.
+			// Player cannot move while the ability is being cast.
+			
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
 				abilities[state.getIndex()].startCooldown();
@@ -192,6 +209,9 @@ public class SwordWeapon extends Weapon {
 				spawnedIceSwords = false;
 				break;
 			}
+
+			player.setVelX(0);
+			player.setVelY(0);
 
 			if (!spawnedIceSwords) {
 				spawnedIceSwords = true;
@@ -203,6 +223,11 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case PoisonRatSummon:
+			// Multiple poison rats get spawned around the player.
+			// Each rat starts running around and attacking enemies.
+			// Rats explode upyyon death, dealing damage to all enemies around them.
+			// Player cannot move while the ability is being cast.
+			
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
 				abilities[state.getIndex()].startCooldown();
@@ -210,6 +235,9 @@ public class SwordWeapon extends Weapon {
 				spawnedPoisonRats = false;
 				break;
 			}
+
+			player.setVelX(0);
+			player.setVelY(0);
 
 			if (!spawnedPoisonRats) {
 				spawnedPoisonRats = true;
@@ -338,19 +366,20 @@ public class SwordWeapon extends Weapon {
 		};
 		abilities[3] = new WeaponAbility(2000, 15, tempAnims2);
 
-		// TODO Ice sword ability
-		Animation[] tempAnims3 = new Animation[] {
-				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
-				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
+		// Ice sword ability
+		int glowDelay = 6;
+		Animation[] iceGlowAnims = new Animation[] {
+				new Animation(tex.getTextures(TextureName.PlayerIceGlow), glowDelay, true),
+				new Animation(tex.getTextures(TextureName.PlayerIceGlow), glowDelay, true),
 		};
-		abilities[4] = new WeaponAbility(2000, 5, tempAnims3);
+		abilities[4] = new WeaponAbility(2000, 5, iceGlowAnims);
 
-		// TODO Poison Rat Summon Ability
-		Animation[] tempAnims4 = new Animation[] {
-				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
-				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
+		// Poison Rat Summon Ability
+		Animation[] poisonGlowAnims = new Animation[] {
+				new Animation(tex.getTextures(TextureName.PlayerPoisonGlow), glowDelay, true),
+				new Animation(tex.getTextures(TextureName.PlayerPoisonGlow), glowDelay, true),
 		};
-		abilities[5] = new WeaponAbility(2000, 5, tempAnims4);
+		abilities[5] = new WeaponAbility(2000, 5, poisonGlowAnims);
 	}
 
 	private int getIndexFromDirection() {

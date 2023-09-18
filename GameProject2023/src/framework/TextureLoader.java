@@ -19,6 +19,8 @@ public class TextureLoader {
 		PlayerJump,
 		PlayerDoubleJump,
 		PlayerDodge,
+		PlayerPoisonGlow,
+		PlayerIceGlow,
 		
 		PlayerSwordIdle,
 		PlayerSwordRun,
@@ -160,6 +162,16 @@ public class TextureLoader {
 				textures[i] = playerSheet.getSubimage(521 + i * 65, 521, 64, 64);
 				textures[i + 7] = playerSheet.getSubimage(521 + i * 65, 586, 64, 64);
 			}
+			break;
+		case PlayerPoisonGlow:
+			textures = new BufferedImage[9];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = playerSheet.getSubimage(1 + i * 65, 1301, 64, 64);
+			break;
+		case PlayerIceGlow:
+			textures = new BufferedImage[9];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = playerSheet.getSubimage(1 + i * 65, 1366, 64, 64);
 			break;
 		case PlayerSwordIdle:
 			textures = new BufferedImage[20];
