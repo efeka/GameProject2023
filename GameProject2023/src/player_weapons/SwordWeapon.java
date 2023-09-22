@@ -15,7 +15,6 @@ import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Explosion;
-import game_objects.PoisonRat;
 import items.SwordItem;
 import items.WeaponItem;
 import visual_effects.FadingTrailEffect;
@@ -80,10 +79,10 @@ public class SwordWeapon extends Weapon {
 
 			if (mouseInput.isAttackButtonPressed() && !abilities[SwordState.AttackChain1.index].isOnCooldown())
 				state = SwordState.AttackChain1;
-			//			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[SwordState.LightningDash.index].isOnCooldown())
-			//				state = SwordState.LightningDash;
-			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[SwordState.PoisonRatSummon.index].isOnCooldown())
-				state = SwordState.PoisonRatSummon;
+						else if (keyInput.isFirstAbilityKeyPressed() && !abilities[SwordState.LightningDash.index].isOnCooldown())
+							state = SwordState.LightningDash;
+//			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[SwordState.PoisonRatSummon.index].isOnCooldown())
+//				state = SwordState.PoisonRatSummon;
 			//			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[SwordState.SpikeChain.index].isOnCooldown())
 			//				state = SwordState.SpikeChain;
 			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[SwordState.IceSwords.index].isOnCooldown())

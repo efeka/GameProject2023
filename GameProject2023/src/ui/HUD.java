@@ -1,4 +1,4 @@
-package window;
+package ui;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -10,7 +10,6 @@ import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.Player;
-import player_weapons.Weapon;
 
 public class HUD extends GameObject {
 

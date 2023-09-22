@@ -1,8 +1,16 @@
 package window;
 
+import java.awt.Cursor;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+
 import javax.swing.JFrame;
 
 import framework.GameConstants;
+import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 import main.Game;
 
 public class GameWindow extends JFrame {
@@ -22,8 +30,12 @@ public class GameWindow extends JFrame {
 		setSize(GameConstants.ScaleConstants.GAME_WIDTH, GameConstants.ScaleConstants.GAME_HEIGHT);
 		setTitle("Game Project 2023");
 		
-		add(game);
+		BufferedImage cursorImage = TextureLoader.getInstance().getTextures(TextureName.Cursor)[0];
+		Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImage, new Point(0, 0),"custom_cursor_name");
+		setCursor(cursor);
 
+		add(game);
+		
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}

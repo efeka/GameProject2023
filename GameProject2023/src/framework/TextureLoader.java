@@ -84,12 +84,18 @@ public class TextureLoader {
 		PoisonRatSummon,
 		PoisonRatRun,
 		PoisonRatAttack,
+		
+		// UI
+		HealthBar,
+		Cursor,
+		Inventory,
 	}
 
 	private BufferedImage playerSheet = null;
 	private BufferedImage blockSheet = null;
 	private BufferedImage enemySheet = null;
 	private BufferedImage itemSheet = null;
+	private BufferedImage uiSheet = null;
  
 	private TextureLoader() {
 		try {
@@ -98,6 +104,7 @@ public class TextureLoader {
 			enemySheet = fileIO.loadSheet("enemy_sheet_64x64.png");
 			blockSheet = fileIO.loadSheet("block_sheet_16x16.png");
 			itemSheet = fileIO.loadSheet("item_sheet_32x32.png");
+			uiSheet = fileIO.loadSheet("ui_sheet.png");
 		} 
 		catch(IOException e) {
 			System.err.println("Failed to load an image file from the /res folder.");
@@ -442,6 +449,26 @@ public class TextureLoader {
 			textures = new BufferedImage[12];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 33, 331, 32, 32);
+			break;
+		case HealthBar:
+			textures = new BufferedImage[3];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = itemSheet.getSubimage(331 + i * 33, 1, 32, 32);
+			break;
+		case Cursor:
+			textures = new BufferedImage[1];
+			textures[0] = uiSheet.getSubimage(1, 85, 16, 16);
+			break;
+		case Inventory:
+			textures = new BufferedImage[14];
+			for (int i = 0; i < 3; i++)
+				for (int j = 0; j < 3; j++)
+					textures[3 * i + j] = uiSheet.getSubimage(1 + 17 * j, 1 + 17 * i, 16, 16);
+			textures[9] = uiSheet.getSubimage(1, 52, 64, 32);
+			textures[10] = uiSheet.getSubimage(52, 1, 16, 16);
+			textures[11] = uiSheet.getSubimage(69, 1, 16, 16);
+			textures[12] = uiSheet.getSubimage(52, 18, 16, 16);
+			textures[13] = uiSheet.getSubimage(69, 18, 16, 16);
 			break;
 		}
 

@@ -57,7 +57,7 @@ public class Player extends Creature {
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 		objectHandler.setPlayer(this);
-
+		
 		weapon = new SwordWeapon(objectHandler, keyInput, mouseInput);
 
 		invulnerableDuration = 700;

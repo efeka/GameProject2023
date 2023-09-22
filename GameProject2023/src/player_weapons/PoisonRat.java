@@ -1,4 +1,4 @@
-package game_objects;
+package player_weapons;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
@@ -16,6 +16,8 @@ import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import game_objects.DamageNumberPopup;
+import game_objects.Explosion;
 import visual_effects.OneTimeAnimation;
 import window.Animation;
 
@@ -206,8 +208,8 @@ public class PoisonRat extends Creature {
 	@Override
 	public void die() {
 		objectHandler.removeObject(this);
+		objectHandler.removeObject(healthBar);
 
-		// TODO Create an explosion class which damages creatures with the given category
 		int smokeSize = (int) (TILE_SIZE * 2f);
 		int smokeX = (int) ((x + width / 2) - smokeSize / 2);
 		int smokeY = (int) ((y + height / 2) - smokeSize / 2);

@@ -5,6 +5,8 @@ import java.awt.event.KeyEvent;
 
 public class KeyInput extends KeyAdapter {
 
+	// TODO Load key configurations from a certain source instead of hard coding
+	
 	// Player movement keys
 	private boolean moveUpKeyPressed = false;
 	private boolean moveRightKeyPressed = false;
@@ -19,17 +21,15 @@ public class KeyInput extends KeyAdapter {
 	private boolean navigateUpKeyPressed = false;
 	private boolean navigateDownKeyPressed = false;
 	private boolean selectionKeyPressed = false;
+	private boolean inventoryKeyToggled = true, inventoryToggleFlag = false;
 	// Interaction keys
 	private boolean interactKeyPressed = false;
-	
 	// Debug
 	private boolean ctrlPressed = false;
 	public boolean debugPressed = false;
-	public boolean[] numberKeyPressed = new boolean[5]; 
-	
+
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Load key configurations from a certain source instead of hard coding
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
 			moveUpKeyPressed = true;
@@ -63,38 +63,29 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_SHIFT:
 			dodgeKeyPressed = true;
 			break;
-		// Debug
+		case KeyEvent.VK_I:
+			if (inventoryKeyToggled && !inventoryToggleFlag)
+				inventoryKeyToggled = false;
+			else if (!inventoryKeyToggled && inventoryToggleFlag)
+				inventoryKeyToggled = true;
+			break;
+			// Debug
 		case KeyEvent.VK_ESCAPE:
 			System.exit(0);
 		case KeyEvent.VK_CONTROL:
 			ctrlPressed = true;
+			break;
 		case KeyEvent.VK_X:
 			if (ctrlPressed) {
 				debugPressed = !debugPressed;
 				ctrlPressed = false;
 			}
 			break;
-		case KeyEvent.VK_1:
-			numberKeyPressed[0] = true;
-			break;
-		case KeyEvent.VK_2:
-			numberKeyPressed[1] = true;
-			break;
-		case KeyEvent.VK_3:
-			numberKeyPressed[2] = true;
-			break;
-		case KeyEvent.VK_4:
-			numberKeyPressed[3] = true;
-			break;
-		case KeyEvent.VK_5:
-			numberKeyPressed[4] = true;
-			break;
 		}
 	}
-	
+
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Load key configurations from a certain source instead of hard coding
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
 			moveUpKeyPressed = false;
@@ -128,76 +119,70 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_SHIFT:
 			dodgeKeyPressed = false;
 			break;
-		// Debug
+		case KeyEvent.VK_I:
+			inventoryToggleFlag = !inventoryToggleFlag;
+			break;
+			// Debug
 		case KeyEvent.VK_CONTROL:
 			ctrlPressed = false;
-		case KeyEvent.VK_1:
-			numberKeyPressed[0] = false;
-			break;
-		case KeyEvent.VK_2:
-			numberKeyPressed[1] = false;
-			break;
-		case KeyEvent.VK_3:
-			numberKeyPressed[2] = false;
-			break;
-		case KeyEvent.VK_4:
-			numberKeyPressed[3] = false;
-			break;
-		case KeyEvent.VK_5:
-			numberKeyPressed[4] = false;
 			break;
 		}
 	}
-	
+
 	public boolean isMoveUpKeyPressed() {
 		return moveUpKeyPressed;
 	}
-	
+
 	public boolean isMoveRightKeyPressed() {
 		return moveRightKeyPressed;
 	}
-	
+
 	public boolean isMoveLeftKeyPressed() {
 		return moveLeftKeyPressed;
 	}
-	
+
 	public boolean isJumpKeyPressed() {
 		return jumpKeyPressed;
 	}
-	
+
 	public void setJumpKeyPressed(boolean isPressed) {
 		jumpKeyPressed = isPressed;
 	}
-	
+
 	public boolean isCrouchKeyPressed() {
 		return crouchKeyPressed;
 	}
-	
+
 	public boolean isNavigateUpKeyPressed() {
 		return navigateUpKeyPressed;
 	}
-	
+
 	public boolean isNavigateDownKeyPressed() {
 		return navigateDownKeyPressed;
 	}
-	
+
 	public boolean isSelectionKeyPressed() {
 		return selectionKeyPressed;
 	}
-	
+
 	public boolean isFirstAbilityKeyPressed() {
 		return firstAbilityKeyPressed;
 	}
-	
+
 	public boolean isSecondAbilityKeyPressed() {
 		return secondAbilityKeyPressed;
 	}
-	
+
 	public boolean isInteractKeyPressed() {
 		return interactKeyPressed;
 	}
-	
+
 	public boolean isDodgeKeyPressed() {
 		return dodgeKeyPressed;
 	}
+
+	public boolean isInventoryKeyToggled() {
+		return inventoryKeyToggled;
+	}
+
 }

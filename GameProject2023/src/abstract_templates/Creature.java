@@ -8,6 +8,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import game_objects.HealthBar;
 
 public abstract class Creature extends GameObject {
 
@@ -27,7 +28,9 @@ public abstract class Creature extends GameObject {
 	protected float staminaRegen;
 
 	protected int invulnerableDuration = 700;
-	protected long lastInvulnerableTimer = 0; 
+	protected long lastInvulnerableTimer = 0;
+	
+	protected HealthBar healthBar;
 
 	public Creature(int x, int y, int width, int height, int damage, int maxHealth, int maxStamina, ObjectHandler objectHandler, ObjectId objectId) {
 		super(x, y, width, height, objectId);
@@ -42,6 +45,12 @@ public abstract class Creature extends GameObject {
 		jumping = false;
 		knockedBack = false;
 		invulnerable = false;
+		
+		// Add a health bar to all creatures except the player
+		if (objectId.getCategory() != Category.Player) {
+			healthBar = new HealthBar(this);
+			objectHandler.addObject(healthBar, ObjectHandler.MIDDLE_LAYER);
+		}
 	}
 
 	public void regenerateStamina() {
@@ -69,6 +78,7 @@ public abstract class Creature extends GameObject {
 
 	public void die() {
 		objectHandler.removeObject(this);
+		objectHandler.removeObject(healthBar);
 		int coinsToDrop = (int) (Math.random() * 6) + 1;
 		for (int i = 0; i < coinsToDrop; i++)
 			objectHandler.addObject(objectHandler.createObjectByName(Name.Coin, (int) x, (int) y), ObjectHandler.MIDDLE_LAYER);

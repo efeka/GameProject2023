@@ -26,7 +26,8 @@ import items.Coin;
 import items.FisticuffsItem;
 import items.HammerItem;
 import items.SwordItem;
-import window.HUD;
+import ui.HUD;
+import ui.Inventory;
 import window.KeyInput;
 import window.MouseInput;
 
@@ -94,8 +95,10 @@ public class ObjectHandler {
 			}
 		}
 		
-		HUD hud = (HUD) createObjectByName(Name.HUD, 10, 10);
-		addObject(hud, ObjectHandler.MENU_LAYER);
+		GameObject hud = createObjectByName(Name.HUD, 10, 10);
+		addObject(hud, MENU_LAYER);
+		GameObject inventory = new Inventory(4, 5, keyInput, mouseInput);
+		addObject(inventory, MENU_LAYER);
 	}
 	
 	/**
