@@ -13,6 +13,8 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import framework.TextureLoader.TextureName;
+import visual_effects.OneTimeAnimation;
 import window.Animation;
 
 public abstract class Item extends GameObject {
@@ -126,6 +128,12 @@ public abstract class Item extends GameObject {
 		float height = 3 * this.height / 5f;
 		float yOffset = this.height / 5f; 
 		return new Rectangle((int) (x + velX), (int) (y + yOffset), width, (int) height);
+	}
+	
+	protected void playPickupAnimation() {
+		OneTimeAnimation sparkleAnimation = new OneTimeAnimation(x - width / 2, y - width / 2, width * 2, height * 2,
+				TextureName.SparkleEffect, 6, objectHandler);
+		objectHandler.addObject(sparkleAnimation, ObjectHandler.MIDDLE_LAYER);
 	}
 
 }

@@ -8,6 +8,7 @@ import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Player;
 import ui.Inventory;
+import visual_effects.OneTimeAnimation;
 
 public class SmallHealthPotionItem extends Item {
 
@@ -20,6 +21,7 @@ public class SmallHealthPotionItem extends Item {
 
 	@Override
 	public void pickupItem() {
+		playPickupAnimation();
 		Inventory inventory = objectHandler.getInventory();
 		boolean pickupSuccessful = inventory.addItem(this);
 		if (pickupSuccessful)
