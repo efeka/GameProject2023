@@ -5,7 +5,6 @@ import static framework.GameConstants.ScaleConstants.TILE_ROWS;
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -20,12 +19,20 @@ import framework.TextureLoader.TextureName;
 import items.Item;
 import window.KeyInput;
 import window.MouseInput;
+import window.MouseInputObserver;
 
-public class Inventory extends GameObject {
+public class Inventory extends GameObject implements MouseInputObserver {
 
 	private class Slot {
+		Rectangle slotBounds;
 		Item item;
 		int currentStackSize;
+		
+		public Slot() {
+			slotBounds = new Rectangle();
+			item = null;
+			currentStackSize = 0;
+		}
 	}
 	
 	private KeyInput keyInput;
@@ -36,6 +43,7 @@ public class Inventory extends GameObject {
 	private int cellSize = (int) (TILE_SIZE * 1.5f);
 	private int rows, cols;
 	private Slot[][] inventorySlots;
+	private boolean calculatedSlotBounds = false;
 
 	public Inventory(int rows, int cols, KeyInput keyInput, MouseInput mouseInput) {
 		super(0, 0, 0, 0, new ObjectId(Category.Menu, Name.Missing));
@@ -43,7 +51,8 @@ public class Inventory extends GameObject {
 		this.mouseInput = mouseInput;
 		this.rows = rows;
 		this.cols = cols;
-
+		mouseInput.registerObserver(this);
+		
 		inventorySlots = new Slot[rows][cols];
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
@@ -57,7 +66,7 @@ public class Inventory extends GameObject {
 	public void tick() {
 		if (keyInput.isInventoryKeyToggled())
 			return;
-
+		
 		// Calculate the centered inventory window position
 		int screenWidth = TILE_COLUMNS * TILE_SIZE;
 		int screenHeight = TILE_ROWS * TILE_SIZE;
@@ -65,6 +74,15 @@ public class Inventory extends GameObject {
 		int invHeight = (rows + 2) * cellSize;
 		x = (screenWidth - invWidth) / 2;
 		y = (screenHeight - invHeight) / 2;
+		
+		// Calculate the boundaries for each slot
+		if (!calculatedSlotBounds) {
+			calculatedSlotBounds = true;
+			for (int i = 0; i < rows; i++)
+				for (int j = 0; j < cols; j++)
+					inventorySlots[i][j].slotBounds = new Rectangle((int) x + (j + 1) * cellSize,
+							(int) y + (i + 1) * cellSize, cellSize, cellSize);
+		}
 	}
 
 	@Override
@@ -94,12 +112,12 @@ public class Inventory extends GameObject {
 		for (int i = 1; i < inventorySlots.length + 1; i++) {
 			for (int j = 1; j < inventorySlots[0].length + 1; j++) {
 				int slotTextureIndex = -1;
-				Rectangle slotRect = new Rectangle((int) x + j * cellSize, (int) y + i * cellSize, cellSize, cellSize);
+				Rectangle slotBounds = inventorySlots[i - 1][j - 1].slotBounds;
 				BufferedImage itemTexture = null;
 				
 				// TODO check equipped items and change slot texture
 				// slotTextureIndex = checkMouseHover(slotRect) ? 13 : 12;				
-				slotTextureIndex = checkMouseHover(slotRect) ? 11 : 10;
+				slotTextureIndex = checkMouseHover(slotBounds) ? 11 : 10;
 				if (inventorySlots[i - 1][j - 1].item != null)
 					itemTexture = inventorySlots[i - 1][j - 1].item.getItemIcon();
 
@@ -174,6 +192,11 @@ public class Inventory extends GameObject {
 		}
 		
 		return foundValidSlot;
+	}
+
+	@Override
+	public void onMouseClick(int x, int y) {
+		System.out.println("a");
 	}
 
 }
