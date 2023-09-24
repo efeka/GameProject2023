@@ -46,9 +46,9 @@ public class Player extends Creature {
 
 	private boolean lockMovementInputs = false; 
 
-	private final int defaultInvulnerabilityDuration = 700;
-
+	// Object Interaction
 	private boolean canInteract = true;
+	private int interactCooldownMillis = 600;
 	private long lastInteractTimer;
 
 	private PlayerAnimationHandler animationHandler;
@@ -86,7 +86,7 @@ public class Player extends Creature {
 		long now = System.currentTimeMillis();
 		if (invulnerable && (now - lastInvulnerableTimer >= invulnerableDuration))
 			invulnerable = false;
-		if (!canInteract && (now - lastInteractTimer >= 1000))
+		if (!canInteract && (now - lastInteractTimer >= interactCooldownMillis))
 			canInteract = true;
 		
 		// Handle the usage of items in the hot bar
@@ -414,10 +414,6 @@ public class Player extends Creature {
 
 	public boolean isDodging() {
 		return dodging;
-	}
-
-	public int getDefaultInvulnerabilityDuration() {
-		return defaultInvulnerabilityDuration;
 	}
 
 	public void setLockMovementInputs(boolean lockMovementInputs) {

@@ -31,6 +31,8 @@ public abstract class Creature extends GameObject {
 	protected long lastInvulnerableTimer = 0;
 	
 	protected HealthBar healthBar;
+	
+	public final int DEFAULT_INVULNERABILITY_DURATION = 700;
 
 	public Creature(int x, int y, int width, int height, int damage, int maxHealth, int maxStamina, ObjectHandler objectHandler, ObjectId objectId) {
 		super(x, y, width, height, objectId);

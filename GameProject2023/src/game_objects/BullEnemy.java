@@ -20,10 +20,8 @@ import window.Animation;
 public class BullEnemy extends Creature {
 	
 	private ObjectHandler objectHandler;
-	private Player player;
 
 	private float runningSpeed = 3f;
-
 	private boolean stunnedByWall = false;
 	
 	private Animation[] runAnimation;
@@ -32,7 +30,6 @@ public class BullEnemy extends Creature {
 	public BullEnemy(int x, int y, ObjectHandler objectHandler) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 150, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BullEnemy));		
 		this.objectHandler = objectHandler;
-		player = objectHandler.getPlayer();
 
 		velX = -runningSpeed;
 		
@@ -83,7 +80,7 @@ public class BullEnemy extends Creature {
 			Creature target = targetList.get(i);
 			if (getBounds().intersects(target.getBounds())) {
 				target.applyKnockback(direction * runningSpeed / 2, -7f);
-				target.takeDamage(25, player.getDefaultInvulnerabilityDuration());
+				target.takeDamage(25, DEFAULT_INVULNERABILITY_DURATION);
 			}
 		}
 	}
