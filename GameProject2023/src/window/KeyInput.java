@@ -24,6 +24,8 @@ public class KeyInput extends KeyAdapter {
 	private boolean inventoryKeyToggled = true, inventoryToggleFlag = false;
 	// Interaction keys
 	private boolean interactKeyPressed = false;
+	private boolean hotkey1Pressed = false;
+	private boolean hotkey2Pressed = false;
 	// Debug
 	private boolean ctrlPressed = false;
 	public boolean debugPressed = false;
@@ -68,6 +70,12 @@ public class KeyInput extends KeyAdapter {
 				inventoryKeyToggled = false;
 			else if (!inventoryKeyToggled && inventoryToggleFlag)
 				inventoryKeyToggled = true;
+			break;
+		case KeyEvent.VK_1:
+			hotkey1Pressed = true;
+			break;
+		case KeyEvent.VK_2:
+			hotkey2Pressed = true;
 			break;
 			// Debug
 		case KeyEvent.VK_ESCAPE:
@@ -121,6 +129,12 @@ public class KeyInput extends KeyAdapter {
 			break;
 		case KeyEvent.VK_I:
 			inventoryToggleFlag = !inventoryToggleFlag;
+			break;
+		case KeyEvent.VK_1:
+			hotkey1Pressed = false;
+			break;
+		case KeyEvent.VK_2:
+			hotkey2Pressed = false;
 			break;
 			// Debug
 		case KeyEvent.VK_CONTROL:
@@ -183,6 +197,14 @@ public class KeyInput extends KeyAdapter {
 
 	public boolean isInventoryKeyToggled() {
 		return inventoryKeyToggled;
+	}
+	
+	public boolean isHotkey1Pressed() {
+		return hotkey1Pressed;
+	}
+	
+	public boolean isHotkey2Pressed() {
+		return hotkey2Pressed;
 	}
 
 }

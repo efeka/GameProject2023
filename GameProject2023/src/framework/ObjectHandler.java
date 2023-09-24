@@ -25,6 +25,7 @@ import game_objects.WoodJumpThroughTileBlock;
 import items.Coin;
 import items.FisticuffsItem;
 import items.HammerItem;
+import items.HealthPotionItem;
 import items.SwordItem;
 import ui.HUD;
 import ui.Inventory;
@@ -34,6 +35,7 @@ import window.MouseInput;
 public class ObjectHandler {
 
 	private Player player = null;
+	private Inventory inventory = null;
 	
 	public static final int BOTTOM_LAYER = 0;
 	public static final int MIDDLE_LAYER = 1;
@@ -97,7 +99,7 @@ public class ObjectHandler {
 		
 		GameObject hud = createObjectByName(Name.HUD, 10, 10);
 		addObject(hud, MENU_LAYER);
-		GameObject inventory = new Inventory(4, 5, keyInput, mouseInput);
+		inventory = new Inventory(4, 5, keyInput, mouseInput);
 		addObject(inventory, MENU_LAYER);
 	}
 	
@@ -430,6 +432,9 @@ public class ObjectHandler {
 		case GrassBackgroundTileBlock_OuterTopRight:
 			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
 			break;
+		case HealthPotionItem:
+			gameObject = new HealthPotionItem(x, y, this);
+			break;
 		}
 		
 		if (gameObject == null)
@@ -444,6 +449,10 @@ public class ObjectHandler {
 	
 	public void setPlayer(Player player) {
 		this.player = player;
+	}
+	
+	public Inventory getInventory() {
+		return inventory;
 	}
 	
 }

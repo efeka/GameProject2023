@@ -2,6 +2,8 @@ package items;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
+import java.awt.image.BufferedImage;
+
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
@@ -45,6 +47,19 @@ public class Coin extends Item {
 				TextureName.SparkleEffect, 8, objectHandler);
 		objectHandler.addObject(sparkleAnimation, ObjectHandler.MIDDLE_LAYER);
 		objectHandler.removeObject(this);
+	}
+
+	@Override
+	public BufferedImage getItemIcon() {
+		return texture;
+	}
+
+	@Override
+	public void useItem() {}
+
+	@Override
+	public int getStackSize() {
+		return 0;
 	}
 
 }

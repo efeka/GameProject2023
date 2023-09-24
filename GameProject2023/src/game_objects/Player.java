@@ -37,15 +37,17 @@ public class Player extends Creature {
 	private float dodgingSpeed = 5f;
 
 	private Weapon weapon;
-	
+
 	private int availableJumps = 2;
 	private boolean doubleJumping = false;
 	private boolean dodging = false;
-	
+	private int dodgeCooldownMillis = 1000;
+	private long lastDodgeTimer = 0;
+
 	private boolean lockMovementInputs = false; 
 
 	private final int defaultInvulnerabilityDuration = 700;
-	
+
 	private boolean canInteract = true;
 	private long lastInteractTimer;
 
@@ -57,7 +59,7 @@ public class Player extends Creature {
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 		objectHandler.setPlayer(this);
-		
+
 		weapon = new SwordWeapon(objectHandler, keyInput, mouseInput);
 
 		invulnerableDuration = 700;
@@ -86,6 +88,15 @@ public class Player extends Creature {
 			invulnerable = false;
 		if (!canInteract && (now - lastInteractTimer >= 1000))
 			canInteract = true;
+		
+		// Handle the usage of items in the hot bar
+		// TODO
+		if (keyInput.isHotkey1Pressed()) {
+			
+		}
+		if (keyInput.isHotkey2Pressed()) {
+			
+		}
 
 		if (!lockMovementInputs)
 			handleMovement();
@@ -161,10 +172,11 @@ public class Player extends Creature {
 		}
 
 		// Dodging
-		if (!dodging && keyInput.isDodgeKeyPressed()) {
+		if (!dodging && keyInput.isDodgeKeyPressed() && (System.currentTimeMillis() - lastDodgeTimer) >= dodgeCooldownMillis) {
 			if (!falling) {
 				dodging = true;
 				velX = dodgingSpeed * direction;
+				lastDodgeTimer = System.currentTimeMillis();
 			}
 		}
 		// Reset the dodge if the animation is over
@@ -215,16 +227,16 @@ public class Player extends Creature {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}
-		
+
 		setHealth(health - damageAmount);
 		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler), ObjectHandler.MENU_LAYER);
-	
+
 		/* TODO
 		if (health <= 0)
 			die();
-		*/
+		 */
 	}
-	
+
 	// TODO
 	@Override
 	public void die() {}
@@ -255,19 +267,22 @@ public class Player extends Creature {
 				checkBlockCollision(other);
 			if (other.getObjectId().getCategory() == Category.DiagonalBlock)
 				checkDiagonalBlockCollision(other);
-				
-			// Check Weapon Item Pickup
-			if (canInteract && keyInput.isInteractKeyPressed() && other.getObjectId().getCategory() == Category.WeaponItem) {
+
+			// Check Item Pickup
+			if (canInteract && keyInput.isInteractKeyPressed()) {
 				if (getBounds().intersects(other.getBounds())) {
-					((WeaponItem) other).pickupItem();
+					if (other.getObjectId().getCategory() == Category.WeaponItem)
+						((WeaponItem) other).pickupItem();
+					else if (other.getObjectId().getCategory() == Category.Item)
+						((Item) other).pickupItem();
 
 					canInteract = false;
 					lastInteractTimer = System.currentTimeMillis();
 				}
 			}
-			
-			// Check other items
-			if (other.getObjectId().getCategory() == Category.Item)
+
+			// Coins get automatically picked up even if interact key is not being pressed
+			if (other.getObjectId().getName() == Name.Coin)
 				if (getBounds().intersects(other.getBounds()))
 					((Item) other).pickupItem();
 		}
@@ -396,11 +411,11 @@ public class Player extends Creature {
 	public void setWeapon(Weapon weapon) {
 		this.weapon = weapon;
 	}
-	
+
 	public boolean isDodging() {
 		return dodging;
 	}
-	
+
 	public int getDefaultInvulnerabilityDuration() {
 		return defaultInvulnerabilityDuration;
 	}
@@ -408,5 +423,5 @@ public class Player extends Creature {
 	public void setLockMovementInputs(boolean lockMovementInputs) {
 		this.lockMovementInputs = lockMovementInputs;
 	}
-	
+
 }

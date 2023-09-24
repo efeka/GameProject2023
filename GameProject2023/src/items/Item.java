@@ -2,6 +2,7 @@ package items;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import abstract_templates.GameObject;
@@ -17,6 +18,10 @@ public abstract class Item extends GameObject {
 	protected Animation animation = null;
 	protected ObjectHandler objectHandler;
 	
+	// The image related to this item to be display in the inventory.
+	protected BufferedImage itemIcon;
+	private int stackSize = 1;
+	
 	private boolean jumping = true;
 	protected float velX;
 	protected float velY = -3f;
@@ -27,6 +32,9 @@ public abstract class Item extends GameObject {
 	}
 
 	public abstract void pickupItem();
+	public abstract void useItem();
+	public abstract int getStackSize();
+	public abstract BufferedImage getItemIcon();
 	
 	@Override
 	public void tick() {
@@ -50,6 +58,8 @@ public abstract class Item extends GameObject {
 	public void render(Graphics g) {
 		if (animation != null)
 			animation.drawAnimation(g, (int) x, (int) y, width, height);
+		else
+			g.drawImage(texture, (int) x, (int) y, width, height, null);
 	}
 	
 	private void checkCollision() {

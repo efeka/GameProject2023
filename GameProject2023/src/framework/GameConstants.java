@@ -50,6 +50,7 @@ public interface GameConstants {
 	
 	public static class FontConstants {
 		public static final Font DAMAGE_FONT = new Font("Calibri", Font.PLAIN, 20);
+		public static final Font INVENTORY_FONT = new Font("Calibri", Font.BOLD, 20);
 	}
 	
 }
