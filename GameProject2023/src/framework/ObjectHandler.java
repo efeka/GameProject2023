@@ -22,10 +22,11 @@ import game_objects.Player;
 import game_objects.RockTileBlock;
 import game_objects.StoneTileBlock;
 import game_objects.WoodJumpThroughTileBlock;
+import items.BigHealthPotionItem;
 import items.Coin;
 import items.FisticuffsItem;
 import items.HammerItem;
-import items.HealthPotionItem;
+import items.SmallHealthPotionItem;
 import items.SwordItem;
 import ui.HUD;
 import ui.Inventory;
@@ -432,8 +433,11 @@ public class ObjectHandler {
 		case GrassBackgroundTileBlock_OuterTopRight:
 			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
 			break;
-		case HealthPotionItem:
-			gameObject = new HealthPotionItem(x, y, this);
+		case SmallHealthPotionItem:
+			gameObject = new SmallHealthPotionItem(x, y, this);
+			break;
+		case BigHealthPotionItem:
+			gameObject = new BigHealthPotionItem(x, y, this);
 			break;
 		}
 		

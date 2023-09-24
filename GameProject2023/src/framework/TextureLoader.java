@@ -89,7 +89,8 @@ public class TextureLoader {
 		HealthBar,
 		Cursor,
 		Inventory,
-		ItemIcons,
+		SmallHealthPotionIcon,
+		BigHealthPotionIcon,
 	}
 
 	private BufferedImage playerSheet = null;
@@ -471,10 +472,11 @@ public class TextureLoader {
 			textures[12] = uiSheet.getSubimage(52, 18, 16, 16);
 			textures[13] = uiSheet.getSubimage(69, 18, 16, 16);
 			break;
-		case ItemIcons:
-			textures = new BufferedImage[10];
-			for (int i = 0; i < textures.length; i++)
-				textures[i] = uiSheet.getSubimage(86 + i * 17, 1, 16, 16);
+		case SmallHealthPotionIcon:
+			textures = new BufferedImage[] {uiSheet.getSubimage(239, 1, 16, 16)};
+			break;
+		case BigHealthPotionIcon:
+			textures = new BufferedImage[] {uiSheet.getSubimage(256, 1, 16, 16)};
 			break;
 		}
 

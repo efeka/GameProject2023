@@ -1,7 +1,5 @@
 package items;
 
-import static framework.GameConstants.ScaleConstants.TILE_SIZE;
-
 import java.awt.image.BufferedImage;
 
 import framework.ObjectHandler;
@@ -11,13 +9,13 @@ import framework.TextureLoader.TextureName;
 import game_objects.Player;
 import ui.Inventory;
 
-public class HealthPotionItem extends Item {
+public class BigHealthPotionItem extends Item {
 
-	private int healAmount = 30;
+	private int healAmount = 50;
 	
-	public HealthPotionItem(float x, float y, ObjectHandler objectHandler) {
-		super(x, y, TILE_SIZE, TILE_SIZE, objectHandler, Name.HealthPotionItem);
-		texture = TextureLoader.getInstance().getTextures(TextureName.ItemIcons)[9];
+	public BigHealthPotionItem(float x, float y, ObjectHandler objectHandler) {
+		super(x, y, objectHandler, Name.BigHealthPotionItem);
+		texture = TextureLoader.getInstance().getTextures(TextureName.BigHealthPotionIcon)[0];
 	}
 
 	@Override
@@ -30,7 +28,7 @@ public class HealthPotionItem extends Item {
 
 	@Override
 	public BufferedImage getItemIcon() {
-		return TextureLoader.getInstance().getTextures(TextureName.ItemIcons)[9];
+		return TextureLoader.getInstance().getTextures(TextureName.BigHealthPotionIcon)[0];
 	}
 
 	@Override
@@ -40,7 +38,7 @@ public class HealthPotionItem extends Item {
 	}
 
 	@Override
-	public int getStackSize() {
+	public int getMaxStackSize() {
 		return 4;
 	}
 

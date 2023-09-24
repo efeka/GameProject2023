@@ -21,14 +21,20 @@ public class MouseInput implements MouseListener, MouseMotionListener {
         observers.remove(observer);
     }
     
-    private void notifyClickObservers() {
-        for (MouseInputObserver observer : observers) {
-            observer.onMouseClick(x, y);
-        }
+    private void notifyClickObservers(MouseEvent e) {
+        for (MouseInputObserver observer : observers)
+            observer.onMouseClick(e);
+    }
+    
+    private void notifyPressObservers(MouseEvent e) {
+        for (MouseInputObserver observer : observers)
+            observer.onMousePress(e);
     }
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		notifyPressObservers(e);
+		
 		if (e.getButton() == MouseEvent.BUTTON1)
 			attackButtonPressed = true;
 	}
@@ -47,7 +53,7 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		notifyClickObservers();
+		notifyClickObservers(e);
 	}
 	
 	@Override

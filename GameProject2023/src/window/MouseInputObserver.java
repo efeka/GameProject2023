@@ -1,5 +1,8 @@
 package window;
 
+import java.awt.event.MouseEvent;
+
 public interface MouseInputObserver {
-	void onMouseClick(int x, int y);
+	void onMouseClick(MouseEvent e);
+	void onMousePress(MouseEvent e);
 }

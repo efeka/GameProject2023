@@ -58,7 +58,7 @@ public class Coin extends Item {
 	public void useItem() {}
 
 	@Override
-	public int getStackSize() {
+	public int getMaxStackSize() {
 		return 0;
 	}
 

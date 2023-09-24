@@ -118,7 +118,8 @@ public class ObjectId {
 		FisticuffsItem(3000),
 		SwordItem(3001),
 		HammerItem(3002),
-		HealthPotionItem(3003),
+		SmallHealthPotionItem(3003),
+		BigHealthPotionItem(3004),
 		;
 		
 		private int uid;

@@ -54,6 +54,15 @@ public abstract class GameObject {
 		return texture;
 	}
 	
+	/**
+	 * Compares this object's Name with the given object.
+	 * @param gameObject the GameObject to compare Names with.
+	 * @return true if the Names match, false otherwise.
+	 */
+	public boolean compareObjectName(GameObject gameObject) {
+		return objectId.getName() == gameObject.objectId.getName();
+	}
+	
 	// Getters & Setters
 	public float getX() {
 		return x;

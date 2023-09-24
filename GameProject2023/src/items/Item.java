@@ -1,5 +1,7 @@
 package items;
 
+import static framework.GameConstants.ScaleConstants.TILE_SIZE;
+
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -17,23 +19,40 @@ public abstract class Item extends GameObject {
 
 	protected Animation animation = null;
 	protected ObjectHandler objectHandler;
-	
-	// The image related to this item to be display in the inventory.
-	protected BufferedImage itemIcon;
-	private int stackSize = 1;
-	
+
 	private boolean jumping = true;
 	protected float velX;
 	protected float velY = -3f;
 
+	public Item(float x, float y, ObjectHandler objectHandler, Name objectName) {
+		super(x, y, 4 * TILE_SIZE / 5, 4 * TILE_SIZE / 5, new ObjectId(Category.Item, objectName));
+		this.objectHandler = objectHandler;
+	}
+	
 	public Item(float x, float y, int width, int height, ObjectHandler objectHandler, Name objectName) {
 		super(x, y, width, height, new ObjectId(Category.Item, objectName));
 		this.objectHandler = objectHandler;
 	}
 
+	/**
+	 * Handles the behaviour of this object when the player picks it up.
+	 */
 	public abstract void pickupItem();
+	
+	/**
+	 * Handles the behaviour of this object when the player uses it.
+	 */
 	public abstract void useItem();
-	public abstract int getStackSize();
+	
+	/**
+	 * @return The maximum number of items of this type that can fit inside one inventory slot.
+	 */
+	public abstract int getMaxStackSize();
+	
+	/**
+	 * The image that represents this item in the inventory.
+	 * @return the buffered image
+	 */
 	public abstract BufferedImage getItemIcon();
 	
 	@Override
