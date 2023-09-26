@@ -89,6 +89,7 @@ public class TextureLoader {
 		HealthBar,
 		Cursor,
 		Inventory,
+		SwordWeaponIcon,
 		SmallHealthPotionIcon,
 		BigHealthPotionIcon,
 	}
@@ -459,24 +460,30 @@ public class TextureLoader {
 			break;
 		case Cursor:
 			textures = new BufferedImage[1];
-			textures[0] = uiSheet.getSubimage(1, 85, 16, 16);
+			textures[0] = uiSheet.getSubimage(86, 1, 16, 16);
 			break;
 		case Inventory:
-			textures = new BufferedImage[14];
+			textures = new BufferedImage[18];
 			for (int i = 0; i < 3; i++)
 				for (int j = 0; j < 3; j++)
-					textures[3 * i + j] = uiSheet.getSubimage(1 + 17 * j, 1 + 17 * i, 16, 16);
+					textures[3 * i + j] = uiSheet.getSubimage(1 + j * 17, 1 + i * 17, 16, 16);
 			textures[9] = uiSheet.getSubimage(1, 52, 64, 32);
 			textures[10] = uiSheet.getSubimage(52, 1, 16, 16);
 			textures[11] = uiSheet.getSubimage(69, 1, 16, 16);
 			textures[12] = uiSheet.getSubimage(52, 18, 16, 16);
 			textures[13] = uiSheet.getSubimage(69, 18, 16, 16);
+			for (int i = 0; i < 3; i++)
+				textures[i + 14] = uiSheet.getSubimage(52 + i * 17, 35, 16, 16);
+			textures[17] = uiSheet.getSubimage(66, 52, 48, 32);
+			break;
+		case SwordWeaponIcon:
+			textures = new BufferedImage[] {uiSheet.getSubimage(103, 1, 16, 16)};
 			break;
 		case SmallHealthPotionIcon:
-			textures = new BufferedImage[] {uiSheet.getSubimage(239, 1, 16, 16)};
+			textures = new BufferedImage[] {uiSheet.getSubimage(256, 1, 16, 16)};
 			break;
 		case BigHealthPotionIcon:
-			textures = new BufferedImage[] {uiSheet.getSubimage(256, 1, 16, 16)};
+			textures = new BufferedImage[] {uiSheet.getSubimage(273, 1, 16, 16)};
 			break;
 		}
 

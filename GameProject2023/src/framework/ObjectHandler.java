@@ -24,10 +24,8 @@ import game_objects.StoneTileBlock;
 import game_objects.WoodJumpThroughTileBlock;
 import items.BigHealthPotionItem;
 import items.Coin;
-import items.FisticuffsItem;
-import items.HammerItem;
 import items.SmallHealthPotionItem;
-import items.SwordItem;
+import items.SwordWeaponItem;
 import ui.HUD;
 import ui.Inventory;
 import window.KeyInput;
@@ -100,7 +98,7 @@ public class ObjectHandler {
 		
 		GameObject hud = createObjectByName(Name.HUD, 10, 10);
 		addObject(hud, MENU_LAYER);
-		inventory = new Inventory(4, 5, keyInput, mouseInput);
+		inventory = new Inventory(4, 5, this, keyInput, mouseInput);
 		addObject(inventory, MENU_LAYER);
 	}
 	
@@ -383,15 +381,6 @@ public class ObjectHandler {
 		case Coin:
 			gameObject = new Coin(x, y, this);
 			break;
-		case FisticuffsItem:
-			gameObject = new FisticuffsItem(x, y, keyInput, mouseInput, this);
-			break;
-		case SwordItem:
-			gameObject = new SwordItem(x, y, keyInput, mouseInput, this); 
-			break;
-		case HammerItem:
-			gameObject = new HammerItem(x, y, keyInput, mouseInput, this);
-			break;
 		case Missing:
 			break;
 		case GrassBackgroundTileBlock_Center:
@@ -432,6 +421,9 @@ public class ObjectHandler {
 			break;
 		case GrassBackgroundTileBlock_OuterTopRight:
 			gameObject = new GrassBackgroundTileBlock(x, y, objectName, TileOrientation.OuterTopRight);
+			break;
+		case SwordWeaponItem:
+			gameObject = new SwordWeaponItem(x, y, this, keyInput, mouseInput);
 			break;
 		case SmallHealthPotionItem:
 			gameObject = new SmallHealthPotionItem(x, y, this);

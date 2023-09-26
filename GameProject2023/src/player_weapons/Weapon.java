@@ -1,14 +1,17 @@
 package player_weapons;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.HashSet;
 
+import abstract_templates.Creature;
 import abstract_templates.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.Player;
-import items.WeaponItem;
 import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
@@ -51,6 +54,27 @@ public abstract class Weapon extends GameObject {
 	 */
 	protected abstract void setupAnimations();
 	
+	protected void checkEnemyCollision(Rectangle attackBounds, HashSet<GameObject> enemiesHit, int damage, float knockbackVelX,
+			float knockbackVelY, int enemyInvulnerabilityDuration) {
+		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		for (int i = midLayer.size() - 1; i >= 0; i--) {
+			GameObject other = midLayer.get(i);
+
+			if (enemiesHit != null && enemiesHit.contains(other))
+				continue;
+
+			if (attackBounds.intersects(other.getBounds()) && other.getObjectId().getCategory() == Category.Enemy) {
+				Creature otherCreature = (Creature) other;
+				if (knockbackVelX != 0 || knockbackVelY != 0)
+					otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
+				otherCreature.takeDamage(damage, enemyInvulnerabilityDuration);
+
+				if (enemiesHit != null)
+					enemiesHit.add(other);
+			}
+		}
+	}
+	
 	public Animation[] getIdleAnimation() {
 		return idleAnimation;
 	}
@@ -58,7 +82,5 @@ public abstract class Weapon extends GameObject {
 	public Animation[] getRunAnimation() {
 		return runAnimation;
 	}
-	
-	public abstract WeaponItem createItemFromWeapon(float x, float y);
-	
+
 }

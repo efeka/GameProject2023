@@ -7,8 +7,6 @@ import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Player;
-import ui.Inventory;
-import visual_effects.OneTimeAnimation;
 
 public class SmallHealthPotionItem extends Item {
 
@@ -17,15 +15,6 @@ public class SmallHealthPotionItem extends Item {
 	public SmallHealthPotionItem(float x, float y, ObjectHandler objectHandler) {
 		super(x, y, objectHandler, Name.SmallHealthPotionItem);
 		texture = TextureLoader.getInstance().getTextures(TextureName.SmallHealthPotionIcon)[0];
-	}
-
-	@Override
-	public void pickupItem() {
-		playPickupAnimation();
-		Inventory inventory = objectHandler.getInventory();
-		boolean pickupSuccessful = inventory.addItem(this);
-		if (pickupSuccessful)
-			objectHandler.removeObject(this);
 	}
 
 	@Override
@@ -42,6 +31,11 @@ public class SmallHealthPotionItem extends Item {
 	@Override
 	public int getMaxStackSize() {
 		return 4;
+	}
+
+	@Override
+	public boolean isEquippable() {
+		return true;
 	}
 
 }

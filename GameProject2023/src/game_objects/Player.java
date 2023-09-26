@@ -21,8 +21,7 @@ import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import items.Item;
-import items.WeaponItem;
-import player_weapons.SwordWeapon;
+import player_weapons.FistWeapon;
 import player_weapons.Weapon;
 import window.KeyInput;
 import window.MouseInput;
@@ -53,6 +52,8 @@ public class Player extends Creature {
 
 	private PlayerAnimationHandler animationHandler;
 	private BufferedImage[] jumpSprites;
+	
+	private Item[] equippedItems;
 
 	public Player(int x, int y, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
@@ -60,7 +61,8 @@ public class Player extends Creature {
 		this.keyInput = keyInput;
 		objectHandler.setPlayer(this);
 
-		weapon = new SwordWeapon(objectHandler, keyInput, mouseInput);
+		equippedItems = new Item[2];
+		weapon = new FistWeapon(objectHandler, keyInput, mouseInput);
 
 		invulnerableDuration = 700;
 
@@ -90,12 +92,13 @@ public class Player extends Creature {
 			canInteract = true;
 		
 		// Handle the usage of items in the hot bar
-		// TODO
 		if (keyInput.isHotkey1Pressed()) {
-			
+			if (equippedItems[0] != null)
+				equippedItems[0].useItem();
 		}
-		if (keyInput.isHotkey2Pressed()) {
-			
+		else if (keyInput.isHotkey2Pressed()) {
+			if (equippedItems[1] != null)
+				equippedItems[1].useItem();
 		}
 
 		if (!lockMovementInputs)
@@ -271,9 +274,8 @@ public class Player extends Creature {
 			// Check Item Pickup
 			if (canInteract && keyInput.isInteractKeyPressed()) {
 				if (getBounds().intersects(other.getBounds())) {
-					if (other.getObjectId().getCategory() == Category.WeaponItem)
-						((WeaponItem) other).pickupItem();
-					else if (other.getObjectId().getCategory() == Category.Item)
+					Category otherCategory = other.getObjectId().getCategory();
+					if (otherCategory == Category.Item || otherCategory == Category.WeaponItem)
 						((Item) other).pickupItem();
 
 					canInteract = false;
@@ -294,7 +296,12 @@ public class Player extends Creature {
 		// Check if the player is grounded or not
 		if (getGroundCheckBounds().intersects(otherBounds))
 			falling = false;
-
+		// Reset knock back status after hitting the ground
+		if (!falling && knockedBack) {
+			knockedBack = false;
+			velX = 0;
+		}
+		
 		// Bottom collision
 		if (getBottomBounds().intersects(otherBounds)) {
 			y = other.getY() - height;
@@ -303,12 +310,6 @@ public class Player extends Creature {
 			// Reset available jump count after hitting the ground
 			availableJumps = 2;
 			doubleJumping = false;
-
-			// Reset knock back status after hitting the ground
-			if (knockedBack) {
-				knockedBack = false;
-				velX = 0;
-			}
 		}
 
 		// Horizontal collision

@@ -62,4 +62,9 @@ public class Coin extends Item {
 		return 0;
 	}
 
+	@Override
+	public boolean isEquippable() {
+		return false;
+	}
+
 }

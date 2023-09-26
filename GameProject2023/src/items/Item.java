@@ -14,6 +14,7 @@ import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader.TextureName;
+import ui.Inventory;
 import visual_effects.OneTimeAnimation;
 import window.Animation;
 
@@ -31,15 +32,31 @@ public abstract class Item extends GameObject {
 		this.objectHandler = objectHandler;
 	}
 	
+	public Item(float x, float y, ObjectHandler objectHandler, ObjectId objectId) {
+		super(x, y, 4 * TILE_SIZE / 5, 4 * TILE_SIZE / 5, objectId);
+		this.objectHandler = objectHandler;
+	}
+	
 	public Item(float x, float y, int width, int height, ObjectHandler objectHandler, Name objectName) {
 		super(x, y, width, height, new ObjectId(Category.Item, objectName));
+		this.objectHandler = objectHandler;
+	}
+	
+	public Item(float x, float y, int width, int height, ObjectHandler objectHandler, ObjectId objectId) {
+		super(x, y, width, height, objectId);
 		this.objectHandler = objectHandler;
 	}
 
 	/**
 	 * Handles the behaviour of this object when the player picks it up.
 	 */
-	public abstract void pickupItem();
+	public void pickupItem() {
+		playPickupAnimation();
+		Inventory inventory = objectHandler.getInventory();
+		boolean pickupSuccessful = inventory.addItem(this);
+		if (pickupSuccessful)
+			objectHandler.removeObject(this);
+	}
 	
 	/**
 	 * Handles the behaviour of this object when the player uses it.
@@ -56,6 +73,11 @@ public abstract class Item extends GameObject {
 	 * @return the buffered image
 	 */
 	public abstract BufferedImage getItemIcon();
+	
+	/**
+	 * @return True if this item is equippable, false otherwise.
+	 */
+	public abstract boolean isEquippable();
 	
 	@Override
 	public void tick() {
