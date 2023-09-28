@@ -98,7 +98,7 @@ public class ObjectHandler {
 		
 		GameObject hud = createObjectByName(Name.HUD, 10, 10);
 		addObject(hud, MENU_LAYER);
-		inventory = new Inventory(4, 5, this, keyInput, mouseInput);
+		inventory = new Inventory(3, 3, this, keyInput, mouseInput);
 		addObject(inventory, MENU_LAYER);
 	}
 	
@@ -215,7 +215,7 @@ public class ObjectHandler {
 		
 		switch (objectName) {
 		case Player:
-			player = new Player(x, y, this, keyInput, mouseInput);
+			player = new Player(x, y, inventory, this, keyInput, mouseInput);
 			gameObject = player;
 			summonsList.add(player);
 			break;

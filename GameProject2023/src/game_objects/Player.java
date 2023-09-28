@@ -23,6 +23,7 @@ import framework.TextureLoader.TextureName;
 import items.Item;
 import player_weapons.FistWeapon;
 import player_weapons.Weapon;
+import ui.Inventory;
 import window.KeyInput;
 import window.MouseInput;
 
@@ -35,6 +36,7 @@ public class Player extends Creature {
 	private float jumpingSpeed = 8.5f;
 	private float dodgingSpeed = 5f;
 
+	private Inventory inventory;
 	private Weapon weapon;
 
 	private int availableJumps = 2;
@@ -52,16 +54,14 @@ public class Player extends Creature {
 
 	private PlayerAnimationHandler animationHandler;
 	private BufferedImage[] jumpSprites;
-	
-	private Item[] equippedItems;
 
-	public Player(int x, int y, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
+	public Player(int x, int y, Inventory inventory, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
+		this.inventory = inventory;
 		objectHandler.setPlayer(this);
 
-		equippedItems = new Item[2];
 		weapon = new FistWeapon(objectHandler, keyInput, mouseInput);
 
 		invulnerableDuration = 700;
@@ -92,15 +92,15 @@ public class Player extends Creature {
 			canInteract = true;
 		
 		// Handle the usage of items in the hot bar
-		if (keyInput.isHotkey1Pressed()) {
-			if (equippedItems[0] != null)
-				equippedItems[0].useItem();
+		if (inventory == null)
+			inventory = objectHandler.getInventory();
+		else {
+			if (keyInput.isHotkey1Pressed())
+				inventory.useItem(0);
+			else if (keyInput.isHotkey2Pressed())
+				inventory.useItem(1);
 		}
-		else if (keyInput.isHotkey2Pressed()) {
-			if (equippedItems[1] != null)
-				equippedItems[1].useItem();
-		}
-
+		
 		if (!lockMovementInputs)
 			handleMovement();
 		weapon.tick();

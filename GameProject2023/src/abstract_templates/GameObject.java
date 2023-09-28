@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import framework.ObjectId;
+import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 
@@ -61,6 +62,15 @@ public abstract class GameObject {
 	 */
 	public boolean compareObjectName(GameObject gameObject) {
 		return objectId.getName() == gameObject.objectId.getName();
+	}
+	
+	/**
+	 * Compares this object's Category with the given Category.
+	 * @param category the Category to be compared
+	 * @return true if the Categories match, false otherwise.
+	 */
+	public boolean compareCategory(Category category) {
+		return objectId.getCategory() == category;
 	}
 	
 	// Getters & Setters

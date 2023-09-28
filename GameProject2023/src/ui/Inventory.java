@@ -35,6 +35,53 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		boolean equipped = false;
 	}
 
+	private class Hotbar {
+		Slot weaponSlot;
+		Slot[] itemSlots;
+
+		public Hotbar() {
+			weaponSlot = new Slot();
+			itemSlots = new Slot[] {
+					new Slot(),
+					new Slot(),
+			};
+		}
+
+		public boolean equipItem(Item item) {
+			boolean equipSuccessful = false;
+			if (item.compareCategory(Category.WeaponItem)) {
+				weaponSlot.item = item;
+				equipSuccessful = true;
+			}
+			else {
+				for (int i = 0; i < itemSlots.length; i++) {
+					if (itemSlots[i].item == null) {
+						itemSlots[i].item = item;
+						equipSuccessful = true;
+						break;
+					}
+				}
+			}
+			return equipSuccessful;
+		}
+		
+		public void unequipItem(Item item) {
+			if (item.compareCategory(Category.WeaponItem)) {
+				weaponSlot.item = null;
+				weaponSlot.equipped = false;
+			}
+			else {
+				for (int i = 0; i < itemSlots.length; i++) {
+					if (itemSlots[i].item != null && itemSlots[i].item.equals(item)) {
+						itemSlots[i].item = null;
+						break;
+					}
+				}
+			}
+		}
+	}
+	private Hotbar hotbar;
+
 	private ObjectHandler objectHandler;
 	private KeyInput keyInput;
 	private MouseInput mouseInput;
@@ -44,7 +91,6 @@ public class Inventory extends GameObject implements MouseInputObserver {
 	private int cellSize = (int) (TILE_SIZE * 1.5f);
 	private int rows, cols;
 	private Slot[][] inventorySlots;
-	private Slot[] hotbarSlots;
 	private boolean calculatedSlotBounds = false;
 
 	private Slot carriedSlot = null;
@@ -57,11 +103,8 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		this.rows = rows;
 		this.cols = cols;
 		mouseInput.registerObserver(this);
+		hotbar = new Hotbar();
 
-		hotbarSlots = new Slot[3];
-		for (int i = 0; i < hotbarSlots.length; i++)
-			hotbarSlots[i] = new Slot();
-		
 		inventorySlots = new Slot[rows][cols];
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
@@ -171,18 +214,28 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		g.drawImage(textures[3], (int) x + hotbarOffsetX, (int) y + hotbarOffsetY + cellSize, cellSize, cellSize, null);
 		g.drawImage(textures[5], (int) x + hotbarOffsetX + 4 * cellSize, (int) y + hotbarOffsetY + cellSize, cellSize, cellSize, null);
 		// Hotbar slots
-		g.drawImage(textures[14], (int) x + hotbarOffsetX + cellSize, (int) y + hotbarOffsetY + cellSize, cellSize, cellSize, null);
-		g.drawImage(textures[15], (int) x + hotbarOffsetX + 2 * cellSize, (int) y + hotbarOffsetY + cellSize, cellSize, cellSize, null);
-		g.drawImage(textures[16], (int) x + hotbarOffsetX + 3 * cellSize, (int) y + hotbarOffsetY + cellSize, cellSize, cellSize, null);
-		for (int i = 0; i < hotbarSlots.length; i++) {
-			Item hotbarItem = hotbarSlots[i].item;
+		BufferedImage slotTexture = hotbar.weaponSlot.item == null ? textures[14] : textures[11];
+		g.drawImage(slotTexture, (int) x + hotbarOffsetX + cellSize, (int) y + hotbarOffsetY + cellSize, cellSize, cellSize, null);
+		slotTexture = hotbar.itemSlots[0].item == null ? textures[15] : textures[11];
+		g.drawImage(slotTexture, (int) x + hotbarOffsetX + 2 * cellSize, (int) y + hotbarOffsetY + cellSize, cellSize, cellSize, null);
+		slotTexture = hotbar.itemSlots[1].item == null ? textures[16] : textures[11];
+		g.drawImage(slotTexture, (int) x + hotbarOffsetX + 3 * cellSize, (int) y + hotbarOffsetY + cellSize, cellSize, cellSize, null);
+		
+		// Item icons in hotbar slots
+		int iconX = (int) x + hotbarOffsetX + iconOffset + cellSize;
+		int iconY = (int) y + hotbarOffsetY + iconOffset+ cellSize;
+		BufferedImage itemIcon = hotbar.weaponSlot.item == null ? null : hotbar.weaponSlot.item.getItemIcon();
+		g.drawImage(itemIcon, iconX, iconY, iconSize, iconSize, null);
+		
+		for (int i = 0; i < hotbar.itemSlots.length; i++) {
+			Item hotbarItem = hotbar.itemSlots[i].item;
 			if (hotbarItem != null) {
-				int iconX = (int) x + hotbarOffsetX + iconOffset + cellSize + i * cellSize;
-				int iconY = (int) y + hotbarOffsetY + iconOffset+ cellSize;
+				iconX = (int) x + hotbarOffsetX + iconOffset + cellSize + (i + 1) * cellSize;
+				iconY = (int) y + hotbarOffsetY + iconOffset+ cellSize;
 				g.drawImage(hotbarItem.getItemIcon(), iconX, iconY, iconSize, iconSize, null);
 			}
 		}
-		
+
 		// Draw the item that is being carried by the mouse
 		if (carriedSlot != null && carriedSlot.item != null) {
 			BufferedImage itemImage = carriedSlot.item.getItemIcon();
@@ -267,7 +320,7 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		else if (e.getButton() == MouseEvent.BUTTON1)
 			handleItemCarrying(clickedSlot);
 		else if (e.getButton() == MouseEvent.BUTTON3)
-			handleItemEquipping(clickedSlot);
+			handleEquippingAction(clickedSlot);
 	}
 
 	private void handleItemCarrying(Slot clickedSlot) {
@@ -315,7 +368,7 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		tempSlot1.item = slot1.item;
 		tempSlot1.currentStackSize = slot1.currentStackSize;
 		tempSlot1.equipped = slot1.equipped;
-		
+
 		slot1.item = slot2.item;
 		slot1.currentStackSize = slot2.currentStackSize;
 		slot1.equipped = slot2.equipped;
@@ -323,45 +376,55 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		slot2.currentStackSize = tempSlot1.currentStackSize;
 		slot2.equipped = tempSlot1.equipped;
 	}
-	
-	private void handleItemEquipping(Slot clickedSlot) {
-		Player player = objectHandler.getPlayer();
+
+	private void handleEquippingAction(Slot clickedSlot) {
 		Item itemInSlot = clickedSlot.item;
-		if (itemInSlot != null && itemInSlot.isEquippable()) {
-			// Equipping a weapon
-			if (itemInSlot.getObjectId().getCategory() == Category.WeaponItem) {
-				// If the player does not currently have an equipped weapon, equip the item in the clicked slot
-				if (hotbarSlots[0].item == null) {
-					clickedSlot.equipped = true;
-					hotbarSlots[0].item = clickedSlot.item;
-					player.setWeapon(((WeaponItem) clickedSlot.item).getWeapon());
-				}
-				// If the player does have a weapon equipped
-				else {
-					// If the clicked slot contains the current weapon, unequip it and 
-					// give the player the default FistWeapon
-					if (clickedSlot.item.equals(hotbarSlots[0].item)) {
-						clickedSlot.equipped = false;
-						hotbarSlots[0].item = null;
-						player.setWeapon(new FistWeapon(objectHandler, keyInput, mouseInput));
-					}
-					// If the clicked slot contains a different weapon, swap to the new weapon
-					else {
-						clickedSlot.equipped = true;
-						unequipFromSlot(hotbarSlots[0].item);
-						hotbarSlots[0].item = clickedSlot.item;
-						objectHandler.getPlayer().setWeapon(((WeaponItem) clickedSlot.item).getWeapon());
-					}
-				}
-			}
+		if (itemInSlot == null || !itemInSlot.isEquippable())
+			return;
+
+		if (itemInSlot.compareCategory(Category.WeaponItem))
+			handleWeaponEquipping(clickedSlot);
+		else if (itemInSlot.compareCategory(Category.Item))
+			handleItemEquipping(clickedSlot);
+	}
+
+	private void handleWeaponEquipping(Slot inventorySlot) {
+		Player player = objectHandler.getPlayer();
+		WeaponItem itemInSlot = (WeaponItem) inventorySlot.item;
+		
+		// If the clicked slot contains the currently equipped weapon
+		if (itemInSlot.equals(hotbar.weaponSlot.item)) {
+			inventorySlot.equipped = false;
+			hotbar.unequipItem(itemInSlot);
+			player.setWeapon(new FistWeapon(objectHandler, keyInput, mouseInput));
 		}
+		// If the clicked slot contains a new weapon
+		else {
+			if (hotbar.weaponSlot.item != null)
+				unequipItemFromInventorySlot(hotbar.weaponSlot.item);
+			inventorySlot.equipped = true;
+			hotbar.equipItem((WeaponItem) itemInSlot);
+			player.setWeapon(((WeaponItem) itemInSlot).getWeapon());
+		}
+	}
+	
+	private void handleItemEquipping(Slot inventorySlot) {
+		Item itemInSlot = inventorySlot.item;
+		// If the clicked slot contains an already equipped item
+		if (inventorySlot.equipped) {
+			inventorySlot.equipped = false;
+			hotbar.unequipItem(itemInSlot);
+		}
+		// If the clicked slot contains a new item
+		else
+			inventorySlot.equipped = hotbar.equipItem(itemInSlot);
 	}
 	
 	/**
 	 * Set the {@code equipped} parameter of the slot that contains the given item to false.
 	 * @param item the item to unequip from the inventory slots.
 	 */
-	private void unequipFromSlot(Item item) {
+	private void unequipItemFromInventorySlot(Item item) {
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				Item slotItem = inventorySlots[i][j].item;
@@ -375,5 +438,9 @@ public class Inventory extends GameObject implements MouseInputObserver {
 
 	@Override
 	public void onMouseClick(MouseEvent e) {}
+	
+	public void useItem(int hotbarItemIndex) {
+		
+	}
 
 }

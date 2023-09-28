@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
-import javax.swing.SwingConstants;
-
 import framework.GameConstants;
 import framework.ObjectHandler;
 import window.GameWindow;
