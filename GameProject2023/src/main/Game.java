@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
+import javax.swing.SwingConstants;
+
+import framework.GameConstants;
 import framework.ObjectHandler;
 import window.GameWindow;
 import window.KeyInput;
@@ -22,6 +25,7 @@ public class Game extends Canvas implements Runnable {
 	
 	private final int MAX_FPS = 120;
 	private final int MAX_UPS = 120;
+	private int displayedFPS, displayedUPS;
 	
 	/**
 	 * The Game class is responsible for setting up and running the game, serving as the entry point of the application.
@@ -96,6 +100,8 @@ public class Game extends Canvas implements Runnable {
 			
 			if (System.currentTimeMillis() - lastCheck >= 1000) {
 				lastCheck = System.currentTimeMillis();
+				displayedFPS = frames;
+				displayedUPS = updates;
 				System.out.println("FPS: " + frames + " | UPS: " + updates);
 				frames = updates = 0;
 			}
@@ -132,7 +138,13 @@ public class Game extends Canvas implements Runnable {
 		
 		// Render game objects
 		objectHandler.renderObjects(g);
-
+		
+		// Display FPS and UPS
+		g.setColor(Color.WHITE);
+		g.setFont(GameConstants.FontConstants.DAMAGE_FONT);
+		g.drawString("FPS: " + displayedFPS, GameConstants.ScaleConstants.GAME_WIDTH - 77, 15);
+		g.drawString("UPS: " + displayedUPS, GameConstants.ScaleConstants.GAME_WIDTH - 80, 35);
+		
 		g.dispose();
 		bs.show();
 	}
