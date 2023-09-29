@@ -21,7 +21,7 @@ public class HUD extends GameObject {
 	private int staminaHeight;
 
 	public HUD(float x, float y, int width, int height, Player player) {
-		super(x, y, width, height, new ObjectId(Category.Menu, Name.HUD));
+		super(x, y, width, height, new ObjectId(Category.Menu, Name.Missing));
 		this.player = player;
 
 		if (player == null) {

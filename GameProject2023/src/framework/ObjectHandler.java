@@ -26,6 +26,7 @@ import items.BigHealthPotionItem;
 import items.Coin;
 import items.SmallHealthPotionItem;
 import items.SwordWeaponItem;
+import level_generation.RoomExit;
 import ui.HUD;
 import ui.Inventory;
 import window.KeyInput;
@@ -67,8 +68,6 @@ public class ObjectHandler {
 		this.keyInput = keyInput;
 		this.mouseInput = mouseInput;
 
-		HUD hud = new HUD(10, 10, TILE_SIZE * 3, TILE_SIZE / 2, player);
-		addObject(hud, MENU_LAYER);
 		inventory = new Inventory(3, 3, this, keyInput, mouseInput);
 		addObject(inventory, MENU_LAYER);
 		
@@ -78,6 +77,9 @@ public class ObjectHandler {
 		int[][] topLayerUIDs = fileIO.loadLevel("levels_fg.txt", 0);
 		
 		loadLevel(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs);
+		
+		HUD hud = new HUD(10, 10, TILE_SIZE * 3, TILE_SIZE / 2, player);
+		addObject(hud, MENU_LAYER);
 	}
 	
 	/**
@@ -437,6 +439,9 @@ public class ObjectHandler {
 			break;
 		case BigHealthPotionItem:
 			gameObject = new BigHealthPotionItem(x, y, this);
+			break;
+		case Exit:
+			gameObject = new RoomExit(x, y, this);
 			break;
 		}
 		
