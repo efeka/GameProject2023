@@ -23,7 +23,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import abstract_templates.GameObject;
 import framework.ObjectHandler;
@@ -102,15 +105,26 @@ public class OptionsPanel extends JPanel {
 		
 		JPanel transparencyPanel = new JPanel();
 		transparencyPanel.setLayout(new FlowLayout());
-		JLabel transparencyLabel = new JLabel("Non-Selected Layer Transparency: ");
-		JComboBox<Float> transparencyComboBox = new JComboBox<>(new Float[] {0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f});
-		transparencyComboBox.setSelectedIndex(4);
-		transparencyComboBox.addActionListener(e -> {
-        	if (optionSelectionListener != null)
-				optionSelectionListener.onTransparencySelect((float) transparencyComboBox.getSelectedItem());
+        JSlider transparencySLider = new JSlider(JSlider.HORIZONTAL, 0, 100, 40);
+        transparencySLider.setMajorTickSpacing(10);
+        transparencySLider.setMinorTickSpacing(5);
+        transparencySLider.setPaintTicks(true);
+        transparencySLider.setPaintLabels(true);
+		String transparencyBaseText = "Non-Selected Layer Transparency: ";
+		JLabel transparencyLabel = new JLabel(transparencyBaseText + " " + String.format("%.2f", transparencySLider.getValue() / 100f));
+        transparencySLider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+            	if (optionSelectionListener != null) {
+            		float transparencyValue = transparencySLider.getValue() / 100f;
+    				optionSelectionListener.onTransparencySelect(transparencyValue);
+    				
+    				transparencyLabel.setText(transparencyBaseText + " " + String.format("%.2f", transparencyValue));
+            	}
+            }
         });
 		transparencyPanel.add(transparencyLabel);
-		transparencyPanel.add(transparencyComboBox);
+		transparencyPanel.add(transparencySLider);
 		selectionGroupPanel.add(transparencyPanel, BorderLayout.SOUTH);
 		topPanel.add(selectionGroupPanel, BorderLayout.CENTER);
 		
