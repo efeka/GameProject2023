@@ -14,6 +14,10 @@ public abstract class WeaponItem extends Item {
 		super(x, y, objectHandler, new ObjectId(Category.WeaponItem, objectName));
 	}
 	
+	public WeaponItem(float x, float y, int width, int height, ObjectHandler objectHandler, Name objectName) {
+		super(x, y, width, height, objectHandler, new ObjectId(Category.WeaponItem, objectName));
+	}
+	
 	public abstract Weapon getWeapon();
 
 }

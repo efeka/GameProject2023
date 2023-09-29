@@ -336,7 +336,7 @@ public class TextureLoader {
 		case SwordItem:
 			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 33, 34, 32, 32);
+				textures[i] = itemSheet.getSubimage(1 + i * 65, 463, 64, 64);
 			break;
 		case HammerItem:
 			textures = new BufferedImage[6];

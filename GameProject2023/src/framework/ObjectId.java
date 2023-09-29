@@ -19,6 +19,7 @@ public class ObjectId {
 		WeaponItem,
 		Projectile,
 		Summon,
+		Exit,
 	}
 	
 	/**
@@ -41,9 +42,9 @@ public class ObjectId {
 		BasicEnemy(2),
 		ArcherEnemy(3),
 		BullEnemy(4),
-
-		HUD(500),
-
+		
+		Exit(999),
+		
 		// Tile blocks
 		StoneTileBlock_OuterTopLeft(1000),
 		StoneTileBlock_OuterTop(1001),

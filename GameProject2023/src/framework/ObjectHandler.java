@@ -67,16 +67,31 @@ public class ObjectHandler {
 		this.keyInput = keyInput;
 		this.mouseInput = mouseInput;
 
-		FileIO fileIO = new FileIO();
-		int[][] objectUIDsBottomLayer = fileIO.loadLevel("levels_bg.txt", 0);
-		int[][] objectUIDsMiddleLayer = fileIO.loadLevel("levels.txt", 0);
-		int[][] objectUIDsTopLayer = fileIO.loadLevel("levels_fg.txt", 0);
+		HUD hud = new HUD(10, 10, TILE_SIZE * 3, TILE_SIZE / 2, player);
+		addObject(hud, MENU_LAYER);
+		inventory = new Inventory(3, 3, this, keyInput, mouseInput);
+		addObject(inventory, MENU_LAYER);
 		
+		FileIO fileIO = new FileIO();
+		int[][] bottomLayerUIDs = fileIO.loadLevel("levels_bg.txt", 0);
+		int[][] middleLayerUIDs = fileIO.loadLevel("levels.txt", 0);
+		int[][] topLayerUIDs = fileIO.loadLevel("levels_fg.txt", 0);
+		
+		loadLevel(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs);
+	}
+	
+	/**
+	 * Creates the gameobjects with the given uids and adds them into the game.
+	 * @param bottomLayerUIDs the uids of the objects on the bottom layer
+	 * @param middleLayerUIDs the uids of the objects on the middle layer
+	 * @param topLayerUIDs the uids of the objects on the top layer
+	 */
+	public void loadLevel(int[][] bottomLayerUIDs, int[][] middleLayerUIDs, int[][] topLayerUIDs) {
 		for (int i = 0; i < TILE_ROWS; i++) {
 			for (int j = 0; j < TILE_COLUMNS; j++) {
-				Name objectNameBL = ObjectId.Name.getByUID(objectUIDsBottomLayer[i][j]);
-				Name objectNameML = ObjectId.Name.getByUID(objectUIDsMiddleLayer[i][j]);
-				Name objectNameTL = ObjectId.Name.getByUID(objectUIDsTopLayer[i][j]);
+				Name objectNameBL = ObjectId.Name.getByUID(bottomLayerUIDs[i][j]);
+				Name objectNameML = ObjectId.Name.getByUID(middleLayerUIDs[i][j]);
+				Name objectNameTL = ObjectId.Name.getByUID(topLayerUIDs[i][j]);
 
 				int x = j * TILE_SIZE;
 				int y = i * TILE_SIZE;
@@ -95,11 +110,6 @@ public class ObjectHandler {
 				}
 			}
 		}
-		
-		GameObject hud = createObjectByName(Name.HUD, 10, 10);
-		addObject(hud, MENU_LAYER);
-		inventory = new Inventory(3, 3, this, keyInput, mouseInput);
-		addObject(inventory, MENU_LAYER);
 	}
 	
 	/**
@@ -227,9 +237,6 @@ public class ObjectHandler {
 			break;
 		case BullEnemy:
 			gameObject = new BullEnemy(x, y, this);
-			break;
-		case HUD:
-			gameObject = new HUD(x, y, TILE_SIZE * 3, TILE_SIZE / 2, player);
 			break;
 		case DiagonalStoneTileBlock_OuterBottomLeft:
 			gameObject = new DiagonalStoneTileBlock(x, y, objectName, TileOrientation.OuterBottomLeft);
@@ -433,7 +440,7 @@ public class ObjectHandler {
 			break;
 		}
 		
-		if (gameObject == null)
+		if (gameObject == null && objectName != Name.Missing)
 			System.err.println("ObjectHandler: Could not create game object with the name: " + objectName);
 		
 		return gameObject;

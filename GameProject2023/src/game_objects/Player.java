@@ -90,17 +90,13 @@ public class Player extends Creature {
 			invulnerable = false;
 		if (!canInteract && (now - lastInteractTimer >= interactCooldownMillis))
 			canInteract = true;
-		
+
 		// Handle the usage of items in the hot bar
-		if (inventory == null)
-			inventory = objectHandler.getInventory();
-		else {
-			if (keyInput.isHotkey1Pressed())
-				inventory.useItem(0);
-			else if (keyInput.isHotkey2Pressed())
-				inventory.useItem(1);
-		}
-		
+		if (keyInput.isHotkey1Pressed())
+			inventory.useItem(0);
+		else if (keyInput.isHotkey2Pressed())
+			inventory.useItem(1);
+
 		if (!lockMovementInputs)
 			handleMovement();
 		weapon.tick();
@@ -301,7 +297,7 @@ public class Player extends Creature {
 			knockedBack = false;
 			velX = 0;
 		}
-		
+
 		// Bottom collision
 		if (getBottomBounds().intersects(otherBounds)) {
 			y = other.getY() - height;
