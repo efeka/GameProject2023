@@ -31,23 +31,36 @@ public class Inventory extends GameObject implements MouseInputObserver {
 	private class Slot {
 		Rectangle slotBounds = new Rectangle();
 		Item item = null;
-		int currentStackSize = 0;
+		int quantity = 0;
 		boolean equipped = false;
+		
+		public Slot() {}
+		
+		public Slot(Item item, int quantity, boolean equipped) {
+			this.item = item;
+			this.quantity = quantity;
+			this.equipped = equipped;
+		}
 	}
 
 	private class Hotbar {
 		Slot weaponSlot;
 		Slot[] itemSlots;
-
+		int slotCooldownMillis = 1000;
+		long[] slotCooldownTimers;
+		
 		public Hotbar() {
 			weaponSlot = new Slot();
-			itemSlots = new Slot[] {
-					new Slot(),
-					new Slot(),
-			};
+			
+			int hotbarSlots = 2;
+			itemSlots = new Slot[hotbarSlots];
+			slotCooldownTimers = new long[hotbarSlots];
+			
+			for (int i = 0; i < hotbarSlots; i++)
+				itemSlots[i] = new Slot();
 		}
 
-		public boolean equipItem(Item item) {
+		public boolean equipItem(Item item, int quantity) {
 			boolean equipSuccessful = false;
 			if (item.compareCategory(Category.WeaponItem)) {
 				weaponSlot.item = item;
@@ -57,6 +70,7 @@ public class Inventory extends GameObject implements MouseInputObserver {
 				for (int i = 0; i < itemSlots.length; i++) {
 					if (itemSlots[i].item == null) {
 						itemSlots[i].item = item;
+						itemSlots[i].quantity = quantity;
 						equipSuccessful = true;
 						break;
 					}
@@ -78,6 +92,24 @@ public class Inventory extends GameObject implements MouseInputObserver {
 					}
 				}
 			}
+		}
+		
+		public void setItemQuantity(Item item, int quantity) {
+			for (int i = 0; i < itemSlots.length; i++) {
+				Item itemInSlot = itemSlots[i].item;
+				if (itemInSlot != null && itemInSlot.equals(item)) {
+					itemSlots[i].quantity = quantity;
+					break;
+				}
+			}
+		}
+		
+		public void startSlotCooldownTimer(int index) {
+			slotCooldownTimers[index] = System.currentTimeMillis();
+		}
+		
+		public boolean isSlotCooldownReady(int index) {
+			return System.currentTimeMillis() - slotCooldownTimers[index] > slotCooldownMillis;
 		}
 	}
 	private Hotbar hotbar;
@@ -185,13 +217,12 @@ public class Inventory extends GameObject implements MouseInputObserver {
 							iconSize, iconSize, null);
 
 					// Write the current stack size of the item in the slot
-					if (slot.currentStackSize > 1) {
+					if (slot.quantity > 1) {
 						g.setColor(Color.BLACK);
 						g.setFont(GameConstants.FontConstants.INVENTORY_FONT);
-						String stackText = slot.currentStackSize + "";
 						int stackTextX = (int) x + iconOffset + cellSize / 20 + j * cellSize;
 						int stackTextY = (int) y + iconOffset + cellSize / 4 + i * cellSize;
-						g.drawString(stackText, stackTextX, stackTextY);
+						g.drawString(slot.quantity + "", stackTextX, stackTextY);
 					}
 				}
 			}
@@ -223,16 +254,21 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		
 		// Item icons in hotbar slots
 		int iconX = (int) x + hotbarOffsetX + iconOffset + cellSize;
-		int iconY = (int) y + hotbarOffsetY + iconOffset+ cellSize;
+		int iconY = (int) y + hotbarOffsetY + iconOffset + cellSize;
 		BufferedImage itemIcon = hotbar.weaponSlot.item == null ? null : hotbar.weaponSlot.item.getItemIcon();
 		g.drawImage(itemIcon, iconX, iconY, iconSize, iconSize, null);
 		
 		for (int i = 0; i < hotbar.itemSlots.length; i++) {
 			Item hotbarItem = hotbar.itemSlots[i].item;
+			iconX += cellSize;
 			if (hotbarItem != null) {
-				iconX = (int) x + hotbarOffsetX + iconOffset + cellSize + (i + 1) * cellSize;
-				iconY = (int) y + hotbarOffsetY + iconOffset+ cellSize;
 				g.drawImage(hotbarItem.getItemIcon(), iconX, iconY, iconSize, iconSize, null);
+				
+				g.setColor(Color.BLACK);
+				g.setFont(GameConstants.FontConstants.INVENTORY_FONT);
+				int stackTextX = iconX + cellSize / 20;
+				int stackTextY = iconY + cellSize / 4;
+				g.drawString(hotbar.itemSlots[i].quantity + "", stackTextX, stackTextY);
 			}
 		}
 
@@ -243,10 +279,10 @@ public class Inventory extends GameObject implements MouseInputObserver {
 			int itemImageY = mouseInput.getY() - iconSize / 2;
 			g.drawImage(itemImage, itemImageX, itemImageY, iconSize, iconSize, null);
 
-			if (carriedSlot.currentStackSize > 1) {
+			if (carriedSlot.quantity > 1) {
 				g.setColor(Color.BLACK);
 				g.setFont(GameConstants.FontConstants.INVENTORY_FONT);
-				String stackText = carriedSlot.currentStackSize + "";
+				String stackText = carriedSlot.quantity + "";
 				int stackTextX = itemImageX + cellSize / 20;
 				int stackTextY = itemImageY + cellSize / 4;
 				g.drawString(stackText, stackTextX, stackTextY);
@@ -279,9 +315,14 @@ public class Inventory extends GameObject implements MouseInputObserver {
 				Item itemInSlot = slot.item;
 				if (item.getMaxStackSize() > 1 && itemInSlot != null) {
 					boolean namesMatch = item.compareObjectName(itemInSlot);
-					if (namesMatch && slot.currentStackSize < item.getMaxStackSize()) {
-						slot.currentStackSize++;
+					if (namesMatch && slot.quantity < item.getMaxStackSize()) {
+						slot.quantity++;
 						foundValidSlot = addedToStack = true;
+						
+						// If this item is currently equipped, increase the quantity of the item
+						// in the hotbar's slot as well
+						if (slot.equipped)
+							hotbar.setItemQuantity(itemInSlot, slot.quantity);
 						break;
 					}
 				}
@@ -291,7 +332,7 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		// If the item was not added to an existing stack, place it in an empty slot.
 		if (!addedToStack && foundValidSlot) {
 			inventorySlots[validRow][validCol].item = item;
-			inventorySlots[validRow][validCol].currentStackSize = 1;
+			inventorySlots[validRow][validCol].quantity = 1;
 		}
 
 		return foundValidSlot;
@@ -326,12 +367,9 @@ public class Inventory extends GameObject implements MouseInputObserver {
 	private void handleItemCarrying(Slot clickedSlot) {
 		// If no item is being carried, start carrying the item in the clicked spot.
 		if (carriedSlot == null) {
-			carriedSlot = new Slot();
-			carriedSlot.item = clickedSlot.item;
-			carriedSlot.currentStackSize = clickedSlot.currentStackSize;
-			carriedSlot.equipped = clickedSlot.equipped;
+			carriedSlot = new Slot(clickedSlot.item, clickedSlot.quantity, clickedSlot.equipped);
 			clickedSlot.item = null;
-			clickedSlot.currentStackSize = 0;
+			clickedSlot.quantity = 0;
 			clickedSlot.equipped = false;
 		}
 		// If an item is being carried and the clicked slot is empty,
@@ -344,17 +382,23 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		// add it to that slot's stack.
 		else if (carriedSlot.item != null && carriedSlot.item.compareObjectName(clickedSlot.item)) {
 			int maxStackSize = carriedSlot.item.getMaxStackSize();
-			int emptySpaceInStack = maxStackSize - clickedSlot.currentStackSize;
-			int neededSpaceInStack = carriedSlot.currentStackSize;
+			int emptySpaceInStack = maxStackSize - clickedSlot.quantity;
+			int neededSpaceInStack = carriedSlot.quantity;
 			// If there is enough space left in the clicked slot
 			if (neededSpaceInStack <= emptySpaceInStack) {
 				carriedSlot = null;
-				clickedSlot.currentStackSize += neededSpaceInStack;
+				clickedSlot.quantity += neededSpaceInStack;
 			}
 			else {
-				carriedSlot.currentStackSize -= emptySpaceInStack;
-				clickedSlot.currentStackSize = maxStackSize;
+				carriedSlot.quantity -= emptySpaceInStack;
+				clickedSlot.quantity = maxStackSize;
 			}
+			
+			// Update item quantity in the hotbar
+			if (carriedSlot.equipped)
+				hotbar.setItemQuantity(carriedSlot.item, carriedSlot.quantity);
+			if (clickedSlot.equipped)
+				hotbar.setItemQuantity(clickedSlot.item, clickedSlot.quantity);
 		}
 		// If an item is being carried and if the clicked slot contains a different item,
 		// start carrying the slotted item and place the current one in.
@@ -364,16 +408,12 @@ public class Inventory extends GameObject implements MouseInputObserver {
 	}
 
 	private void swapSlotContents(Slot slot1, Slot slot2) {
-		Slot tempSlot1 = new Slot();
-		tempSlot1.item = slot1.item;
-		tempSlot1.currentStackSize = slot1.currentStackSize;
-		tempSlot1.equipped = slot1.equipped;
-
+		Slot tempSlot1 = new Slot(slot1.item, slot1.quantity, slot1.equipped);
 		slot1.item = slot2.item;
-		slot1.currentStackSize = slot2.currentStackSize;
+		slot1.quantity = slot2.quantity;
 		slot1.equipped = slot2.equipped;
 		slot2.item = tempSlot1.item;
-		slot2.currentStackSize = tempSlot1.currentStackSize;
+		slot2.quantity = tempSlot1.quantity;
 		slot2.equipped = tempSlot1.equipped;
 	}
 
@@ -401,9 +441,9 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		// If the clicked slot contains a new weapon
 		else {
 			if (hotbar.weaponSlot.item != null)
-				unequipItemFromInventorySlot(hotbar.weaponSlot.item);
+				getInventorySlotFromItem(hotbar.weaponSlot.item).equipped = false;
 			inventorySlot.equipped = true;
-			hotbar.equipItem((WeaponItem) itemInSlot);
+			hotbar.equipItem((WeaponItem) itemInSlot, 1);
 			player.setWeapon(((WeaponItem) itemInSlot).getWeapon());
 		}
 	}
@@ -417,30 +457,61 @@ public class Inventory extends GameObject implements MouseInputObserver {
 		}
 		// If the clicked slot contains a new item
 		else
-			inventorySlot.equipped = hotbar.equipItem(itemInSlot);
+			inventorySlot.equipped = hotbar.equipItem(itemInSlot, inventorySlot.quantity);
+	}
+
+	/**
+	 * Use the item in the given hotbar item index.
+	 * @param hotbarItemIndex the index of the item in the hotbar
+	 */
+	public void useItem(int hotbarItemIndex) {
+		if (hotbarItemIndex < 0 || hotbarItemIndex >= hotbar.itemSlots.length)
+			throw new IndexOutOfBoundsException("Index " + hotbarItemIndex + " is out of bounds for the hotbar items array");
+		
+		Slot hotbarSlot = hotbar.itemSlots[hotbarItemIndex];
+		if (hotbarSlot == null)
+			return;
+		if (!hotbar.isSlotCooldownReady(hotbarItemIndex))
+			return;
+		Item hotbarItem = hotbarSlot.item;
+		if (hotbarItem == null)
+			return;
+		
+		// Use the item
+		Slot inventorySlot = getInventorySlotFromItem(hotbarItem);
+		inventorySlot.quantity--;
+		hotbarItem.useItem();
+		hotbarSlot.quantity--;
+		hotbar.startSlotCooldownTimer(hotbarItemIndex);
+		
+		// If there is no more of this item left in the slot
+		if (hotbarSlot.quantity == 0) {
+			// Reset the slots
+			hotbarSlot.equipped = false;
+			hotbarSlot.item = null;
+			inventorySlot.equipped = false;
+			inventorySlot.item = null;
+		}
 	}
 	
 	/**
-	 * Set the {@code equipped} parameter of the slot that contains the given item to false.
-	 * @param item the item to unequip from the inventory slots.
+	 * Search the inventory for the given item, if it exists, return the inventory slot that contains it.
+	 * @param item the item to search the inventory slots with
+	 * @return the slot that contains the item if it exists, null otherwise
 	 */
-	private void unequipItemFromInventorySlot(Item item) {
+	private Slot getInventorySlotFromItem(Item item) {
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				Item slotItem = inventorySlots[i][j].item;
 				if (slotItem != null && slotItem.equals(item)) {
-					inventorySlots[i][j].equipped = false;
-					return;
+					return inventorySlots[i][j];
 				}
 			}
 		}
+		return null;
 	}
-
+	
 	@Override
 	public void onMouseClick(MouseEvent e) {}
-	
-	public void useItem(int hotbarItemIndex) {
-		
-	}
 
 }
