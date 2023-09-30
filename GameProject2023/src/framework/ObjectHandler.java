@@ -6,7 +6,6 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.List;
 
 import abstract_templates.Creature;
 import abstract_templates.GameObject;
@@ -69,7 +68,8 @@ public class ObjectHandler {
 	 * @param roomsPerFloor the number of rooms to generate per each floor
 	 */
 	public void setupGame(int roomsPerFloor) {
-		floor = new Floor(roomsPerFloor, this);
+		floor = new Floor(this);
+		floor.generateRandomFloor(roomsPerFloor);
 		
 		inventory = new Inventory(3, 3, this, keyInput, mouseInput);
 		addObject(inventory, MENU_LAYER);

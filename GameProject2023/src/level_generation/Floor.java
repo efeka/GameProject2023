@@ -18,13 +18,16 @@ public class Floor {
 
 	private ObjectHandler objectHandler;
 
-	private ArrayList<Room> roomList;
+	// Contains all the available rooms which are loaded from the file system
+	private ArrayList<Room> roomPool;
+	// Contains the randomly generated room layout for this floor
+	private ArrayList<Room> floorRooms;
 	private Room startingRoom;
 	private Room currentRoom;
 
-	public Floor(int roomCount, ObjectHandler objectHandler) {
+	public Floor(ObjectHandler objectHandler) {
 		this.objectHandler = objectHandler;
-		roomList = new ArrayList<>();
+		roomPool = new ArrayList<>();
 		createRooms();
 	}
 
@@ -38,11 +41,73 @@ public class Floor {
 				if (i == 0)
 					startingRoom = new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler);
 				else
-					roomList.add(new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler));
+					roomPool.add(new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler));
 			}
 		} catch (NullPointerException e) {}
 		
 		currentRoom = startingRoom;
+	}
+	
+	/**
+	 * Procedurally generates a random floor using rooms selected from the room pool.
+	 * Reaching the max room count may not be possible due to randomness.
+	 * @param maxRoomCount the maximum number of rooms in the floor
+	 */
+	public void generateRandomFloor(int maxRoomCount) {
+		// Keeps track of rooms that still have unused exits
+		ArrayList<Room> leafRooms = new ArrayList<>();
+		leafRooms.add(startingRoom);
+		floorRooms.add(startingRoom);
+		
+		while (!leafRooms.isEmpty() && maxRoomCount-- > 0) {
+			// Randomly select a leaf room and remove it from the leaf list
+			int randomLeafRoomIndex = (int) (Math.random() * leafRooms.size());
+			Room randomLeafRoom = leafRooms.remove(randomLeafRoomIndex);
+			
+			// Randomly select an unused exit of the randomLeafRoom
+			ArrayList<ExitLocation> unusedExits = randomLeafRoom.getUnusedExitLocations();
+			if (!unusedExits.isEmpty()) { 
+				int randomExitIndex = (int) (Math.random() * unusedExits.size());
+				ExitLocation selectedExit = unusedExits.get(randomExitIndex);
+				
+				// Randomly select a room from the room pool which has the opposite of the selected exit
+				ExitLocation oppositeExit = selectedExit.getOppositeExitLocation(selectedExit);
+				Room newRoom = getRandomRoomWithExit(oppositeExit);
+				
+	            if (newRoom != null) {
+	                // Link the currentLeafRoom and the newRoom together
+	            	randomLeafRoom.setNeighbor(selectedExit, newRoom);
+	            	newRoom.setNeighbor(oppositeExit, randomLeafRoom);
+	            	floorRooms.add(newRoom);
+
+	                // Check to see if the randomLeafRoom or newRoom have more unused exits.
+	            	// If they do, add them into the leafRooms list.
+	            	if (!randomLeafRoom.getUnusedExitLocations().isEmpty())
+	            		leafRooms.add(randomLeafRoom);
+	            	if (!newRoom.getUnusedExitLocations().isEmpty())
+	            		leafRooms.add(newRoom);
+	            }
+			}
+		}
+	}
+	
+	/**
+	 * Retrieves a randomly selected room from the roomPool with the required exit location.
+	 * @param neededExitLocation the exit location to search for
+	 * @return the room with the required exit location
+	 */
+	private Room getRandomRoomWithExit(ExitLocation neededExitLocation) {
+		ArrayList<Room> eligibleRooms = new ArrayList<>();
+		for (Room room : roomPool)
+			if (room.hasExitLocation(neededExitLocation))
+				eligibleRooms.add(room);
+			
+		int randomRoomIndex = (int) (Math.random() * eligibleRooms.size());
+		Room randomRoom = eligibleRooms.get(randomRoomIndex);
+		if (randomRoom != null)
+			return randomRoom.createCopy();
+		else
+			return null;
 	}
 	
 	public Room getCurrentRoom() {

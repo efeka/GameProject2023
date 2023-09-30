@@ -30,10 +30,10 @@ public class RoomExit extends GameObject {
 			imageIndex = 2;
 			break;
 		case RoomExitLeft:
-			imageIndex = 1;
+			imageIndex = 3;
 			break;
 		case RoomExitRight:
-			imageIndex = 3;
+			imageIndex = 1;
 			break;		
 		}
 		texture = TextureLoader.getInstance().getTextures(TextureName.ExitTiles)[imageIndex];
