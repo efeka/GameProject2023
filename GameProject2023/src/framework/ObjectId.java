@@ -43,7 +43,10 @@ public class ObjectId {
 		ArcherEnemy(3),
 		BullEnemy(4),
 		
-		Exit(999),
+		RoomExitUp(995),
+		RoomExitDown(997),
+		RoomExitLeft(998),
+		RoomExitRight(999),
 		
 		// Tile blocks
 		StoneTileBlock_OuterTopLeft(1000),

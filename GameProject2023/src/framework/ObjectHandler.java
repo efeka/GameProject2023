@@ -6,6 +6,7 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.List;
 
 import abstract_templates.Creature;
 import abstract_templates.GameObject;
@@ -26,6 +27,8 @@ import items.BigHealthPotionItem;
 import items.Coin;
 import items.SmallHealthPotionItem;
 import items.SwordWeaponItem;
+import level_generation.Floor;
+import level_generation.Room;
 import level_generation.RoomExit;
 import ui.HUD;
 import ui.Inventory;
@@ -34,6 +37,7 @@ import window.MouseInput;
 
 public class ObjectHandler {
 
+	private Floor floor;
 	private Player player = null;
 	private Inventory inventory = null;
 	
@@ -42,7 +46,7 @@ public class ObjectHandler {
 	public static final int TOP_LAYER = 2;
 	public static final int MENU_LAYER = 3;
 	
-	private ArrayList<GameObject> bottomLayer, middleLayer, topLayer, menuLayer;
+	private ArrayList<GameObject> menuLayer;
 	private ArrayList<Creature> summonsList;
 	
 	private KeyInput keyInput;
@@ -52,43 +56,47 @@ public class ObjectHandler {
 	 * This is the class responsible for adding and removing GameObjects from the game.
 	 * Objects can be added to different layers to determine their rendering order.
 	 */
-	public ObjectHandler() {
-		bottomLayer = new ArrayList<GameObject>();
-		middleLayer = new ArrayList<GameObject>();
-		topLayer = new ArrayList<GameObject>();
+	public ObjectHandler(KeyInput keyInput, MouseInput mouseInput) {
+		this.keyInput = keyInput;
+		this.mouseInput = mouseInput;
+		
 		menuLayer = new ArrayList<GameObject>();
 		summonsList = new ArrayList<Creature>();
 	}
 	
 	/**
-	 * Load the first level from the levels file and initialize objects.
-	 * @param keyInput the key listener object attached to the game window
+	 * Creates the necessary UI elements and generates the first floor of the run.
+	 * @param roomsPerFloor the number of rooms to generate per each floor
 	 */
-	public void setupGame(KeyInput keyInput, MouseInput mouseInput) {
-		this.keyInput = keyInput;
-		this.mouseInput = mouseInput;
-
+	public void setupGame(int roomsPerFloor) {
+		floor = new Floor(roomsPerFloor, this);
+		
 		inventory = new Inventory(3, 3, this, keyInput, mouseInput);
 		addObject(inventory, MENU_LAYER);
-		
-		FileIO fileIO = new FileIO();
-		int[][] bottomLayerUIDs = fileIO.loadLevel("levels_bg.txt", 0);
-		int[][] middleLayerUIDs = fileIO.loadLevel("levels.txt", 0);
-		int[][] topLayerUIDs = fileIO.loadLevel("levels_fg.txt", 0);
-		
-		loadLevel(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs);
 		
 		HUD hud = new HUD(10, 10, TILE_SIZE * 3, TILE_SIZE / 2, player);
 		addObject(hud, MENU_LAYER);
 	}
 	
 	/**
-	 * Creates the gameobjects with the given uids and adds them into the game.
+	 * Creates the GameObjects with the given uids and returns them as a list.
 	 * @param bottomLayerUIDs the uids of the objects on the bottom layer
 	 * @param middleLayerUIDs the uids of the objects on the middle layer
 	 * @param topLayerUIDs the uids of the objects on the top layer
+	 * @return A list containing the game objects.
+	 * 		   Index 0 contains the bottom layer.
+	 * 		   Index 1 contains the middle layer.
+	 *		   Index 2 contain the top layer. 
 	 */
-	public void loadLevel(int[][] bottomLayerUIDs, int[][] middleLayerUIDs, int[][] topLayerUIDs) {
+	public ArrayList<ArrayList<GameObject>> loadLevel(int[][] bottomLayerUIDs, int[][] middleLayerUIDs, int[][] topLayerUIDs) {
+		ArrayList<ArrayList<GameObject>> layers = new ArrayList<>();
+		// Bottom layer on index 0
+		layers.add(new ArrayList<GameObject>());
+		// Middle layer on index 1
+		layers.add(new ArrayList<GameObject>());
+		// Top layer on index 2
+		layers.add(new ArrayList<GameObject>());
+		
 		for (int i = 0; i < TILE_ROWS; i++) {
 			for (int j = 0; j < TILE_COLUMNS; j++) {
 				Name objectNameBL = ObjectId.Name.getByUID(bottomLayerUIDs[i][j]);
@@ -100,61 +108,77 @@ public class ObjectHandler {
 				
 				if (objectNameBL != null) {
 					GameObject gameObject = createObjectByName(objectNameBL, x, y);
-					addObject(gameObject, BOTTOM_LAYER);
+					layers.get(0).add(gameObject);
 				}
 				if (objectNameML != null) {
 					GameObject gameObject = createObjectByName(objectNameML, x, y);
-					addObject(gameObject, MIDDLE_LAYER);
+					layers.get(1).add(gameObject);
 				}
 				if (objectNameTL != null) {
 					GameObject gameObject = createObjectByName(objectNameTL, x, y);
-					addObject(gameObject, TOP_LAYER);
+					layers.get(2).add(gameObject);
 				}
 			}
 		}
+		
+		return layers;
 	}
 	
 	/**
-	 * Updates all objects in the game.
-	 * This should be called in every frame of the game loop.
+	 * Update the GameObjects in the current room.
+	 * This method should be called in every update of the game loop.
+	 * Culling is performed by only updating the room that the player is in.
 	 */
 	public void updateObjects() {
-		for (int i = middleLayer.size() - 1; i >= 0; i--) 
-			middleLayer.get(i).tick();
-		for (int i = bottomLayer.size() - 1; i >= 0; i--) 
-			bottomLayer.get(i).tick();
-		for (int i = topLayer.size() - 1; i >= 0; i--) 
-			topLayer.get(i).tick();
+		if (floor == null)
+			return;
+		
+		Room currentRoom = floor.getCurrentRoom();
+		for (int i = currentRoom.getBottomLayer().size() - 1; i >= 0; i--) 
+			currentRoom.getBottomLayer().get(i).tick();
+		for (int i = currentRoom.getMiddleLayer().size() - 1; i >= 0; i--) 
+			currentRoom.getMiddleLayer().get(i).tick();
+		for (int i = currentRoom.getTopLayer().size() - 1; i >= 0; i--) 
+			currentRoom.getTopLayer().get(i).tick();
 		for (int i = menuLayer.size() - 1; i >= 0; i--) 
 			menuLayer.get(i).tick();
 	}
 
 	/**
-	 * Renders all objects in the game.
-	 * This should be called in every update of the game loop.
-	 * @param g graphics object to use for rendering
+	 * Render the GameObjects in the current room.
+	 * This method should be called in every frame of the game loop.
+	 * Culling is performed by only rendering the room that the player is in.
+	 * @param g the graphics object to use for rendering
 	 */
 	public void renderObjects(Graphics g) {
-		for (int i = bottomLayer.size() - 1; i >= 0; i--) 
-			bottomLayer.get(i).render(g);
-		for (int i = middleLayer.size() - 1; i >= 0; i--) 
-			middleLayer.get(i).render(g);
-		for (int i = topLayer.size() - 1; i >= 0; i--) 
-			topLayer.get(i).render(g);
+		if (floor == null)
+			return;
+		
+		Room currentRoom = floor.getCurrentRoom();
+		for (int i = currentRoom.getBottomLayer().size() - 1; i >= 0; i--) 
+			currentRoom.getBottomLayer().get(i).render(g);
+		for (int i = currentRoom.getMiddleLayer().size() - 1; i >= 0; i--) 
+			currentRoom.getMiddleLayer().get(i).render(g);
+		for (int i = currentRoom.getTopLayer().size() - 1; i >= 0; i--) 
+			currentRoom.getTopLayer().get(i).render(g);
 		for (int i = menuLayer.size() - 1; i >= 0; i--) 
 			menuLayer.get(i).render(g);
 	}
 
 	public void addObject(GameObject object, int layer) {
+		if (floor == null)
+			return;
+		
+		Room currentRoom = floor.getCurrentRoom();
 		switch(layer) {
 		case BOTTOM_LAYER:
-			bottomLayer.add(object);
+			currentRoom.getBottomLayer().add(object);
 			break;
 		case MIDDLE_LAYER:
-			middleLayer.add(object);
+			currentRoom.getMiddleLayer().add(object);
 			break;
 		case TOP_LAYER:
-			topLayer.add(object);
+			currentRoom.getTopLayer().add(object);
 			break;
 		case MENU_LAYER:
 			menuLayer.add(object);
@@ -166,12 +190,16 @@ public class ObjectHandler {
 	}
 
 	public void removeObject(GameObject object) {
-		if (middleLayer.contains(object))
-			middleLayer.remove(object);
-		else if (bottomLayer.contains(object))
-			bottomLayer.remove(object);
-		else if (topLayer.contains(object))
-			topLayer.remove(object);
+		if (floor == null)
+			return;
+		
+		Room currentRoom = floor.getCurrentRoom();
+		if (currentRoom.getMiddleLayer().contains(object))
+			currentRoom.getMiddleLayer().remove(object);
+		else if (currentRoom.getBottomLayer().contains(object))
+			currentRoom.getBottomLayer().remove(object);
+		else if (currentRoom.getTopLayer().contains(object))
+			currentRoom.getTopLayer().remove(object);
 		else if (menuLayer.contains(object))
 			menuLayer.remove(object);
 		
@@ -180,18 +208,22 @@ public class ObjectHandler {
 	}
 	
 	public void removeObjectFromLayer(GameObject object, int layer) {
+		if (floor == null)
+			return;
+		
+		Room currentRoom = floor.getCurrentRoom();
 		switch (layer) {
 		case BOTTOM_LAYER:
-			if (bottomLayer.contains(object))
-				bottomLayer.remove(object);
+			if (currentRoom.getBottomLayer().contains(object))
+				currentRoom.getBottomLayer().remove(object);
 			break;
 		case MIDDLE_LAYER:
-			if (middleLayer.contains(object))
-				middleLayer.remove(object);
+			if (currentRoom.getMiddleLayer().contains(object))
+				currentRoom.getMiddleLayer().remove(object);
 			break;
 		case TOP_LAYER:
-			if (topLayer.contains(object))
-				topLayer.remove(object);
+			if (currentRoom.getTopLayer().contains(object))
+				currentRoom.getTopLayer().remove(object);
 			break;
 		case MENU_LAYER:
 			if (menuLayer.contains(object))
@@ -204,13 +236,17 @@ public class ObjectHandler {
 	}
 	
 	public ArrayList<GameObject> getLayer(int layer) {
+		if (floor == null)
+			return null;
+		
+		Room currentRoom = floor.getCurrentRoom();
 		switch (layer) {
 		case BOTTOM_LAYER:
-			return bottomLayer;
+			return currentRoom.getBottomLayer();
 		case MIDDLE_LAYER:
-			return middleLayer;
+			return currentRoom.getMiddleLayer();
 		case TOP_LAYER:
-			return topLayer;
+			return currentRoom.getTopLayer();
 		case MENU_LAYER:
 			return menuLayer;
 		default:
@@ -440,8 +476,11 @@ public class ObjectHandler {
 		case BigHealthPotionItem:
 			gameObject = new BigHealthPotionItem(x, y, this);
 			break;
-		case Exit:
-			gameObject = new RoomExit(x, y, this);
+		case RoomExitUp:
+		case RoomExitDown:
+		case RoomExitLeft:
+		case RoomExitRight:
+			gameObject = new RoomExit(x, y, this, objectName);
 			break;
 		}
 		

@@ -176,9 +176,6 @@ public class OptionsPanel extends JPanel {
 
 		for (int i = 0, gridBagIndex = 0; i < enumValues.length; i++) {
 		    Name objectName = enumValues[i];
-		    if (objectName == Name.HUD)
-		        continue;
-		    
 		    // Get objects image by Name
 		    BufferedImage objectImage = getImageByObjectName(objectName);
 
@@ -212,7 +209,7 @@ public class OptionsPanel extends JPanel {
 	}
 	
 	private BufferedImage getImageByObjectName(Name objectName) {
-		GameObject gameObject = new ObjectHandler().createObjectByName(objectName, -1, -1);
+		GameObject gameObject = new ObjectHandler(null, null).createObjectByName(objectName, -1, -1);
 		return gameObject != null ? gameObject.getTexture() : 
 			TextureLoader.getInstance().getTextures(TextureName.Missing)[0];
 	}

@@ -36,7 +36,6 @@ public class Player extends Creature {
 	private float jumpingSpeed = 8.5f;
 	private float dodgingSpeed = 5f;
 
-	private Inventory inventory;
 	private Weapon weapon;
 
 	private int availableJumps = 2;
@@ -59,7 +58,6 @@ public class Player extends Creature {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
-		this.inventory = inventory;
 		objectHandler.setPlayer(this);
 
 		weapon = new FistWeapon(objectHandler, keyInput, mouseInput);
@@ -92,6 +90,7 @@ public class Player extends Creature {
 			canInteract = true;
 
 		// Handle the usage of items in the hot bar
+		Inventory inventory = objectHandler.getInventory();
 		if (keyInput.isHotkey1Pressed())
 			inventory.useItem(0);
 		else if (keyInput.isHotkey2Pressed())

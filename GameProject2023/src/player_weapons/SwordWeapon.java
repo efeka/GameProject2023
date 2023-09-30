@@ -13,6 +13,7 @@ import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Explosion;
+import game_objects.Player;
 import visual_effects.FadingTrailEffect;
 import visual_effects.OneTimeAnimation;
 import window.Animation;
@@ -65,6 +66,7 @@ public class SwordWeapon extends Weapon {
 
 	@Override
 	public void tick() {
+		Player player = objectHandler.getPlayer();
 		switch (state) {
 		case None:
 			currentAnimation = null;
@@ -254,6 +256,7 @@ public class SwordWeapon extends Weapon {
 	}
 
 	private Rectangle getChainAttackBounds() {
+		Player player = objectHandler.getPlayer();
 		int x = (int) player.getX();
 		int y = (int) player.getY();
 		int width = player.getWidth();
@@ -269,6 +272,7 @@ public class SwordWeapon extends Weapon {
 	}
 
 	private Rectangle getSwordDashBounds() {
+		Player player = objectHandler.getPlayer();
 		int playerWidth = player.getWidth();
 		int playerHeight = player.getHeight();
 		return new Rectangle((int) (player.getX() - playerWidth / 2), (int) (player.getY() - playerHeight / 2),
@@ -353,7 +357,7 @@ public class SwordWeapon extends Weapon {
 	}
 
 	private int getIndexFromDirection() {
-		return player.getDirection() == 1 ? 0 : 1;
+		return objectHandler.getPlayer().getDirection() == 1 ? 0 : 1;
 	}
 
 }

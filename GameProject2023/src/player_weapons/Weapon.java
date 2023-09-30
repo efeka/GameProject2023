@@ -19,7 +19,6 @@ import window.MouseInput;
 public abstract class Weapon extends GameObject {
 
 	protected ObjectHandler objectHandler;
-	protected Player player;
 	protected KeyInput keyInput;
 	protected MouseInput mouseInput;
 	
@@ -29,7 +28,6 @@ public abstract class Weapon extends GameObject {
 	public Weapon(ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(0, 0, 0, 0, new ObjectId(Category.Missing, Name.Missing));
 		this.objectHandler = objectHandler;
-		player = objectHandler.getPlayer();
 		this.keyInput = keyInput;
 		this.mouseInput = mouseInput;
 		

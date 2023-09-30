@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import framework.ObjectHandler;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import game_objects.Player;
 import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
@@ -36,6 +37,7 @@ public class FistWeapon extends Weapon {
 	
 	@Override
 	public void tick() {
+		Player player = objectHandler.getPlayer();
 		switch (state) {
 		case None:
 			currentAnimation = null;
@@ -77,6 +79,7 @@ public class FistWeapon extends Weapon {
 	}
 
 	private Rectangle getAttackBounds() {
+		Player player = objectHandler.getPlayer();
 		int x = (int) player.getX();
 		int y = (int) player.getY();
 		int width = player.getWidth();
@@ -131,7 +134,7 @@ public class FistWeapon extends Weapon {
 	}
 	
 	private int getIndexFromDirection() {
-		return player.getDirection() == 1 ? 0 : 1;
+		return objectHandler.getPlayer().getDirection() == 1 ? 0 : 1;
 	}
 	
 }

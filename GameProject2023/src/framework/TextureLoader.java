@@ -57,6 +57,7 @@ public class TextureLoader {
 		RockTiles,
 		DiagonalStoneTiles,
 		WoodJumpThroughTiles,
+		ExitTiles,
 		
 		// Items
 		BronzeCoin,
@@ -312,6 +313,11 @@ public class TextureLoader {
 			textures = new BufferedImage[3];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = blockSheet.getSubimage(1 + i * 17, 69, 16, 16);
+			break;
+		case ExitTiles:
+			textures = new BufferedImage[4];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = blockSheet.getSubimage(1 + i * 17, 103, 16, 16);
 			break;
 		case BronzeCoin:
 			textures = new BufferedImage[6];
