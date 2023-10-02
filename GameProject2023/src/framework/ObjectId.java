@@ -18,8 +18,9 @@ public class ObjectId {
 		Item,
 		WeaponItem,
 		Projectile,
-		Summon,
-		Exit,
+		FriendlySummon,
+		RoomExit,
+		PlayerExitDestination,
 	}
 	
 	/**
@@ -43,6 +44,10 @@ public class ObjectId {
 		ArcherEnemy(3),
 		BullEnemy(4),
 		
+		PlayerExitDestinationUp(991),
+		PlayerExitDestinationDown(992),
+		PlayerExitDestinationLeft(993),
+		PlayerExitDestinationRight(994),
 		RoomExitUp(995),
 		RoomExitDown(997),
 		RoomExitLeft(998),

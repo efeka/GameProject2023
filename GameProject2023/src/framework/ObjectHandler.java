@@ -26,6 +26,8 @@ import items.BigHealthPotionItem;
 import items.Coin;
 import items.SmallHealthPotionItem;
 import items.SwordWeaponItem;
+import level_generation.Direction;
+import level_generation.PlayerExitDestination;
 import level_generation.Floor;
 import level_generation.Room;
 import level_generation.RoomExit;
@@ -52,8 +54,9 @@ public class ObjectHandler {
 	private MouseInput mouseInput;
 	
 	/**
-	 * This is the class responsible for adding and removing GameObjects from the game.
-	 * Objects can be added to different layers to determine their rendering order.
+	 * This is the class responsible for adding, removing, updating and rendering 
+	 * all GameObjects in the game.
+	 * Objects can be added to different layers to set their rendering order.
 	 */
 	public ObjectHandler(KeyInput keyInput, MouseInput mouseInput) {
 		this.keyInput = keyInput;
@@ -165,6 +168,11 @@ public class ObjectHandler {
 			menuLayer.get(i).render(g);
 	}
 
+	/**
+	 * Add an object into the current room
+	 * @param object the object to be added
+	 * @param layer the layer to add the object into
+	 */
 	public void addObject(GameObject object, int layer) {
 		if (floor == null)
 			return;
@@ -185,10 +193,14 @@ public class ObjectHandler {
 			break;
 		}
 		
-		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.Summon)
+		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.FriendlySummon)
 			summonsList.add((Creature) object);
 	}
 
+	/**
+	 * Remove a game object from the current room
+	 * @param object the object to be removed
+	 */
 	public void removeObject(GameObject object) {
 		if (floor == null)
 			return;
@@ -203,10 +215,15 @@ public class ObjectHandler {
 		else if (menuLayer.contains(object))
 			menuLayer.remove(object);
 		
-		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.Summon)
+		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.FriendlySummon)
 			summonsList.remove((Creature) object);
 	}
 	
+	/**
+	 * Remove an object from the current floor, from the given layer.
+	 * @param object the object to be removed
+	 * @param layer the layer to remove the object from
+	 */
 	public void removeObjectFromLayer(GameObject object, int layer) {
 		if (floor == null)
 			return;
@@ -231,10 +248,15 @@ public class ObjectHandler {
 			break;
 		}
 		
-		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.Summon)
+		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.FriendlySummon)
 			summonsList.add((Creature) object);
 	}
 	
+	/**
+	 * Retrieve the selected layer of objects from the current room
+	 * @param layer the layer to retrieve
+	 * @return list objects in the selected layer
+	 */
 	public ArrayList<GameObject> getLayer(int layer) {
 		if (floor == null)
 			return null;
@@ -252,6 +274,23 @@ public class ObjectHandler {
 		default:
 			return null;
 		}
+	}
+	
+	/**
+	 * Loads the the room that is neighboring the currentRoom, at the given location.
+	 * Slightly moves the player to avoid getting stuck inside the two exits.
+	 * @param roomExit the roomExit that the player just went through
+	 * @param exitLocationToNeighbor the location of the exit leading to the neighbor
+	 */
+	public void loadNeighboringRoom(RoomExit roomExit, Direction exitLocationToNeighbor) {
+		floor.getCurrentRoom().getMiddleLayer().remove(player);
+		floor.loadNextRoom(exitLocationToNeighbor);
+		floor.getCurrentRoom().getMiddleLayer().add(player);
+		// Move the player to the corresponding spawn location of the next rooms exit
+		Direction oppositeExitLocation = Direction.getOppositeDirection(exitLocationToNeighbor);
+		PlayerExitDestination playerExitDestination = floor.getCurrentRoom().getPlayerExitDestination(oppositeExitLocation);
+		player.setX(playerExitDestination.getX());
+		player.setY(playerExitDestination.getY());
 	}
 	
 	public ArrayList<Creature> getSummonsList() {
@@ -481,6 +520,12 @@ public class ObjectHandler {
 		case RoomExitLeft:
 		case RoomExitRight:
 			gameObject = new RoomExit(x, y, this, objectName);
+			break;
+		case PlayerExitDestinationUp:
+		case PlayerExitDestinationDown:
+		case PlayerExitDestinationLeft:
+		case PlayerExitDestinationRight:
+			gameObject = new PlayerExitDestination(x, y, objectName);
 			break;
 		}
 		

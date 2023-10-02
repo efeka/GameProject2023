@@ -40,7 +40,7 @@ public class PoisonRat extends Creature {
 	private long lastAttackTimer = 0;
 
 	public PoisonRat(int x, int y, int direction, int damage, int explosionDamage, int maxHealth, ObjectHandler objectHandler) {
-		super(x, y, TILE_SIZE, TILE_SIZE, damage, maxHealth, 0, objectHandler, new ObjectId(Category.Summon, Name.Missing));
+		super(x, y, TILE_SIZE, TILE_SIZE, damage, maxHealth, 0, objectHandler, new ObjectId(Category.FriendlySummon, Name.Missing));
 		this.direction = direction;
 		this.explosionDamage = explosionDamage;
 		enemiesHit = new HashSet<>();

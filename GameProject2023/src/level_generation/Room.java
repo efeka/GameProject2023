@@ -9,14 +9,24 @@ import framework.ObjectId.Name;
 
 public class Room {
 
-	private int[][] bottomLayerUIDs, middleLayerUIDs, topLayerUIDs;
-	
-	private Room upNeighbor, downNeighbor, leftNeighbor, rightNeighbor;
-	private boolean hasUpExit, hasDownExit, hasLeftExit, hasRightExit;
-	
 	private ObjectHandler objectHandler;
+	private int[][] bottomLayerUIDs, middleLayerUIDs, topLayerUIDs;
 	private ArrayList<GameObject> bottomLayer, middleLayer, topLayer;
 
+	private Room[] neighbors;
+	private boolean[] hasRoomExit;
+	private PlayerExitDestination[] playerExitDestinations;
+
+	/**
+	 * The Room class represent the vertices of the Floor graph.
+	 * It stores the game objects of a singular level and allows easy access to them
+	 * for updating and rendering.
+	 * The objects of this class also maintain references to adjacent rooms which have linked exits.
+	 * @param bottomLayerUIDs the uid's of the objects on the bottom layer of this level
+	 * @param middleLayerUIDs the uid's of the objects on the middle layer of this level
+	 * @param topLayerUIDs the uid's of the objects on the top layer of this level
+	 * @param objectHandler the reference to the ObjectHandler
+	 */
 	public Room(int[][] bottomLayerUIDs, int[][] middleLayerUIDs, int[][] topLayerUIDs, ObjectHandler objectHandler) {
 		this.bottomLayerUIDs = bottomLayerUIDs;
 		this.middleLayerUIDs = middleLayerUIDs;
@@ -27,89 +37,106 @@ public class Room {
 		bottomLayer = layers.get(0);
 		middleLayer = layers.get(1);
 		topLayer = layers.get(2);
-		
-		upNeighbor = downNeighbor = leftNeighbor = rightNeighbor = null;
+
+		neighbors = new Room[4];
+		hasRoomExit = new boolean[4];
+		playerExitDestinations = new PlayerExitDestination[4];
 		findExits(middleLayer);
 	}
-	
+
+	// Search the objects in the middle layer to determine the room's
+	// exit directions and player exit destinations.
 	private void findExits(ArrayList<GameObject> middleLayer) {
 		for (int i = middleLayer.size() - 1; i >= 0; i--) {
 			GameObject gameObject = middleLayer.get(i);
 			Name objectName = gameObject.getObjectId().getName();
-			if (gameObject.getObjectId().getCategory() == Category.Exit) {
-				switch(objectName) {
-				case RoomExitUp:
-					hasUpExit = true;
-					break;
-				case RoomExitDown:
-					hasDownExit = true;
-					break;
-				case RoomExitLeft:
-					hasLeftExit = true;
-					break;
-				case RoomExitRight:
-					hasRightExit = true;
-					break;
-				default:
-					break;
+			int directionIndex = Direction.convertNameToDirection(objectName).getValue();
+			
+			if (directionIndex == -1)
+				continue;
+			
+			if (gameObject.getObjectId().getCategory() == Category.RoomExit)
+				hasRoomExit[directionIndex] = true;
+			else if (gameObject.getObjectId().getCategory() == Category.PlayerExitDestination)
+				playerExitDestinations[directionIndex] = (PlayerExitDestination) gameObject;
+		}
+	}
+
+	/**
+	 * Checks if this room has an exit in the given direction.
+	 * @param direction of the exit to search for
+	 * @return true if an exit in the given direction exists, false otherwise
+	 */
+	public boolean hasExitInDirection(Direction direction) {
+		int directionIndex = direction.getValue();
+		return hasRoomExit[directionIndex];
+	}
+
+	public Room createDeepCopy() {
+		return new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler);
+	}
+	
+	public PlayerExitDestination getPlayerExitDestination(Direction direction) {
+		int directionIndex = direction.getValue();
+		return playerExitDestinations[directionIndex];
+	}
+
+	public void disableUnusedExits() {
+		ArrayList<Direction> unusedExitLocations = getUnusedExitLocations();
+		for (int i = middleLayer.size() - 1; i >= 0; i--) {
+			GameObject gameObject = middleLayer.get(i);
+			Name objectName = gameObject.getObjectId().getName();
+			if (gameObject.getObjectId().getCategory() == Category.RoomExit) {
+				for (int j = unusedExitLocations.size() - 1; j >= 0; j--) {
+					Direction locationFromName = Direction.convertNameToDirection(objectName);
+					if (locationFromName == unusedExitLocations.get(j)) {
+						// TODO implement a better way of removing exits which is visually appealing
+						middleLayer.remove(i);
+						GameObject disabledExitPlaceholder = 
+								objectHandler.createObjectByName(Name.GrassBackgroundTileBlock_Center,
+										(int) gameObject.getX(),
+										(int) gameObject.getY());
+						middleLayer.add(disabledExitPlaceholder);
+					}
 				}
 			}
 		}
 	}
-	
-	public boolean hasExitLocation(ExitLocation exitLocation) {
-		boolean hasExit = false;
-		switch (exitLocation) {
-		case Up:
-			hasExit = hasUpExit;
-			break;
-		case Down:
-			hasExit = hasDownExit;
-			break;
-		case Left:
-			hasExit = hasLeftExit;
-			break;
-		case Right:
-			hasExit = hasRightExit;
-			break;
+
+	/**
+	 * Retrieves the exits of this room which are not yet linked to other rooms.
+	 * @return the list of available exits
+	 */
+	public ArrayList<Direction> getUnusedExitLocations() {
+		ArrayList<Direction> list = new ArrayList<>();
+		for (int i = 0; i < neighbors.length; i++) {
+			Direction direction = Direction.getByValue(i);
+			if (hasExitInDirection(direction) && getNeighbor(direction) == null)
+				list.add(direction);
 		}
-		return hasExit;
-	}
-	
-	public Room createCopy() {
-		return new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler);
-	}
-	
-	public ArrayList<ExitLocation> getUnusedExitLocations() {
-		ArrayList<ExitLocation> list = new ArrayList<>();
-		if (hasUpExit && upNeighbor == null)
-			list.add(ExitLocation.Up);
-		if (hasDownExit && downNeighbor == null)
-			list.add(ExitLocation.Down);
-		if (hasLeftExit && leftNeighbor == null)
-			list.add(ExitLocation.Left);
-		if (hasRightExit && rightNeighbor == null)
-			list.add(ExitLocation.Right);
 		return list;
 	}
-	
-	public void setNeighbor(ExitLocation exitLocation, Room neighbor) {
-		switch (exitLocation) {
-		case Up:
-			upNeighbor = neighbor;
-			break;
-		case Down:
-			downNeighbor = neighbor;
-			break;
-		case Left:
-			leftNeighbor = neighbor;
-			break;
-		case Right:
-			rightNeighbor = neighbor;
-			break;
-		}
+
+	/**
+	 * Returns the neighboring room at the given direction.
+	 * @param direction the direction towards the neighbor
+	 * @return the neighbor
+	 */
+	public Room getNeighbor(Direction direction) {
+		int directionIndex = direction.getValue();
+		return neighbors[directionIndex];
 	}
-	
+
+	/**
+	 * Set the neighboring room that the given exit of this room leads to.
+	 * @param direction the direction of the exit that leads to the neighbor
+	 * @param neighbor the neighbor to be added at the given direction
+	 */
+	public void setNeighbor(Direction direction, Room neighbor) {
+		int directionIndex = direction.getValue();
+		neighbors[directionIndex] = neighbor;
+	}
+
 	public ArrayList<GameObject> getBottomLayer() {
 		return bottomLayer;
 	}
@@ -122,36 +149,4 @@ public class Room {
 		return topLayer;
 	}
 
-	public Room getUpNeighbor() {
-		return upNeighbor;
-	}
-
-	public void setUpNeighbor(Room upNeighbor) {
-		this.upNeighbor = upNeighbor;
-	}
-
-	public Room getDownNeighbor() {
-		return downNeighbor;
-	}
-
-	public void setDownNeighbor(Room downNeighbor) {
-		this.downNeighbor = downNeighbor;
-	}
-
-	public Room getLeftNeighbor() {
-		return leftNeighbor;
-	}
-
-	public void setLeftNeighbor(Room leftNeighbor) {
-		this.leftNeighbor = leftNeighbor;
-	}
-
-	public Room getRightNeighbor() {
-		return rightNeighbor;
-	}
-
-	public void setRightNeighbor(Room rightNeighbor) {
-		this.rightNeighbor = rightNeighbor;
-	}
-	
 }

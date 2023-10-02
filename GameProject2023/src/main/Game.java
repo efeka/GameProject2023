@@ -39,7 +39,7 @@ public class Game extends Canvas implements Runnable {
 
 		// Load the first level
 		objectHandler = new ObjectHandler(keyInput, mouseInput);
-		objectHandler.setupGame(5);
+		objectHandler.setupGame(15);
 
 		requestFocus();
 		start();
