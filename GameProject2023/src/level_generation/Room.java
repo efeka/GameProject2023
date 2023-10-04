@@ -1,6 +1,8 @@
 package level_generation;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 
 import abstracts.GameObject;
 import framework.ObjectHandler;
@@ -82,7 +84,7 @@ public class Room {
 	}
 
 	public void disableUnusedExits() {
-		ArrayList<Direction> unusedExitLocations = getUnusedExitLocations();
+		List<Direction> unusedExitLocations = getAvailableExitDirections();
 		for (int i = middleLayer.size() - 1; i >= 0; i--) {
 			GameObject gameObject = middleLayer.get(i);
 			Name objectName = gameObject.getObjectId().getName();
@@ -107,8 +109,8 @@ public class Room {
 	 * Retrieves the exits of this room which are not yet linked to other rooms.
 	 * @return the list of available exits
 	 */
-	public ArrayList<Direction> getUnusedExitLocations() {
-		ArrayList<Direction> list = new ArrayList<>();
+	public List<Direction> getAvailableExitDirections() {
+		List<Direction> list = new ArrayList<>();
 		for (int i = 0; i < neighbors.length; i++) {
 			Direction direction = Direction.getByValue(i);
 			if (hasExitInDirection(direction) && getNeighbor(direction) == null)

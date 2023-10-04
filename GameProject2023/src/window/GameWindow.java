@@ -1,7 +1,6 @@
 package window;
 
 import java.awt.Cursor;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -23,8 +22,8 @@ public class GameWindow extends JFrame {
 	 * @param main reference to the Game class, used to set up the JFrame with a Canvas.
 	 */
 	public GameWindow(Game game) {
-		setExtendedState(JFrame.MAXIMIZED_BOTH);
-		//setUndecorated(true);
+		// setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setUndecorated(true);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(GameConstants.ScaleConstants.GAME_WIDTH, GameConstants.ScaleConstants.GAME_HEIGHT);

@@ -27,12 +27,13 @@ import items.Coin;
 import items.SmallHealthPotionItem;
 import items.SwordWeaponItem;
 import level_generation.Direction;
-import level_generation.PlayerExitDestination;
 import level_generation.Floor;
+import level_generation.PlayerExitDestination;
 import level_generation.Room;
 import level_generation.RoomExit;
 import ui.HUD;
 import ui.Inventory;
+import ui.Minimap;
 import window.KeyInput;
 import window.MouseInput;
 
@@ -79,6 +80,9 @@ public class ObjectHandler {
 		
 		HUD hud = new HUD(10, 10, TILE_SIZE * 3, TILE_SIZE / 2, player);
 		addObject(hud, MENU_LAYER);
+		
+		Minimap minimap = new Minimap(TILE_SIZE * 4, TILE_SIZE * 4, floor);
+		addObject(minimap, MENU_LAYER);
 	}
 	
 	/**

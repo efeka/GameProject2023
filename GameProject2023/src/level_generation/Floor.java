@@ -1,6 +1,11 @@
 package level_generation;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import framework.FileIO;
 import framework.ObjectHandler;
@@ -10,9 +15,13 @@ public class Floor {
 	private ObjectHandler objectHandler;
 
 	// Contains all the available rooms which are loaded from the file system
-	private ArrayList<Room> roomPool;
-	// Contains the randomly generated room layout for this floor
-	private ArrayList<Room> floorRooms;
+	private List<Room> roomPool;
+
+	// Contains the randomly generated room layout for this floor.
+	// Each room's relative position is also stored here to avoid overlapping.
+	private List<Room> floorRooms;
+	private Map<Room, Point2D> roomPositions;
+
 	private Room startingRoom;
 	private Room currentRoom;
 
@@ -28,6 +37,7 @@ public class Floor {
 		this.objectHandler = objectHandler;
 		roomPool = new ArrayList<>();
 		floorRooms = new ArrayList<>();
+		roomPositions = new HashMap<>();
 		loadRooms();
 	}
 
@@ -48,10 +58,10 @@ public class Floor {
 					roomPool.add(new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler));
 			}
 		} catch (NullPointerException e) {}
-		
+
 		currentRoom = startingRoom;
 	}
-	
+
 	/**
 	 * Procedurally generates a random floor using rooms selected from the room pool.
 	 * Reaching the max room count may not be possible due to randomness.
@@ -59,46 +69,94 @@ public class Floor {
 	 */
 	public void generateRandomFloor(int maxRoomCount) {
 		// Keeps track of rooms that still have unused exits
-		ArrayList<Room> leafRooms = new ArrayList<>();
+		List<Room> leafRooms = new ArrayList<>();
 		leafRooms.add(startingRoom);
 		floorRooms.add(startingRoom);
+		roomPositions.put(startingRoom, new Point(0, 0));
 
 		while (!leafRooms.isEmpty() && maxRoomCount-- > 0) {
 			// Randomly select a leaf room and remove it from the leaf list
 			Room randomLeafRoom = getRandomElement(leafRooms);
 			leafRooms.remove(randomLeafRoom);
-			
-			ArrayList<Direction> unusedExits = randomLeafRoom.getUnusedExitLocations();
-			if (!unusedExits.isEmpty()) { 
+
+			List<Direction> availableExits = randomLeafRoom.getAvailableExitDirections();
+			removeOverlappingExitDirection(availableExits, randomLeafRoom);
+			if (!availableExits.isEmpty()) { 
 				// Randomly select an unused exit of the randomLeafRoom
-				Direction selectedExit = getRandomElement(unusedExits);
-				
+				Direction selectedExit = getRandomElement(availableExits);
+
 				// Randomly select a room from the room pool which has the opposite of the selected exit
 				Direction oppositeExit = Direction.getOppositeDirection(selectedExit);
 				Room newRoom = getRandomRoomWithExit(oppositeExit);
-				
-	            if (newRoom != null) {
-	                // Link the currentLeafRoom and the newRoom together
-	            	randomLeafRoom.setNeighbor(selectedExit, newRoom);
-	            	newRoom.setNeighbor(oppositeExit, randomLeafRoom);
-	            	floorRooms.add(newRoom);
 
-	                // Check to see if the randomLeafRoom or newRoom have more unused exits.
-	            	// If they do, add them into the leafRooms list.
-	            	if (!randomLeafRoom.getUnusedExitLocations().isEmpty())
-	            		leafRooms.add(randomLeafRoom);
-	            	if (!newRoom.getUnusedExitLocations().isEmpty())
-	            		leafRooms.add(newRoom);
-	            }
+				if (newRoom != null) {
+					// Link the currentLeafRoom and the newRoom together
+					randomLeafRoom.setNeighbor(selectedExit, newRoom);
+					newRoom.setNeighbor(oppositeExit, randomLeafRoom);
+					floorRooms.add(newRoom);
+
+					// Check to see if the randomLeafRoom or newRoom have more unused exits.
+					// If they do, add them into the leafRooms list.
+					if (!randomLeafRoom.getAvailableExitDirections().isEmpty())
+						leafRooms.add(randomLeafRoom);
+					if (!newRoom.getAvailableExitDirections().isEmpty()) {
+						leafRooms.add(newRoom);
+
+						Point2D newRoomPosition = calculateNewPositionBasedOnDirection(
+								selectedExit,
+								roomPositions.get(randomLeafRoom));
+						roomPositions.put(newRoom, newRoomPosition);
+					}
+				}
 			}
 		}
-		
+
 		// After the floor generation is complete, close the exits
 		// of the leaf rooms that lead to nowhere
 		for (Room room : leafRooms)
-			room.disableUnusedExits();		
+			room.disableUnusedExits();
 	}
-	
+
+	// Checks if adding a room in a direction selected from the list would cause an
+	// overlap between rooms. If so, removes that direction from the list.
+	private void removeOverlappingExitDirection(List<Direction> directions, Room room) {
+		Point2D roomPosition = roomPositions.get(room);
+		for (int i = directions.size() - 1; i >= 0; i--) {
+			Direction direction = directions.get(i);
+			Point2D neighborPosition = calculateNewPositionBasedOnDirection(direction, roomPosition);
+			if (roomPositions.containsValue(neighborPosition))
+				directions.remove(direction);
+		}
+	}
+
+	/**
+	 * Calculates and returns new coordinates based on the given direction and room size.
+	 * @param direction the direction in which to calculate the new coordinates
+	 * @param position the position of the center room
+	 * @return a new Point2D representing the new point in the given direction
+	 */
+	private Point2D calculateNewPositionBasedOnDirection(Direction direction, Point2D position) {
+		int roomX = (int) position.getX();
+		int roomY = (int) position.getY();
+		switch (direction) {
+		case None:
+			break;
+		case Up:
+			roomY -= 1;
+			break;
+		case Down:
+			roomY += 1;
+			break;
+		case Left:
+			roomX -= 1;
+			break;
+		case Right:
+			roomX += 1;
+			break;
+		}
+		return new Point(roomX, roomY);
+	}
+
 	/**
 	 * Loads the neighboring room in the given direction.
 	 * @param exitDirectionToNextRoom the exiting direction towards the neighbor
@@ -106,7 +164,7 @@ public class Floor {
 	public void loadNextRoom(Direction exitDirectionToNextRoom) {
 		currentRoom = currentRoom.getNeighbor(exitDirectionToNextRoom);
 	}
-	
+
 	/**
 	 * Retrieves a randomly selected room from the roomPool which has an exit in the given direction.
 	 * @param neededExitDirection the exit direction to search for
@@ -117,31 +175,39 @@ public class Floor {
 		for (Room room : roomPool)
 			if (room.hasExitInDirection(neededExitDirection))
 				eligibleRooms.add(room);
-		
+
 		if (eligibleRooms.size() == 0)
 			return null;
-		
+
 		Room randomRoom = getRandomElement(eligibleRooms);
 		if (randomRoom != null)
 			return randomRoom.createDeepCopy();
 		else
 			return null;
 	}
-	
+
 	// Retrieves a randomly selected element from the given list.
-	private <T> T getRandomElement(ArrayList<T> list) {
+	private <T> T getRandomElement(List<T> list) {
 		if (list == null || list.isEmpty())
 			return null;
 		int randomIndex = (int) (Math.random() * list.size());
 		return list.get(randomIndex);
 	}
-	
+
 	public Room getCurrentRoom() {
 		return currentRoom;
 	}
-	
+
 	public void setCurrentRoom(Room currentRoom) {
 		this.currentRoom = currentRoom;
+	}
+
+	public Room getStartingRoom() {
+		return startingRoom;
+	}
+	
+	public Map<Room, Point2D> getRoomPositions() {
+		return roomPositions;
 	}
 
 }

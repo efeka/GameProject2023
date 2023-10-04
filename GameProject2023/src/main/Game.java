@@ -18,7 +18,7 @@ public class Game extends Canvas implements Runnable {
 	public static boolean running = false;
 	
 	private GameWindow window;
-	
+	private KeyInput keyInput;
 	private ObjectHandler objectHandler;
 	
 	private final int MAX_FPS = 120;
@@ -29,7 +29,7 @@ public class Game extends Canvas implements Runnable {
 	 * The Game class is responsible for setting up and running the game, serving as the entry point of the application.
 	 */
 	public Game() {
-		KeyInput keyInput = new KeyInput();
+		keyInput = new KeyInput();
 		MouseInput mouseInput = new MouseInput();
 		addKeyListener(keyInput);
 		addMouseListener(mouseInput);
@@ -138,10 +138,12 @@ public class Game extends Canvas implements Runnable {
 		objectHandler.renderObjects(g);
 		
 		// Display FPS and UPS
-		g.setColor(Color.WHITE);
-		g.setFont(GameConstants.FontConstants.DAMAGE_FONT);
-		g.drawString("FPS: " + displayedFPS, GameConstants.ScaleConstants.GAME_WIDTH - 77, 15);
-		g.drawString("UPS: " + displayedUPS, GameConstants.ScaleConstants.GAME_WIDTH - 80, 35);
+		if (keyInput.debugPressed) {
+			g.setColor(Color.WHITE);
+			g.setFont(GameConstants.FontConstants.DAMAGE_FONT);
+			g.drawString("FPS: " + displayedFPS, GameConstants.ScaleConstants.GAME_WIDTH - 77, 15);
+			g.drawString("UPS: " + displayedUPS, GameConstants.ScaleConstants.GAME_WIDTH - 80, 35);
+		}
 		
 		g.dispose();
 		bs.show();

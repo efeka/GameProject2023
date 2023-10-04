@@ -93,6 +93,7 @@ public class TextureLoader {
 		SwordWeaponIcon,
 		SmallHealthPotionIcon,
 		BigHealthPotionIcon,
+		Minimap,
 	}
 
 	private BufferedImage playerSheet = null;
@@ -490,6 +491,11 @@ public class TextureLoader {
 			break;
 		case BigHealthPotionIcon:
 			textures = new BufferedImage[] {uiSheet.getSubimage(273, 1, 16, 16)};
+			break;
+		case Minimap:
+			textures = new BufferedImage[4];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = uiSheet.getSubimage(1 + i * 17, 85, 16, 16);
 			break;
 		}
 
