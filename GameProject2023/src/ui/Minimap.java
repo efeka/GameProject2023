@@ -60,9 +60,9 @@ public class Minimap extends GameObject {
 		for (Map.Entry<Room, Rectangle> entry : roomBounds.entrySet()) {
 			BufferedImage texture = textures[0];
 			if (entry.getKey().equals(floor.getCurrentRoom()))
-				texture = textures[1];
-			else if (entry.getKey().equals(floor.getStartingRoom()))
 				texture = textures[2];
+			else if (entry.getKey().equals(floor.getStartingRoom()))
+				texture = textures[1];
 			
 			Rectangle rect = entry.getValue();
 			g.drawImage(texture, rect.x, rect.y, rect.width, rect.height, null);

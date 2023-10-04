@@ -111,9 +111,8 @@ public class Floor {
 			}
 		}
 
-		// After the floor generation is complete, close the exits
-		// of the leaf rooms that lead to nowhere
-		for (Room room : leafRooms)
+		// After the floor generation is complete, close off the exits that lead to nowhere
+		for (Room room : floorRooms)
 			room.disableUnusedExits();
 	}
 

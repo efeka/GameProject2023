@@ -208,7 +208,6 @@ public class PoisonRat extends Creature {
 	@Override
 	public void die() {
 		objectHandler.removeObject(this);
-		objectHandler.removeObject(healthBar);
 
 		int smokeSize = (int) (TILE_SIZE * 2f);
 		int smokeX = (int) ((x + width / 2) - smokeSize / 2);
