@@ -2,6 +2,7 @@ package items;
 
 import java.awt.image.BufferedImage;
 
+import abstracts.Item;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;

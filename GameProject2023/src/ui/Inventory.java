@@ -10,7 +10,8 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-import abstract_templates.GameObject;
+import abstracts.GameObject;
+import abstracts.Item;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -19,7 +20,6 @@ import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Player;
-import items.Item;
 import items.WeaponItem;
 import player_weapons.FistWeapon;
 import window.KeyInput;

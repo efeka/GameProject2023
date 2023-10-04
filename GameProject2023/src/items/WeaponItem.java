@@ -1,10 +1,11 @@
 package items;
 
+import abstracts.Item;
+import abstracts.Weapon;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
-import player_weapons.Weapon;
 
 public abstract class WeaponItem extends Item {
 

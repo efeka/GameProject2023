@@ -1,4 +1,4 @@
-package abstract_templates;
+package abstracts;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 

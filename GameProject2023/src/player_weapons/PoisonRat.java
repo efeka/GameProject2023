@@ -8,8 +8,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import abstract_templates.Creature;
-import abstract_templates.GameObject;
+import abstracts.Creature;
+import abstracts.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;

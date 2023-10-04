@@ -28,7 +28,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import abstract_templates.GameObject;
+import abstracts.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;

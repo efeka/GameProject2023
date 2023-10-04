@@ -2,6 +2,7 @@ package player_weapons;
 
 import java.awt.Rectangle;
 
+import abstracts.Weapon;
 import framework.ObjectHandler;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;

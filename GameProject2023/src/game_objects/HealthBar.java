@@ -2,16 +2,15 @@ package game_objects;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import abstract_templates.Creature;
-import abstract_templates.GameObject;
+import abstracts.Creature;
+import abstracts.GameObject;
 import framework.ObjectId;
-import framework.TextureLoader;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 
 public class HealthBar extends GameObject {

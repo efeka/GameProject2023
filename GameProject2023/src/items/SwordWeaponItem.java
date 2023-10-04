@@ -2,12 +2,12 @@ package items;
 
 import java.awt.image.BufferedImage;
 
+import abstracts.Weapon;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import player_weapons.SwordWeapon;
-import player_weapons.Weapon;
 import window.Animation;
 import window.KeyInput;
 import window.MouseInput;

@@ -1,4 +1,4 @@
-package items;
+package abstracts;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
@@ -7,7 +7,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import abstract_templates.GameObject;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;

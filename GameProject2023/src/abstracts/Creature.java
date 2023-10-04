@@ -1,4 +1,4 @@
-package abstract_templates;
+package abstracts;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;

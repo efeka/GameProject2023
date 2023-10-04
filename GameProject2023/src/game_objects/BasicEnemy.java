@@ -7,7 +7,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import abstract_templates.Creature;
+import abstracts.Creature;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;

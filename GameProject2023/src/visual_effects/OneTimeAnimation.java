@@ -4,7 +4,7 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.Graphics;
 
-import abstract_templates.GameObject;
+import abstracts.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;

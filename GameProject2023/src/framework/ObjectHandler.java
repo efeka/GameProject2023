@@ -7,9 +7,9 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
-import abstract_templates.Creature;
-import abstract_templates.GameObject;
-import abstract_templates.TileOrientation;
+import abstracts.Creature;
+import abstracts.GameObject;
+import abstracts.TileOrientation;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.ArcherEnemy;

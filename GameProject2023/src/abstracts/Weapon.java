@@ -1,17 +1,14 @@
-package player_weapons;
+package abstracts;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import abstract_templates.Creature;
-import abstract_templates.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
-import game_objects.Player;
 import window.Animation;
 import window.KeyInput;
 import window.MouseInput;

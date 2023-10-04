@@ -6,7 +6,8 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 
-import abstract_templates.GameObject;
+import abstracts.GameObject;
+import abstracts.Weapon;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId.Category;

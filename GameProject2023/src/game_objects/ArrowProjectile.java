@@ -8,9 +8,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
-import abstract_templates.Creature;
-import abstract_templates.GameObject;
-import abstract_templates.Projectile;
+import abstracts.Creature;
+import abstracts.GameObject;
+import abstracts.Projectile;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;

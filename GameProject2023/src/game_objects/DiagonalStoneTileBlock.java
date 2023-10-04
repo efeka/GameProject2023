@@ -2,8 +2,8 @@ package game_objects;
 
 import java.awt.Graphics;
 
-import abstract_templates.DiagonalTileBlock;
-import abstract_templates.TileOrientation;
+import abstracts.DiagonalTileBlock;
+import abstracts.TileOrientation;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;

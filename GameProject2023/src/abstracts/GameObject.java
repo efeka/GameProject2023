@@ -1,4 +1,4 @@
-package abstract_templates;
+package abstracts;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;

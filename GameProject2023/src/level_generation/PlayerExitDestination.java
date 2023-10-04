@@ -2,7 +2,7 @@ package level_generation;
 
 import java.awt.Graphics;
 
-import abstract_templates.GameObject;
+import abstracts.GameObject;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;

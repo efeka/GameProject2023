@@ -30,6 +30,9 @@ public enum Direction {
 		case Right:
 			oppositeDirection = Left;
 			break;
+		default:
+			oppositeDirection = None;
+			break;
 		}
 		return oppositeDirection;
 	}
@@ -57,27 +60,6 @@ public enum Direction {
 			direction = None;
 		}
 		return direction;
-	}
-	
-	public static Name convertDirectionToName(Direction direction) {
-		Name name;
-		switch (direction) {
-		case Up:
-			name = Name.RoomExitUp;
-			break;
-		case Down:
-			name = Name.RoomExitDown;
-			break;
-		case Left:
-			name = Name.RoomExitLeft;
-			break;
-		case Right:
-			name = Name.RoomExitRight;
-			break;
-		default:
-			name = null;
-		}
-		return name;
 	}
 	
 	public int getValue() {

@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
-import abstract_templates.GameObject;
+import abstracts.GameObject;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
