@@ -42,6 +42,7 @@ public class TextureLoader {
 		BasicEnemyAttack,
 		BasicEnemyIdle,
 		BasicEnemyJump,
+		BasicEnemyHurt,
 		
 		ArcherEnemyIdle,
 		ArcherEnemyShootTorso,
@@ -284,6 +285,11 @@ public class TextureLoader {
 				textures[i] = enemySheet.getSubimage(521 + i * 65, 131, 64, 64);
 				textures[i + 2] = enemySheet.getSubimage(521 + i * 65, 196, 64, 64);
 			}
+			break;
+		case BasicEnemyHurt:
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = enemySheet.getSubimage(1 + i * 65, 391, 64, 64);
 			break;
 		case DiagonalStoneTiles:
 			textures = new BufferedImage[4];
