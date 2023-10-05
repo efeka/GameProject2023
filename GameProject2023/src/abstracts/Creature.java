@@ -34,7 +34,7 @@ public abstract class Creature extends GameObject {
 	public Creature(int x, int y, int width, int height, int damage, int maxHealth, int maxStamina, ObjectHandler objectHandler, ObjectId objectId) {
 		super(x, y, width, height, objectId);
 		this.objectHandler = objectHandler; 
-		
+
 		health = this.maxHealth = maxHealth;
 		stamina = this.maxStamina = maxStamina;
 		staminaRegen = (int) (stamina / 200f);
@@ -59,7 +59,7 @@ public abstract class Creature extends GameObject {
 	 * @param invulnerabilityDuration duration of the invulnerability state after the damage is taken.
 	 */
 	public abstract void takeDamage(int damageAmount, int invulnerabilityDuration);
-	
+
 	/**
 	 * Applies force in the given direction to this creature.
 	 * Important: Depending on the implementation, it might be necessary
@@ -75,22 +75,21 @@ public abstract class Creature extends GameObject {
 		for (int i = 0; i < coinsToDrop; i++)
 			objectHandler.addObject(objectHandler.createObjectByName(Name.Coin, (int) x, (int) y), ObjectHandler.MIDDLE_LAYER);
 	}
-	
+
 	protected void basicBlockCollision() {
 		falling = true;
-		
+
 		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
-			
+
 			// Collision with Blocks
-			if (other.getObjectId().getCategory() == Category.Block ||
-					(other.getObjectId().getCategory() == Category.JumpThroughBlock && getVelY() > 0)) {
+			if (other.getObjectId().getCategory() == Category.Block) {
 				Rectangle otherBounds = other.getBounds();
 
 				if (getGroundCheckBounds().intersects(otherBounds))
 					falling = false;
-				
+
 				// Bottom collision
 				if (getBottomBounds().intersects(otherBounds)) {
 					y = other.getY() - height;
@@ -119,6 +118,26 @@ public abstract class Creature extends GameObject {
 				if (getTopBounds().intersects(otherBounds)) {
 					y = other.getY() + other.getHeight();
 					velY = 0;
+				}
+			}
+			// Collision with Jump Through Blocks
+			else if (other.getObjectId().getCategory() == Category.JumpThroughBlock && getVelY() >= 0) {
+				Rectangle otherBounds = other.getBounds();
+
+				if (getGroundCheckBounds().intersects(otherBounds))
+					falling = false;
+
+				// Bottom collision
+				if (getBottomBounds().intersects(otherBounds)) {
+					y = other.getY() - height;
+					velY = 0;
+					jumping = false;
+
+					// Reset knock back status after hitting the ground
+					if (knockedBack) {
+						knockedBack = false;
+						velX = 0;
+					}
 				}
 			}
 		}
@@ -153,7 +172,7 @@ public abstract class Creature extends GameObject {
 			attackX = (int) x - width / 2;
 		return new Rectangle(attackX, (int) y, width, height);
 	}
-	
+
 	protected Rectangle getGroundCheckBounds() {
 		float width = 3 * this.width / 5f;
 		float xOffset = (this.width - width) / 2;

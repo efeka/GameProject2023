@@ -78,10 +78,10 @@ public class SwordWeapon extends Weapon {
 
 			if (mouseInput.isAttackButtonPressed() && !abilities[ActionState.AttackChain1.index].isOnCooldown())
 				state = ActionState.AttackChain1;
-			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[ActionState.LightningDash.index].isOnCooldown())
-				state = ActionState.LightningDash;
-			//			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[SwordState.PoisonRatSummon.index].isOnCooldown())
-			//				state = SwordState.PoisonRatSummon;
+//			else if (keyInput.isFirstAbilityKeyPressed() && !abilities[ActionState.LightningDash.index].isOnCooldown())
+//				state = ActionState.LightningDash;
+						else if (keyInput.isFirstAbilityKeyPressed() && !abilities[ActionState.PoisonRatSummon.index].isOnCooldown())
+							state = ActionState.PoisonRatSummon;
 			//			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[SwordState.SpikeChain.index].isOnCooldown())
 			//				state = SwordState.SpikeChain;
 			else if (keyInput.isSecondAbilityKeyPressed() && !abilities[ActionState.IceSwords.index].isOnCooldown())
@@ -89,9 +89,11 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case AttackChain1:
-			// First stage of the basic attack chain.
-			// The player deals damage to all enemies in a short range.
-			// Player cannot move while the ability is being cast.
+			/*
+			 * First stage of the basic attack chain.
+			 * The player deals damage to all enemies in a short range.
+			 * Player cannot move while the ability is being cast.
+			 */
 
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
@@ -112,9 +114,11 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case AttackChain2:
-			// Second stage of the basic attack chain.
-			// The player deals damage to all enemies in a short range and knocks them back.
-			// Player cannot move while the ability is being cast.
+			/*
+			 * Second stage of the basic attack chain.
+			 * The player deals damage to all enemies in a short range and knocks them back.
+			 * Player cannot move while the ability is being cast.
+			 */
 
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
@@ -130,10 +134,12 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case LightningDash:
-			// The player quickly dashes into the current direction and
-			// deals damage to enemies that it passes through.
-			// Then multiple lightning explosions happen in the dash path.
-			// Player moves in the dash direction while the ability is being cast.
+			/*
+			 * The player quickly dashes into the current direction and
+			 * deals damage to enemies that it passes through.
+			 * Then multiple lightning explosions happen in the dash path.
+			 * Player moves in the dash direction while the ability is being cast.
+			 */
 
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			// Dash started
@@ -196,9 +202,11 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case IceSwords:
-			// Spawns swords of ice that rotate around the player.
-			// The swords deal damage to enemies on contact.
-			// Player cannot move while the ability is being cast.
+			/*
+			 * Spawns swords of ice that rotate around the player.
+			 * The swords deal damage to enemies on contact.
+			 * Player cannot move while the ability is being cast.
+			 */
 
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
@@ -221,10 +229,12 @@ public class SwordWeapon extends Weapon {
 			break;
 
 		case PoisonRatSummon:
-			// Multiple poison rats get spawned around the player.
-			// Each rat starts running around and attacking enemies.
-			// Rats explode upyyon death, dealing damage to all enemies around them.
-			// Player cannot move while the ability is being cast.
+			/*
+			 * Multiple poison rats get spawned around the player.
+			 * Each rat starts running around and attacking enemies.
+			 * Rats explode upyyon death, dealing damage to all enemies around them.
+			 * Player cannot move while the ability is being cast.
+			 */
 
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
@@ -316,7 +326,7 @@ public class SwordWeapon extends Weapon {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordAttack, 1), attackDelay, true),
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordAttack, -1), attackDelay, true),
 		};
-		abilities[0] = new WeaponAbility(500, 15, attackAnims);
+		abilities[0] = new WeaponAbility(300, 15, attackAnims);
 
 		// Combo Chain 2
 		int stabDelay = 5;

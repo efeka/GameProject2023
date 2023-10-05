@@ -19,6 +19,7 @@ public class TextureLoader {
 		PlayerJump,
 		PlayerDoubleJump,
 		PlayerDodge,
+		PlayerLand,
 		PlayerPoisonGlow,
 		PlayerIceGlow,
 		
@@ -174,6 +175,13 @@ public class TextureLoader {
 			for (int i = 0; i < 7; i++) {
 				textures[i] = playerSheet.getSubimage(521 + i * 65, 521, 64, 64);
 				textures[i + 7] = playerSheet.getSubimage(521 + i * 65, 586, 64, 64);
+			}
+			break;
+		case PlayerLand:
+			textures = new BufferedImage[18];
+			for (int i = 0; i < textures.length / 2; i++) {
+				textures[i] = playerSheet.getSubimage(716 + i * 65, 1, 64, 64);
+				textures[i + 9] = playerSheet.getSubimage(716 + i * 65, 66, 64, 64);
 			}
 			break;
 		case PlayerPoisonGlow:

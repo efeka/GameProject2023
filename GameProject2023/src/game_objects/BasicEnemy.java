@@ -121,11 +121,11 @@ public class BasicEnemy extends Creature {
 		if (invulnerableDuration != 0) {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
+			
+			tookDamage = true;
+			hurtAnimation[0].resetAnimation();
+			hurtAnimation[1].resetAnimation();
 		}
-
-		tookDamage = true;
-		hurtAnimation[0].resetAnimation();
-		hurtAnimation[1].resetAnimation();
 		
 		setHealth(health - damageAmount);
 		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler),
