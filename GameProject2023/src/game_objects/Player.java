@@ -8,7 +8,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import abstracts.Creature;
@@ -54,7 +53,6 @@ public class Player extends Creature {
 	private long lastInteractTimer;
 
 	private PlayerAnimationHandler animationHandler;
-	private BufferedImage[] jumpSprites;
 
 	public Player(int x, int y, Inventory inventory, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
@@ -67,7 +65,6 @@ public class Player extends Creature {
 		invulnerableDuration = 700;
 
 		animationHandler = new PlayerAnimationHandler(this);
-		jumpSprites = TextureLoader.getInstance().getTextures(TextureName.PlayerJump);
 		texture = TextureLoader.getInstance().getTextures(TextureName.PlayerIdle)[0];
 	}
 
@@ -110,12 +107,12 @@ public class Player extends Creature {
 		weapon.tick();
 		handleObjectInteraction();
 
-		runAnimations();
+		animationHandler.runPlayerAnimations();
 	}
 
 	@Override
 	public void render(Graphics g) {
-		drawAnimations(g);
+		animationHandler.drawPlayerAnimations(g);
 		weapon.render(g);
 
 		// Debug
@@ -233,6 +230,7 @@ public class Player extends Creature {
 			return;
 
 		if (invulnerabilityDuration != 0) {
+			invulnerableDuration = invulnerabilityDuration; 
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}
@@ -389,62 +387,6 @@ public class Player extends Creature {
 		}
 	}
 
-	// TODO Should be moved into PlayerAnimationHandler
-	private void runAnimations() {
-		if (weapon.isUsingAbility() && weapon.getCurrentAnimation() != null)
-			weapon.getCurrentAnimation().runAnimation();
-		else if (dodging) {
-			animationHandler.getDodgeAnimation(1).runAnimation();
-			animationHandler.getDodgeAnimation(-1).runAnimation();
-		}
-		else if (landing) {
-			animationHandler.getLandAnimation(1).runAnimation();
-			animationHandler.getLandAnimation(-1).runAnimation();
-		}
-		else if (doubleJumping) {
-			animationHandler.getDoubleJumpAnimation(1).runAnimation();
-			animationHandler.getDoubleJumpAnimation(-1).runAnimation();
-		}
-		// Idle
-		else if (velX == 0)
-			animationHandler.getIdleAnimation().runAnimation();
-		// Running
-		else if (velX != 0)
-			animationHandler.getRunAnimation().runAnimation();
-	}
-
-	// TODO Should be moved into PlayerAnimationHandler
-	private void drawAnimations(Graphics g) {
-		int directionToIndex = animationHandler.getIndexFromDirection();
-
-		if (weapon.isUsingAbility() && weapon.getCurrentAnimation() != null)
-			weapon.getCurrentAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		else if (dodging)
-			animationHandler.getDodgeAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		// Landing
-		else if (landing)
-			animationHandler.getLandAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		// Jumping
-		else if (falling || jumping || doubleJumping) {
-			if (!doubleJumping) {
-				// Going up
-				if (velY <= 0)
-					g.drawImage(jumpSprites[directionToIndex * 2], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
-				// Going down
-				else if (velY > 0)
-					g.drawImage(jumpSprites[directionToIndex * 2 + 1], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
-			}
-			else
-				animationHandler.getDoubleJumpAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		}
-		// Idle
-		else if (velX == 0)
-			animationHandler.getIdleAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		// Running
-		else if (velX != 0)
-			animationHandler.getRunAnimation().drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-	}
-
 	public Weapon getWeapon() {
 		return weapon;
 	}
@@ -455,6 +397,14 @@ public class Player extends Creature {
 
 	public boolean isDodging() {
 		return dodging;
+	}
+	
+	public boolean isLanding() {
+		return landing;
+	}
+	
+	public boolean isDoubleJumping() {
+		return doubleJumping;
 	}
 
 	public void setLockMovementInputs(boolean lockMovementInputs) {
