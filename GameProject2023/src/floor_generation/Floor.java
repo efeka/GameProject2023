@@ -1,7 +1,8 @@
-package level_generation;
+package floor_generation;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +58,9 @@ public class Floor {
 				else
 					roomPool.add(new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler));
 			}
-		} catch (NullPointerException e) {}
+		} catch (EOFException e) {
+			e.printStackTrace();
+		}
 
 		currentRoom = startingRoom;
 	}
