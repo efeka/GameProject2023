@@ -58,9 +58,7 @@ public class Floor {
 				else
 					roomPool.add(new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler));
 			}
-		} catch (EOFException e) {
-			e.printStackTrace();
-		}
+		} catch (EOFException e) {}
 
 		currentRoom = startingRoom;
 	}

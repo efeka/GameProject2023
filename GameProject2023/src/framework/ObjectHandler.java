@@ -31,6 +31,7 @@ import items.BigHealthPotionItem;
 import items.Coin;
 import items.SmallHealthPotionItem;
 import items.SwordWeaponItem;
+import ui.DebugConsole;
 import ui.HUD;
 import ui.Inventory;
 import ui.Minimap;
@@ -74,6 +75,8 @@ public class ObjectHandler {
 	public void setupGame(int roomsPerFloor) {
 		floor = new Floor(this);
 		floor.generateRandomFloor(roomsPerFloor);
+		
+		addObject(new DebugConsole(180, 10, keyInput, this), MENU_LAYER);
 		
 		inventory = new Inventory(3, 3, this, keyInput, mouseInput);
 		addObject(inventory, MENU_LAYER);

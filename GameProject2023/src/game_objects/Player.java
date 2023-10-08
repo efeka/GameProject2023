@@ -3,10 +3,7 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
@@ -114,44 +111,6 @@ public class Player extends Creature {
 	public void render(Graphics g) {
 		animationHandler.drawPlayerAnimations(g);
 		weapon.render(g);
-
-		// Debug
-		if (keyInput.debugPressed) {
-			int consoleX = 180, consoleY = 10;
-			g.setFont(new Font("Calibri", Font.PLAIN, 15));
-			g.setColor(new Color(0, 0, 0, 150));
-			g.fillRect(consoleX - 5, consoleY, 170, 255);
-
-			g.setColor(new Color(220, 80, 80));
-			g.drawString("Health......................" + (int) health, consoleX, consoleY += 20);
-			g.setColor(new Color(80, 220, 80));
-			g.drawString("Stamina...................." + (int) stamina, consoleX, consoleY += 20);
-
-			g.setColor(Color.CYAN);
-			g.drawString("velX: " + velX, consoleX, consoleY += 20);
-			g.drawString("velY: " + velY, consoleX, consoleY += 20);
-
-			g.setColor(Color.white);
-			g.drawString("Falling....................." + falling, consoleX, consoleY += 20);
-			g.drawString("Jumping.................." + jumping, consoleX, consoleY += 20);
-			g.drawString("Double Jumping......." + doubleJumping, consoleX, consoleY += 20);
-			g.drawString("Landing..............." + landing, consoleX, consoleY += 20);
-			g.drawString("Invulnerable............" + invulnerable, consoleX, consoleY += 20);
-			g.drawString("Knocked back.........." + knockedBack, consoleX, consoleY += 20);
-			g.drawString("Can Interact............." + canInteract, consoleX, consoleY += 20);
-			g.drawString("Available Jumps.........." + availableJumps, consoleX, consoleY += 20);
-
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.setColor(Color.white);
-			g2d.draw(getBottomBounds());
-			g2d.draw(getHorizontalBounds());
-			g2d.draw(getTopBounds());
-			g2d.setColor(new Color(255, 255, 255, 70));
-			g2d.draw(getBounds());
-			g2d.setColor(new Color(255, 0, 0, 100));
-			g2d.setColor(Color.MAGENTA);
-			g2d.draw(getGroundCheckBounds());
-		}
 	}
 
 	// Use the keyboard inputs of the user to move the player
