@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 
 import abstracts.GameObject;
 import abstracts.Item;
+import abstracts.WeaponItem;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -20,7 +21,6 @@ import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Player;
-import items.WeaponItem;
 import player_weapons.FistWeapon;
 import window.KeyInput;
 import window.MouseInput;

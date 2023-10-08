@@ -1,4 +1,4 @@
-package level_generation;
+package floor_generation;
 
 import framework.ObjectId.Name;
 

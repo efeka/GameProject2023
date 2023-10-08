@@ -1,4 +1,4 @@
-package level_generation;
+package floor_generation;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 

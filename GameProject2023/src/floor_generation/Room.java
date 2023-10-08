@@ -1,4 +1,4 @@
-package level_generation;
+package floor_generation;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

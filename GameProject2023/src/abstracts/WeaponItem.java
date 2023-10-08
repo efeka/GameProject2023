@@ -1,7 +1,5 @@
-package items;
+package abstracts;
 
-import abstracts.Item;
-import abstracts.Weapon;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;

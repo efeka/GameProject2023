@@ -3,6 +3,7 @@ package items;
 import java.awt.image.BufferedImage;
 
 import abstracts.Weapon;
+import abstracts.WeaponItem;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;

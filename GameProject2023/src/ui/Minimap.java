@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.Map;
 
 import abstracts.GameObject;
+import floor_generation.Direction;
+import floor_generation.Floor;
+import floor_generation.Room;
 import framework.GameConstants;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader.TextureName;
-import level_generation.Direction;
-import level_generation.Floor;
-import level_generation.Room;
 
 public class Minimap extends GameObject {
 
