@@ -81,7 +81,7 @@ public class ObjectHandler {
 		inventory = new Inventory(3, 3, this, keyInput, mouseInput);
 		addObject(inventory, MENU_LAYER);
 		
-		HUD hud = new HUD(10, 10, TILE_SIZE * 3, TILE_SIZE / 2, player);
+		HUD hud = new HUD(0, 0, TILE_SIZE * 3, TILE_SIZE / 2, player);
 		addObject(hud, MENU_LAYER);
 		
 		Minimap minimap = new Minimap(TILE_SIZE * 4, TILE_SIZE * 4, floor);

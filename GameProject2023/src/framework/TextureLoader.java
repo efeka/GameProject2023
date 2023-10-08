@@ -10,7 +10,7 @@ public class TextureLoader {
 
 	public enum TextureName {
 		Missing,
-		
+
 		// Player / Weapons
 		PlayerIdle,
 		PlayerRun,
@@ -22,7 +22,7 @@ public class TextureLoader {
 		PlayerLand,
 		PlayerPoisonGlow,
 		PlayerIceGlow,
-		
+
 		PlayerSwordIdle,
 		PlayerSwordRun,
 		PlayerSwordAttack,
@@ -30,28 +30,28 @@ public class TextureLoader {
 		PlayerSwordThrow,
 		PlayerSwordSwing,
 		PlayerSwordDash,
-		
+
 		PlayerHammerIdle,
 		PlayerHammerRun,
 		PlayerHammerAttack,
 		PlayerHammerVerticalSlam,
 		PlayerHammerSwing,
 		PlayerHammerProjectile,
-		
+
 		// Enemies
 		BasicEnemyRun,
 		BasicEnemyAttack,
 		BasicEnemyIdle,
 		BasicEnemyJump,
 		BasicEnemyHurt,
-		
+
 		ArcherEnemyIdle,
 		ArcherEnemyShootTorso,
 		ArcherEnemyShootLegs,
-		
+
 		BullEnemyRun,
 		BullEnemyStunned,
-		
+
 		// Tiles
 		StoneTiles,
 		GrassTiles,
@@ -60,7 +60,7 @@ public class TextureLoader {
 		DiagonalStoneTiles,
 		WoodJumpThroughTiles,
 		ExitTiles,
-		
+
 		// Items
 		BronzeCoin,
 		SilverCoin,
@@ -68,28 +68,28 @@ public class TextureLoader {
 		FisticuffsItem,
 		SwordItem,
 		HammerItem,
-		
+
 		// Projectiles
 		SwordProjectile,
 		ArrowProjectile,
 		SwordSlashProjectile,
-		
+
 		// Effects
 		SparkleEffect,
 		DarkSmokeEffect,
 		PoisonSmokeEffect,
 		LightningEffect,
-		
+
 		SpikeAttack,
 		IceSword,
 		IceCircle,
-		
+
 		PoisonRatSummon,
 		PoisonRatRun,
 		PoisonRatAttack,
-		
+
 		// UI
-		HealthBar,
+		HUD,
 		Cursor,
 		Inventory,
 		SwordWeaponIcon,
@@ -103,7 +103,7 @@ public class TextureLoader {
 	private BufferedImage enemySheet = null;
 	private BufferedImage itemSheet = null;
 	private BufferedImage uiSheet = null;
- 
+
 	private TextureLoader() {
 		try {
 			FileIO fileIO = new FileIO();
@@ -474,10 +474,15 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 33, 331, 32, 32);
 			break;
-		case HealthBar:
-			textures = new BufferedImage[3];
-			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(331 + i * 33, 1, 32, 32);
+		case HUD:
+			textures = new BufferedImage[] {
+					uiSheet.getSubimage(1, 102, 26, 24),
+					uiSheet.getSubimage(52, 123, 26, 24),
+					uiSheet.getSubimage(28, 102, 50, 7),
+					uiSheet.getSubimage(1, 127, 50, 7),
+					uiSheet.getSubimage(1, 135, 50, 7),
+					uiSheet.getSubimage(28, 110, 38, 12),
+			};
 			break;
 		case Cursor:
 			textures = new BufferedImage[1];
@@ -515,11 +520,11 @@ public class TextureLoader {
 
 		return textures;
 	}
-	
+
 	public BufferedImage[] getTexturesByDirection(TextureName textureName, int direction) {
 		if (direction != 1 && direction != -1)
 			throw new IllegalArgumentException("Invalid direction value: " + direction);
-		
+
 		BufferedImage[] textures = getTextures(textureName);
 		BufferedImage[] directionalTextures;
 		// Right
@@ -528,7 +533,7 @@ public class TextureLoader {
 		// Left
 		else
 			directionalTextures = Arrays.copyOfRange(textures, textures.length / 2, textures.length);
-		
+
 		return directionalTextures;
 	}
 

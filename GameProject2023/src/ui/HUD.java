@@ -1,97 +1,125 @@
 package ui;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
+import static framework.GameConstants.ScaleConstants.TILE_SIZE;
+
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import abstracts.GameObject;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 import game_objects.Player;
 
 public class HUD extends GameObject {
 
 	private Player player;
 
-	private float healthWidthUnit;
-	private float staminaWidthUnit;
-	private int healthHeight;
-	private int staminaHeight;
+	private int prevPlayerHealth;
+	private float healthDiff = 0, deltaHealthDiff = 0.5f;
+
+	private BufferedImage[] hudTextures;
 
 	public HUD(float x, float y, int width, int height, Player player) {
 		super(x, y, width, height, new ObjectId(Category.Menu, Name.Missing));
 		this.player = player;
 
-		if (player == null) {
-			healthWidthUnit = staminaWidthUnit = 0;
-			healthHeight = staminaHeight = 0;
-		}
-		else {
-			healthWidthUnit = (float) width / player.getMaxHealth();
-			staminaWidthUnit = (float) width / player.getMaxStamina();
-			healthHeight = 3 * height / 5;
-			staminaHeight = height - healthHeight;
-		}
+		hudTextures = TextureLoader.getInstance().getTextures(TextureName.HUD);
 	}
 
 	@Override
-	public void tick() {}
+	public void tick() {
+		if (player == null)
+			return;
+
+		if (prevPlayerHealth != player.getHealth()) {
+			healthDiff = player.getHealth() - prevPlayerHealth; 
+			prevPlayerHealth = player.getHealth();
+		}
+		if (healthDiff < -0.1f)
+			healthDiff += deltaHealthDiff;
+		else
+			healthDiff = 0;
+	}
 
 	@Override
 	public void render(Graphics g) {
 		if (player == null)
 			return;
-		
-		// These are temporary
-		// Max health and stamina
-		g.setColor(new Color(51, 51, 51));
-		g.fillRect((int) x, (int) y, (int) (player.getMaxHealth() * healthWidthUnit), healthHeight);
-		g.fillRect((int) x, (int) y + healthHeight, (int) (player.getMaxStamina() * staminaWidthUnit), staminaHeight);
 
-		// Health bar
-		g.setColor(new Color(220, 80, 80));
-		g.fillRect((int) x, (int) y, (int) (player.getHealth() * healthWidthUnit), healthHeight);
-		// Stamina bar
-		g.setColor(new Color(80, 220, 80));
-		g.fillRect((int) x, (int) y + healthHeight, (int) (player.getStamina() * staminaWidthUnit), staminaHeight);
+		final int x = (int) this.x;
+		final int y = (int) this.y;
+		final int portraitSize = (int) (TILE_SIZE * 1.8f);
+		final int healthBarWidth = (int) (TILE_SIZE * 3.5f);
+		final int healthBarHeight = (int) (TILE_SIZE * 0.6f);
+		final int moneyBarWidth = (int) (TILE_SIZE * 2.4f);
+		final int moneyBarHeight = (int) (TILE_SIZE * 0.8f);
 
-		// Max health and stam borders
-		g.setColor(Color.BLACK);
-		g.drawRect((int) x, (int) y, (int) (player.getMaxHealth() * healthWidthUnit), healthHeight);
-		g.drawRect((int) x, (int) y + healthHeight, (int) (player.getMaxStamina() * staminaWidthUnit), staminaHeight);
-	
-		// Ability cooldowns
-		int ovalSize = 40;
-		g.setColor(Color.WHITE);
-		g.drawOval((int) x, 50, ovalSize, ovalSize);
-		Font font = new Font("Calibri", Font.BOLD, 18);
-		FontMetrics metrics = g.getFontMetrics(font);
-		int strX = (int) x + (ovalSize - metrics.stringWidth("Q")) / 2;
-		int strY = 53 + ((ovalSize - metrics.getHeight()) / 2) + metrics.getAscent();
-		g.setFont(font);
-		g.drawString("Q", strX, strY);
-		
-//		Weapon weapon = player.getWeapon();
-//		int timeLeft = weapon.getAbility(0).timeLeftUntilReady();
-//		int maxTime = weapon.getAbility(0).getCooldown();
-//		if (timeLeft > 0) {
-//			g.setColor(new Color(255, 255, 255, 80));
-//			float cooldownRatio = (float) timeLeft / maxTime;
-//			g.fillArc((int) x, 50, ovalSize, ovalSize, 90, (int) (-360 * cooldownRatio));
-//		}
-//		strX += 60;
-//		g.setColor(Color.WHITE);
-//		g.drawOval((int) x + 58, 50, ovalSize, ovalSize);
-//		g.drawString("E", strX, strY);
-//		timeLeft = weapon.getAbility(1).timeLeftUntilReady();
-//		maxTime = weapon.getAbility(1).getCooldown();
-//		if (timeLeft > 0) {
-//			g.setColor(new Color(255, 255, 255, 80));
-//			float cooldownRatio = (float) timeLeft / maxTime;
-//			g.fillArc((int) x + 60, 50, ovalSize, ovalSize, 90, (int) (-360 * cooldownRatio));
-//		}
+		// Player portrait
+		g.drawImage(hudTextures[0], x, y, portraitSize, portraitSize, null);
+		g.drawImage(hudTextures[1], x, y, portraitSize, portraitSize, null);
+
+		// Player health bar background
+		g.drawImage(hudTextures[2], x + portraitSize, y, healthBarWidth, healthBarHeight, null);
+
+		// Health bar damage effect
+		if (healthDiff < 0) {
+			float playerHealthRatio = (float) (player.getHealth() - healthDiff) / player.getMaxHealth();
+			BufferedImage damageImage = getClippedImage(hudTextures[4], playerHealthRatio,
+					healthBarWidth, healthBarHeight);
+			g.drawImage(damageImage, x + portraitSize, y, null);
+		}
+
+		// Player health bar
+		if (player.getHealth() > 0) {
+			float playerHealthRatio = (float) player.getHealth() / player.getMaxHealth();
+			BufferedImage healthBarImage = getClippedImage(hudTextures[3], playerHealthRatio,
+					healthBarWidth, healthBarHeight);
+			g.drawImage(healthBarImage, x + portraitSize, y, null);
+		}
+
+		// Player money background
+		g.drawImage(hudTextures[5], x + portraitSize, y + healthBarHeight, moneyBarWidth, moneyBarHeight, null);
 	}
 
+	// Scale and clip the health bar image to match the player's actual health
+	private BufferedImage getClippedImage(BufferedImage image, float ratio, int width, int height) {
+		Image healthScaledImage = image.getScaledInstance(width, height, 0);
+		image = toBufferedImage(healthScaledImage);
+
+		int newWidth = (int) ((image.getWidth()) * ratio);
+		int newX = width - newWidth;
+		image = image.getSubimage(
+				Math.min(newX, width - 1),
+				0,
+				Math.max(newWidth, 1),
+				image.getHeight());
+		return image;
+	}
+
+	/**
+	 * Converts a given Image into a BufferedImage
+	 *
+	 * @param img The Image to be converted
+	 * @return The converted BufferedImage
+	 */
+	private BufferedImage toBufferedImage(Image img) {
+		if (img instanceof BufferedImage)
+			return (BufferedImage) img;
+
+		// Create a buffered image with transparency
+		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+		// Draw the image on to the buffered image
+		Graphics2D bGr = bimage.createGraphics();
+		bGr.drawImage(img, 0, 0, null);
+		bGr.dispose();
+
+		// Return the buffered image
+		return bimage;
+	}
 }
