@@ -19,6 +19,10 @@ public class PlayerAnimationHandler {
 	private Animation[] landAnimations;
 	private BufferedImage[] jumpSprites;
 	
+	private boolean flashWhiteToggle;
+	private long flashWhiteToggleTimer;
+	private int flashWhiteToggleCooldownMillis = 100; 
+	
 	public PlayerAnimationHandler(Player player) {
 		this.player = player;
 		jumpSprites = TextureLoader.getInstance().getTextures(TextureName.PlayerJump);
@@ -61,7 +65,17 @@ public class PlayerAnimationHandler {
 		int imageWidth = player.getWidth() * 2;
 		int imageHeight = player.getHeight() * 2;
 		
-		g.drawImage(getCurrentAnimationImage(), imageX, imageY, imageWidth, imageHeight, null);
+		if (System.currentTimeMillis() - flashWhiteToggleTimer >= flashWhiteToggleCooldownMillis) {
+			flashWhiteToggle = !flashWhiteToggle;
+			flashWhiteToggleTimer = System.currentTimeMillis();
+		}
+		
+		// If the player is invulnerable, display a periodic white flash as an indicator
+		BufferedImage currentImage = getCurrentAnimationImage();
+		if (player.isInvulnerable() && flashWhiteToggle)
+			currentImage = getImageInWhite((Graphics2D) g, currentImage);
+		
+		g.drawImage(currentImage, imageX, imageY, imageWidth, imageHeight, null);
 	}
 	
 	private BufferedImage getCurrentAnimationImage() {
@@ -180,7 +194,7 @@ public class PlayerAnimationHandler {
 	            int pixel = image.getRGB(x, y);
 	            int alpha = (pixel >> 24) & 0xFF;
 	            if (alpha != 0)
-	                whiteImage.setRGB(x, y, Color.WHITE.getRGB());
+	                whiteImage.setRGB(x, y, new Color(199, 207, 204).getRGB());
 	        }
 	    }
 

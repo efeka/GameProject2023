@@ -25,16 +25,17 @@ import window.MouseInput;
 
 public class Player extends Creature {
 
+	private PlayerAnimationHandler animationHandler;
 	private ObjectHandler objectHandler;
 	private KeyInput keyInput;
 
+	private Weapon weapon;
+	
 	private boolean landing = false;
 	private float runningSpeed = 3f;
 	private float jumpingSpeed = 7.3f;
 	private float doubleJumpSpeed = 6.5f;
 	private float dodgingSpeed = 5f;
-
-	private Weapon weapon;
 
 	private int availableJumps = 2;
 	private boolean doubleJumping = false;
@@ -48,8 +49,6 @@ public class Player extends Creature {
 	private boolean canInteract = true;
 	private int interactCooldownMillis = 600;
 	private long lastInteractTimer;
-
-	private PlayerAnimationHandler animationHandler;
 
 	public Player(int x, int y, Inventory inventory, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
