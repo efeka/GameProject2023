@@ -3,9 +3,9 @@ package framework;
 import static framework.GameConstants.ScaleConstants.TILE_COLUMNS;
 import static framework.GameConstants.ScaleConstants.TILE_ROWS;
 
-import java.lang.StringBuilder;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,7 +30,7 @@ public class FileIO {
 	 * @param index the index of the level to read
 	 * @return 2D array containing the object UIDs in the level
 	 */
-	public int[][] loadLevel(String filename, int index) {		
+	public int[][] loadLevel(String filename, int index) throws EOFException {		
 		int[][] objectUIDs = new int[rows][cols];
 		
 		FileInputStream inputStream = null;
@@ -50,7 +50,10 @@ public class FileIO {
             	for (int j = 0; j < line.length; j++) 
             		objectUIDs[i][j] = Integer.parseInt(line[j]);
             }
-        } 
+        }
+        catch (NullPointerException e) {
+        	throw new EOFException();
+        }
         catch (IOException e) {
             e.printStackTrace();
         }
