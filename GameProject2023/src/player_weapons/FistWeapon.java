@@ -1,7 +1,9 @@
 package player_weapons;
 
 import java.awt.Rectangle;
+import java.util.HashSet;
 
+import abstracts.GameObject;
 import abstracts.Weapon;
 import framework.ObjectHandler;
 import framework.TextureLoader;
@@ -15,7 +17,9 @@ public class FistWeapon extends Weapon {
 
 	enum ActionState {
 		None(-1),
-		Attack(0);
+		AttackChain1(0),
+		AttackChain2(1),
+		AttackChain3(2);
 
 		private int index;
 
@@ -30,9 +34,13 @@ public class FistWeapon extends Weapon {
 	private ActionState state = ActionState.None;
 	private Animation currentAnimation;
 	private WeaponAbility[] abilities;
+	private HashSet<GameObject> enemiesHitByAttack1, enemiesHitByAttack2, enemiesHitByAttack3;
 	
 	public FistWeapon(ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(objectHandler, keyInput, mouseInput);
+		enemiesHitByAttack1 = new HashSet<>();
+		enemiesHitByAttack2 = new HashSet<>();
+		enemiesHitByAttack3 = new HashSet<>();
 		setupAbilities();
 	}
 	
@@ -41,49 +49,124 @@ public class FistWeapon extends Weapon {
 		Player player = objectHandler.getPlayer();
 		switch (state) {
 		case None:
+			enemiesHitByAttack1.clear();
+			enemiesHitByAttack2.clear();
+			enemiesHitByAttack3.clear();
+			
 			currentAnimation = null;
 			for (WeaponAbility weaponAbility : abilities) {
 				if (!weaponAbility.isOnCooldown())
 					weaponAbility.resetAnimations();
 			}
 
-			if (mouseInput.isAttackButtonPressed() && !abilities[ActionState.Attack.index].isOnCooldown())
-				state = ActionState.Attack;
+			if (mouseInput.isAttackButtonPressed() && !abilities[ActionState.AttackChain1.index].isOnCooldown())
+				state = ActionState.AttackChain1;
 			break;
 
-		case Attack:
+		case AttackChain1:
 			/*
+			 * First stage of the basic attack chain.
 			 * The player deals damage to all enemies in a short range.
-			 * Player cannot move while the ability is being cast. 
+			 * Player cannot move while the ability is being cast.
 			 */
-			
+
 			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
 			if (currentAnimation.isPlayedOnce()) {
-				abilities[state.getIndex()].startCooldown();
+				if (mouseInput.isAttackButtonPressed()) {
+					state = ActionState.AttackChain2;
+					break;
+				}
+				else {
+					abilities[state.getIndex()].startCooldown();
+					state = ActionState.None;
+					break;
+				}
+			}
+
+			int currentFrame = currentAnimation.getCurrentFrame();
+			if (currentFrame == 1 || currentFrame == 2)
+				checkEnemyCollision(getJabAttackBounds(),
+						enemiesHitByAttack1,
+						abilities[state.getIndex()].getDamage(),
+						0, 0, 50);
+			player.setVelX(0);
+			break;
+
+		case AttackChain2:
+			/*
+			 * Second stage of the basic attack chain.
+			 * The player deals damage to all enemies in a short range..
+			 * Player cannot move while the ability is being cast.
+			 */
+
+			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
+			if (currentAnimation.isPlayedOnce()) {
+				if (mouseInput.isAttackButtonPressed()) {
+					state = ActionState.AttackChain3;
+					break;
+				}
+				else {
+					abilities[state.getIndex()].startCooldown();
+					state = ActionState.None;
+					break;
+				}
+			}
+
+			currentFrame = currentAnimation.getCurrentFrame();
+			if (currentFrame == 1 || currentFrame == 2)
+				checkEnemyCollision(getJabAttackBounds(),
+						enemiesHitByAttack2,
+						abilities[state.getIndex()].getDamage(),
+						0, 0, 50);
+			player.setVelX(0);
+			break;
+			
+		case AttackChain3:
+			/*
+			 * Third stage of the basic attack chain.
+			 * The player deals damage to all enemies in a short range and knocks them back.
+			 * Player cannot move while the ability is being cast.
+			 */
+
+			currentAnimation = abilities[state.getIndex()].getAnimations()[getIndexFromDirection()];
+			if (currentAnimation.isPlayedOnce()) {
+				abilities[ActionState.AttackChain1.getIndex()].startCooldown();
 				state = ActionState.None;
 				break;
 			}
 
-			if (currentAnimation.getCurrentFrame() == 4) {
-				float knockbackX = player.getDirection() * 3f;
-				float knockbackY = -2f;
-				checkEnemyCollision(getAttackBounds(), null, abilities[state.getIndex()].getDamage(),
-						knockbackX, knockbackY, 400);
-			}
-			
-			if (!player.isFalling()) {
-				player.setVelX(0);
-				player.setVelY(0);
-			}
+			currentFrame = currentAnimation.getCurrentFrame();
+			if (currentFrame == 2)
+				checkEnemyCollision(getJabAttackBounds(),
+						enemiesHitByAttack3,
+						abilities[state.getIndex()].getDamage(),
+						4 * player.getDirection(), -2f, 50);
+			player.setVelX(0);
 			break;
 		}
 	}
 
-	private Rectangle getAttackBounds() {
+	public Rectangle getJabAttackBounds() {
 		Player player = objectHandler.getPlayer();
 		int x = (int) player.getX();
 		int y = (int) player.getY();
 		int width = player.getWidth();
+		int height = player.getHeight();
+
+		int attackX;
+		int attackWidth = (int) (4f * width / 5);
+		if (player.getDirection() == 1)
+			attackX = (int) x + width / 2;
+		else
+			attackX = (int) x - attackWidth / 2;
+		return new Rectangle(attackX, (int) y, attackWidth, height);
+	}
+	
+	public Rectangle getCrossAttackBounds() {
+		Player player = objectHandler.getPlayer();
+		int x = (int) player.getX();
+		int y = (int) player.getY();
+		int width = (int) (player.getWidth() * 1.2f);
 		int height = player.getHeight();
 
 		int attackX;
@@ -119,19 +202,36 @@ public class FistWeapon extends Weapon {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerRun, 1), runDelay, false),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerRun, -1), runDelay, false),
 		};
+		jumpSprites = textureLoader.getTextures(TextureName.PlayerJump);
 	}
 	
 	private void setupAbilities() {
-		abilities = new WeaponAbility[1];
+		abilities = new WeaponAbility[3];
 		TextureLoader tex = TextureLoader.getInstance();
 
-		// Basic Attack
-		int attackDelay = 7;
-		Animation[] attackAnims = new Animation[] {
-				new Animation(tex.getTexturesByDirection(TextureName.PlayerAttack, 1), attackDelay, true),
-				new Animation(tex.getTexturesByDirection(TextureName.PlayerAttack, -1), attackDelay, true),
+		// Attack Chain 1
+		int firstJabDelay = 6;
+		Animation[] jabAnims = new Animation[] {
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchJab, 1), firstJabDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchJab, -1), firstJabDelay, true),
 		};
-		abilities[0] = new WeaponAbility(500, 15, attackAnims);
+		abilities[0] = new WeaponAbility(150, 7, jabAnims);
+		
+		// Attack Chain 2
+		int secondJabDelay = 2;
+		Animation[] jabAnims2 = new Animation[] {
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchJab, 1), secondJabDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchJab, -1), secondJabDelay, true),
+		};
+		abilities[1] = new WeaponAbility(150, 7, jabAnims2);
+		
+		// Attack Chain 3
+		int crossDelay = 6;
+		Animation[] crossAnims = new Animation[] {
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchCross, 1), crossDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchCross, -1), crossDelay, true),
+		};
+		abilities[2] = new WeaponAbility(500, 15, crossAnims);
 	}
 	
 	private int getIndexFromDirection() {

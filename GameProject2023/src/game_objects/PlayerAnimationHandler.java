@@ -17,7 +17,6 @@ public class PlayerAnimationHandler {
 	private Animation[] doubleJumpAnimations;
 	private Animation[] dodgeAnimations;
 	private Animation[] landAnimations;
-	private BufferedImage[] jumpSprites;
 	
 	private boolean flashWhiteToggle;
 	private long flashWhiteToggleTimer;
@@ -25,7 +24,6 @@ public class PlayerAnimationHandler {
 	
 	public PlayerAnimationHandler(Player player) {
 		this.player = player;
-		jumpSprites = TextureLoader.getInstance().getTextures(TextureName.PlayerJump);
 		setupAnimations();
 	}
 	
@@ -98,6 +96,7 @@ public class PlayerAnimationHandler {
 		// Jumping / Double Jumping
 		else if (player.isFalling() || player.isJumping() || player.isDoubleJumping()) {
 			if (!player.isDoubleJumping()) {
+				BufferedImage[] jumpSprites = getJumpSprites();
 				if (velY <= 0)
 					currentAnimationImage = jumpSprites[directionToIndex * 2];
 				else if (velY > 0)
@@ -150,6 +149,10 @@ public class PlayerAnimationHandler {
 
 	public Animation getRunAnimation() {
 		return player.getWeapon().getRunAnimation()[getIndexFromDirection()];
+	}
+	
+	public BufferedImage[] getJumpSprites() {
+		return player.getWeapon().getJumpSprites();
 	}
 
 	public boolean isDoubleJumpAnimationFinished() {
