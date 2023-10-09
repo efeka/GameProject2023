@@ -3,9 +3,7 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
@@ -112,12 +110,6 @@ public class Player extends Creature {
 
 	@Override
 	public void render(Graphics g) {
-//		Graphics2D g2d = (Graphics2D) g;
-//		g2d.setColor(Color.magenta);
-//		g2d.draw(((FistWeapon) weapon).getJabAttackBounds());
-//		g2d.setColor(Color.orange);
-//		g2d.draw(((FistWeapon) weapon).getCrossAttackBounds());
-		
 		animationHandler.drawPlayerAnimations(g);
 		weapon.render(g);
 	}

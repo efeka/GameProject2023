@@ -148,34 +148,34 @@ public class FistWeapon extends Weapon {
 
 	public Rectangle getJabAttackBounds() {
 		Player player = objectHandler.getPlayer();
-		int x = (int) player.getX();
-		int y = (int) player.getY();
-		int width = player.getWidth();
-		int height = player.getHeight();
+		int px = (int) player.getX();
+		int py = (int) player.getY();
+		int pWidth = player.getWidth();
+		int pHeight = player.getHeight();
 
 		int attackX;
-		int attackWidth = (int) (4f * width / 5);
+		int attackWidth = (int) (7f * pWidth / 10);
 		if (player.getDirection() == 1)
-			attackX = (int) x + width / 2;
+			attackX = px + pWidth / 2;
 		else
-			attackX = (int) x - attackWidth / 2;
-		return new Rectangle(attackX, (int) y, attackWidth, height);
+			attackX = px + pWidth / 2 - attackWidth;
+		return new Rectangle(attackX, py, attackWidth, pHeight);
 	}
 	
 	public Rectangle getCrossAttackBounds() {
 		Player player = objectHandler.getPlayer();
-		int x = (int) player.getX();
-		int y = (int) player.getY();
-		int width = (int) (player.getWidth() * 1.2f);
-		int height = player.getHeight();
+		int px = (int) player.getX();
+		int py = (int) player.getY();
+		int pWidth = player.getWidth();
+		int pHeight = player.getHeight();
 
 		int attackX;
-		int attackWidth = (int) (4f * width / 5);
+		int attackWidth = pWidth;
 		if (player.getDirection() == 1)
-			attackX = (int) x + width / 2;
+			attackX = px + pWidth / 2;
 		else
-			attackX = (int) x - attackWidth / 2;
-		return new Rectangle(attackX, (int) y, attackWidth, height);
+			attackX = px + pWidth / 2 - attackWidth;
+		return new Rectangle(attackX, py, attackWidth, pHeight);
 	}
 
 	@Override

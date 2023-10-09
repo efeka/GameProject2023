@@ -109,7 +109,7 @@ public class SwordWeapon extends Weapon {
 			}
 
 			if (currentAnimation.getCurrentFrame() == 2 || currentAnimation.getCurrentFrame() == 3)
-				checkEnemyCollision(getChainAttackBounds(), null, abilities[state.getIndex()].getDamage(), 0, 0, 400);
+				checkEnemyCollision(getAttackBounds(), null, abilities[state.getIndex()].getDamage(), 0, 0, 400);
 			player.setVelX(0);
 			break;
 
@@ -128,7 +128,7 @@ public class SwordWeapon extends Weapon {
 			}
 
 			if (currentAnimation.getCurrentFrame() == 4)
-				checkEnemyCollision(getChainAttackBounds(), null, abilities[state.getIndex()].getDamage(),
+				checkEnemyCollision(getAttackBounds(), null, abilities[state.getIndex()].getDamage(),
 						4 * player.getDirection(), -2f, 400);
 			player.setVelX(0);
 			break;
@@ -266,28 +266,36 @@ public class SwordWeapon extends Weapon {
 		}
 	}
 
-	private Rectangle getChainAttackBounds() {
+	public Rectangle getAttackBounds() {
 		Player player = objectHandler.getPlayer();
-		int x = (int) player.getX();
-		int y = (int) player.getY();
-		int width = player.getWidth();
-		int height = player.getHeight();
+		int px = (int) player.getX();
+		int py = (int) player.getY();
+		int pWidth = player.getWidth();
+		int pHeight = player.getHeight();
 
 		int attackX;
-		int attackWidth = (int) (4f * width / 5);
+		int attackWidth = (int) (4f * pWidth / 5);
 		if (player.getDirection() == 1)
-			attackX = (int) x + width / 2;
+			attackX = px + pWidth / 2;
 		else
-			attackX = (int) x - attackWidth / 2;
-		return new Rectangle(attackX, (int) y, attackWidth, height);
+			attackX = px + pWidth / 2 - attackWidth;
+		return new Rectangle(attackX, py, attackWidth, pHeight);
 	}
 
-	private Rectangle getSwordDashBounds() {
+	public Rectangle getSwordDashBounds() {
 		Player player = objectHandler.getPlayer();
-		int playerWidth = player.getWidth();
-		int playerHeight = player.getHeight();
-		return new Rectangle((int) (player.getX() - playerWidth / 2), (int) (player.getY() - playerHeight / 2),
-				playerWidth * 2, playerHeight * 2);
+		int px = (int) player.getX();
+		int py = (int) player.getY();
+		int pWidth = player.getWidth();
+		int pHeight = player.getHeight();
+		
+		int attackWidth = (int) (player.getWidth() * 1.2f);
+		int attackX;
+		if (player.getDirection() == 1)
+			attackX = px + pWidth / 2;
+		else
+			attackX = px + pWidth / 2 - attackWidth;
+		return new Rectangle(attackX, py, attackWidth, pHeight);
 	}
 
 	@Override
