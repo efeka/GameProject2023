@@ -2,12 +2,16 @@ package ui;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import abstracts.GameObject;
+import framework.GameConstants.FontConstants;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
@@ -50,7 +54,7 @@ public class HUD extends GameObject {
 	public void render(Graphics g) {
 		if (player == null)
 			return;
-
+		
 		final int x = (int) this.x;
 		final int y = (int) this.y;
 		final int portraitSize = (int) (TILE_SIZE * 1.8f);
@@ -84,8 +88,36 @@ public class HUD extends GameObject {
 
 		// Player money background
 		g.drawImage(hudTextures[5], x + portraitSize, y + healthBarHeight, moneyBarWidth, moneyBarHeight, null);
+		
+		// Player money amount
+		g.setColor(FontConstants.WHITE_FONT_COLOR);
+		Font font = FontConstants.UI_FONT;
+		g.setFont(font);
+		String coinText = player.getCoinCount() + "";
+		Point textCenter = new Point(x + portraitSize + moneyBarWidth / 4, y + healthBarHeight + moneyBarHeight / 2);
+		Point alignedTextPosition = getTextPositionForLeftAlignment(g, font, textCenter, coinText);
+		g.drawString(coinText, alignedTextPosition.x, alignedTextPosition.y - 2);
 	}
 
+	private Point getTextPositionForCenterAlignment(Graphics g, Font font, Point center, String text) {
+	    FontMetrics metrics = g.getFontMetrics(font);
+	    int textWidth = metrics.stringWidth(text);
+	    int textHeight = metrics.getHeight();
+
+	    int verticalPosition = center.y + (textHeight / 2) - metrics.getDescent();
+	    int horizontalPosition = center.x - (textWidth / 2);
+	    return new Point(horizontalPosition, verticalPosition);
+	}
+	
+	private Point getTextPositionForLeftAlignment(Graphics g, Font font, Point left, String text) {
+	    FontMetrics metrics = g.getFontMetrics(font);
+	    int textHeight = metrics.getHeight();
+
+	    int verticalPosition = left.y + (textHeight / 2) - metrics.getDescent();
+	    int horizontalPosition = left.x;
+	    return new Point(horizontalPosition, verticalPosition);
+	}
+	
 	// Scale and clip the health bar image to match the player's actual health
 	private BufferedImage getClippedImage(BufferedImage image, float ratio, int width, int height) {
 		Image healthScaledImage = image.getScaledInstance(width, height, 0);

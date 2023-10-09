@@ -9,11 +9,14 @@ import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import game_objects.Player;
 import visual_effects.OneTimeAnimation;
 import window.Animation;
 
 public class Coin extends Item {
 
+	private int worth;
+	
 	public Coin(float x, float y, ObjectHandler objectHandler) {
 		super(x, y, TILE_SIZE / 2, TILE_SIZE / 2, objectHandler, Name.Coin);
 		
@@ -30,12 +33,18 @@ public class Coin extends Item {
 		 */
 		int randomCoin = (int) (Math.random() * 100);
 		TextureName textureName;
-		if (randomCoin < 45)
+		if (randomCoin < 45) {
 			textureName = TextureName.BronzeCoin;
-		else if (randomCoin >= 45 && randomCoin < 80)
+			worth = 1;
+		}
+		else if (randomCoin >= 45 && randomCoin < 80) {
 			textureName = TextureName.SilverCoin;
-		else
+			worth = 3;
+		}
+		else {
 			textureName = TextureName.GoldCoin;
+			worth = 5;
+		}
 		
 		int spinDelay = 7;
 		animation = new Animation(textureLoader.getTextures(textureName), spinDelay, false);
@@ -43,11 +52,14 @@ public class Coin extends Item {
 
 	@Override
 	public void pickupItem() {
-		// TODO increase player's coin count
 		OneTimeAnimation sparkleAnimation = new OneTimeAnimation(x - width / 2, y - height / 2,
 				TextureName.SparkleEffect, 8, objectHandler);
 		objectHandler.addObject(sparkleAnimation, ObjectHandler.MIDDLE_LAYER);
 		objectHandler.removeObject(this);
+		
+		// Increase player's coin count
+		Player player = objectHandler.getPlayer();
+		player.setCoinCount(player.getCoinCount() + worth);
 	}
 
 	@Override

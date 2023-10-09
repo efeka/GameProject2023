@@ -49,6 +49,8 @@ public class Player extends Creature {
 	private boolean canInteract = true;
 	private int interactCooldownMillis = 600;
 	private long lastInteractTimer;
+	
+	private int coinCount = 0;
 
 	public Player(int x, int y, Inventory inventory, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
@@ -363,6 +365,14 @@ public class Player extends Creature {
 	
 	public boolean isDoubleJumping() {
 		return doubleJumping;
+	}
+	
+	public int getCoinCount() {
+		return coinCount;
+	}
+	
+	public void setCoinCount(int coinCount) {
+		this.coinCount = coinCount;
 	}
 
 	public void setLockMovementInputs(boolean lockMovementInputs) {

@@ -1,6 +1,10 @@
 package framework;
 
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
+import java.io.IOException;
+import java.io.InputStream;
 
 public interface GameConstants {
 
@@ -49,8 +53,29 @@ public interface GameConstants {
 	}
 	
 	public static class FontConstants {
+		public static final Color WHITE_FONT_COLOR = new Color(235, 237, 233);
+		
 		public static final Font DAMAGE_FONT = new Font("Calibri", Font.PLAIN, 20);
 		public static final Font INVENTORY_FONT = new Font("Calibri", Font.BOLD, 20);
+		public static Font UI_FONT;
+		
+		static {
+			InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream("quaver.ttf");
+			try {
+				/*
+				 * TODO: Scale Font size dynamically
+				 * double scaleFactorX = (double) screenWidth / originalWidth;
+				 * double scaleFactorY = (double) screenHeight / originalHeight;
+				 * int baseFontSize = 16; // Your base font size
+				 * int scaledFontSize = (int) (baseFontSize * Math.min(scaleFactorX, scaleFactorY));
+				 */
+				UI_FONT = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(24f);
+			} catch (FontFormatException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 }
