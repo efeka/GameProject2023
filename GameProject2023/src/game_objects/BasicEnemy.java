@@ -3,8 +3,9 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import abstracts.Creature;
@@ -17,7 +18,11 @@ import window.Animation;
 public class BasicEnemy extends Creature {
 
 	private ObjectHandler objectHandler;
-	
+
+	// After death, gradually fades out the enemy before removing 
+	private float alpha = 1;
+	private float fadingRate = 0.005f;
+
 	// If this enemy recently took damage and is in the hurt animation
 	private boolean tookDamage = false;
 
@@ -33,10 +38,10 @@ public class BasicEnemy extends Creature {
 	private Animation[] runAnimation;
 	private Animation[] attackAnimation;
 	private Animation[] hurtAnimation;
-	private BufferedImage[] jumpingSprites;
+	private Animation[] deathAnimation;
 
 	public BasicEnemy(int x, int y, ObjectHandler objectHandler) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 29, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
 		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
@@ -47,7 +52,7 @@ public class BasicEnemy extends Creature {
 	public void tick() {
 		x += velX;
 		y += velY;
-
+		
 		if (falling || jumping) {
 			velY += GRAVITY;
 
@@ -60,11 +65,18 @@ public class BasicEnemy extends Creature {
 
 		if (tookDamage && (hurtAnimation[0].isPlayedOnce() || hurtAnimation[1].isPlayedOnce()))
 			tookDamage = false;
-		
+
 		//if (!knockedBack)
 		//handleMovement();
 		handleAttacking();
 		basicBlockCollision();
+
+		if (dead) {
+			if (alpha > fadingRate) 
+				alpha -= fadingRate;
+			else
+				objectHandler.removeObject(this);
+		}
 
 		runAnimations();
 	}
@@ -76,8 +88,8 @@ public class BasicEnemy extends Creature {
 
 	private void handleAttacking() {
 		if (startedAttacking && !attacking) { 
-			if ((attackAnimation[0].getCurrentFrame() >= 4 && attackAnimation[0].getCurrentFrame() < 7) ||
-					attackAnimation[1].getCurrentFrame() >= 4 && attackAnimation[1].getCurrentFrame() < 7)
+			int currentFrame = Math.max(attackAnimation[0].getCurrentFrame(), attackAnimation[1].getCurrentFrame());
+			if (currentFrame == 3 || currentFrame == 4)
 				attacking = true;
 			else
 				attacking = false;
@@ -117,22 +129,22 @@ public class BasicEnemy extends Creature {
 		if (invulnerable)
 			return;
 		invulnerableDuration = invulnerabilityDuration; 
-		
+
 		if (invulnerableDuration != 0) {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
-			
+
 			tookDamage = true;
 			hurtAnimation[0].resetAnimation();
 			hurtAnimation[1].resetAnimation();
 		}
-		
+
 		setHealth(health - damageAmount);
 		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler),
 				ObjectHandler.MENU_LAYER);
 
-		if (health <= 0)
-			die();
+		if (health <= 0 && !dead)
+			die(false);
 	}
 
 	@Override
@@ -147,9 +159,8 @@ public class BasicEnemy extends Creature {
 
 	private void setupAnimations() {
 		TextureLoader textureLoader = TextureLoader.getInstance();
-		jumpingSprites = textureLoader.getTextures(TextureName.BasicEnemyJump);
 
-		final int idleDelay = 8;
+		final int idleDelay = 20;
 		idleAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyIdle, 1),
 						idleDelay, false),
@@ -157,14 +168,14 @@ public class BasicEnemy extends Creature {
 						idleDelay, false),
 		};
 
-		final int runDelay = 8;
+		final int runDelay = 15;
 		runAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyRun, 1),
 						runDelay, false),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyRun, -1),
 						runDelay, false),
 		};
-		
+
 		final int attackDelay = 10;
 		attackAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, 1),
@@ -172,22 +183,32 @@ public class BasicEnemy extends Creature {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, -1),
 						attackDelay, true),
 		};
-		
+
 		final int hurtDelay = 10;
 		hurtAnimation = new Animation[] {
-			new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyHurt, 1),
-					hurtDelay, true),
-			new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyHurt, -1),
-					hurtDelay, true),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyHurt, 1),
+						hurtDelay, true),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyHurt, -1),
+						hurtDelay, true),
 		};
 
+		final int deathDelay = 10;
+		deathAnimation = new Animation[] {
+				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyDeath, 1),
+						deathDelay, true),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyDeath, -1),
+						deathDelay, true),	
+		};
 	}
 
 	private void runAnimations() {
 		int directionToIndex = getIndexFromDirection();
 
+		// Dead
+		if (dead)
+			deathAnimation[directionToIndex].runAnimation();
 		// Taken damage
-		if (tookDamage)
+		else if (tookDamage)
 			hurtAnimation[directionToIndex].runAnimation();
 		// Attacking
 		else if (startedAttacking)
@@ -203,31 +224,39 @@ public class BasicEnemy extends Creature {
 	private void drawAnimations(Graphics g) {
 		int directionToIndex = getIndexFromDirection();
 
+		final int x = (int) this.x - width / 2;
+		final int y = (int) this.y - height / 2;
+		final int width = this.width * 2;
+		final int height = this.height * 2;
+
+		// Dead
+		if (dead) {
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setComposite(makeTransparent(alpha));
+			deathAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
+			g2d.setComposite(makeTransparent(1));
+		}
 		// Taken damage
-		if (tookDamage)
-			hurtAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		else if (tookDamage)
+			hurtAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
 		// Attacking
 		else if (startedAttacking)
-			attackAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		// Jumping
-		else if (jumping) {
-			// Going up
-			if (velY <= 0)
-				g.drawImage(jumpingSprites[directionToIndex * 2], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
-			// Going down
-			else if (velY > 0)
-				g.drawImage(jumpingSprites[directionToIndex * 2 + 1], (int) x - width / 2, (int) y - height / 2, width * 2, height * 2, null);
-		}
+			attackAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
 		// Idle
 		else if (velX == 0)
-			idleAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+			idleAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
 		// Running
 		else
-			runAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+			runAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
 	}
 
 	public int getIndexFromDirection() {
 		return (-direction + 1) / 2;
+	}
+
+	private AlphaComposite makeTransparent(float alpha) {
+		int type = AlphaComposite.SRC_OVER;
+		return(AlphaComposite.getInstance(type, alpha));
 	}
 
 }

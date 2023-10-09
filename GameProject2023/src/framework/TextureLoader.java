@@ -36,8 +36,8 @@ public class TextureLoader {
 		BasicEnemyRun,
 		BasicEnemyAttack,
 		BasicEnemyIdle,
-		BasicEnemyJump,
 		BasicEnemyHurt,
+		BasicEnemyDeath,
 
 		ArcherEnemyIdle,
 		ArcherEnemyShootTorso,
@@ -221,37 +221,34 @@ public class TextureLoader {
 			fillArrayWithFlippedImages(textures);
 			break;
 		case BasicEnemyIdle:
-			textures = new BufferedImage[20];
-			for (int i = 0; i < 10; i++) {
-				textures[i] = enemySheet.getSubimage(1 + i * 65, 1, 64, 64);
-				textures[i + 10] = enemySheet.getSubimage(1 + i * 65, 66, 64, 64);
-			}
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = enemySheet.getSubimage(66 + i * 65, 1, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case BasicEnemyRun:
-			textures = new BufferedImage[16];
-			for (int i = 0; i < 8; i++) {
-				textures[i] = enemySheet.getSubimage(1 + i * 65, 131, 64, 64);
-				textures[i + 8] = enemySheet.getSubimage(1 + i * 65, 196, 64, 64);
-			}
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = enemySheet.getSubimage(66 + i * 65, 66, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case BasicEnemyAttack:
 			textures = new BufferedImage[16];
-			for (int i = 0; i < 8; i++) {
-				textures[i] = enemySheet.getSubimage(1 + i * 65, 261, 64, 64);
-				textures[i + 8] = enemySheet.getSubimage(1 + i * 65, 326, 64, 64);
-			}
-			break;
-		case BasicEnemyJump:
-			textures = new BufferedImage[4];
-			for (int i = 0; i < 2; i++) {
-				textures[i] = enemySheet.getSubimage(521 + i * 65, 131, 64, 64);
-				textures[i + 2] = enemySheet.getSubimage(521 + i * 65, 196, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++) 
+				textures[i] = enemySheet.getSubimage(66 + i * 65, 131, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case BasicEnemyHurt:
-			textures = new BufferedImage[8];
-			for (int i = 0; i < textures.length; i++)
-				textures[i] = enemySheet.getSubimage(1 + i * 65, 391, 64, 64);
+			textures = new BufferedImage[6];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = enemySheet.getSubimage(66 + i * 65, 196, 64, 64);
+			fillArrayWithFlippedImages(textures);
+			break;
+		case BasicEnemyDeath:
+			textures = new BufferedImage[10];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = enemySheet.getSubimage(66 + i * 65, 261, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case DiagonalStoneTiles:
 			textures = new BufferedImage[4];

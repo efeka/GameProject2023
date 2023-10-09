@@ -8,6 +8,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import game_objects.Player;
 
 public abstract class Creature extends GameObject {
 
@@ -16,7 +17,7 @@ public abstract class Creature extends GameObject {
 
 	protected ObjectHandler objectHandler; 
 
-	protected boolean falling, jumping, knockedBack, invulnerable;
+	protected boolean falling, jumping, knockedBack, invulnerable, dead;
 	// 1 for right, -1 for left
 	protected int direction = 1;
 	protected float velX, velY;
@@ -70,7 +71,19 @@ public abstract class Creature extends GameObject {
 	public abstract void applyKnockback(float velX, float velY);
 
 	public void die() {
+		dead = true;
 		objectHandler.removeObject(this);
+		dropCoins();
+	}
+	
+	public void die(boolean removeObject) {
+		dead = true;
+		if (removeObject)
+			objectHandler.removeObject(this);
+		dropCoins();
+	}
+	
+	private void dropCoins() {
 		int coinsToDrop = (int) (Math.random() * 6) + 1;
 		for (int i = 0; i < coinsToDrop; i++)
 			objectHandler.addObject(objectHandler.createObjectByName(Name.Coin, (int) x, (int) y), ObjectHandler.MIDDLE_LAYER);
@@ -166,11 +179,12 @@ public abstract class Creature extends GameObject {
 
 	protected Rectangle getGroundAttackBounds() {
 		int attackX;
+		int attackWidth = 3 * width / 5;
 		if (direction == 1)
-			attackX = (int) x + width / 2;
+			attackX = (int) (x + width / 2);
 		else
-			attackX = (int) x - width / 2;
-		return new Rectangle(attackX, (int) y, width, height);
+			attackX = (int) (x + width / 2 - attackWidth);
+		return new Rectangle(attackX, (int) y, attackWidth, height);
 	}
 
 	protected Rectangle getGroundCheckBounds() {

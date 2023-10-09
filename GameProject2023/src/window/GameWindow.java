@@ -25,7 +25,7 @@ public class GameWindow extends JFrame implements MouseInputObserver {
 	 * @param main reference to the Game class, used to set up the JFrame with a Canvas.
 	 */
 	public GameWindow(Game game) {
-		boolean fullscreen = true;
+		boolean fullscreen = false;
 		if (fullscreen)
 			setUndecorated(true);
 		else
