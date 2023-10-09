@@ -2,6 +2,7 @@ package abstracts;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -21,6 +22,7 @@ public abstract class Weapon extends GameObject {
 	
 	protected Animation[] idleAnimation = new Animation[2];
 	protected Animation[] runAnimation = new Animation[2];
+	protected BufferedImage[] jumpSprites;
 	
 	public Weapon(ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
 		super(0, 0, 0, 0, new ObjectId(Category.Missing, Name.Missing));
@@ -76,6 +78,10 @@ public abstract class Weapon extends GameObject {
 	
 	public Animation[] getRunAnimation() {
 		return runAnimation;
+	}
+	
+	public BufferedImage[] getJumpSprites() {
+		return jumpSprites;
 	}
 
 }

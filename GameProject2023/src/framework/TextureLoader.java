@@ -1,5 +1,7 @@
 package framework;
 
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,8 +16,8 @@ public class TextureLoader {
 		// Player / Weapons
 		PlayerIdle,
 		PlayerRun,
-		PlayerAttack,
-		PlayerUppercut,
+		PlayerPunchJab,
+		PlayerPunchCross,
 		PlayerJump,
 		PlayerDoubleJump,
 		PlayerDodge,
@@ -25,18 +27,10 @@ public class TextureLoader {
 
 		PlayerSwordIdle,
 		PlayerSwordRun,
+		PlayerSwordJump,
 		PlayerSwordAttack,
 		PlayerSwordStab,
-		PlayerSwordThrow,
-		PlayerSwordSwing,
 		PlayerSwordDash,
-
-		PlayerHammerIdle,
-		PlayerHammerRun,
-		PlayerHammerAttack,
-		PlayerHammerVerticalSlam,
-		PlayerHammerSwing,
-		PlayerHammerProjectile,
 
 		// Enemies
 		BasicEnemyRun,
@@ -134,137 +128,97 @@ public class TextureLoader {
 			break;
 		case PlayerIdle:
 			textures = new BufferedImage[20];
-			for (int i = 0; i < 10; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 1, 64, 64);
-				textures[i + 10] = playerSheet.getSubimage(1 + i * 65, 66, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 1, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerRun:
 			textures = new BufferedImage[16];
-			for (int i = 0; i < 8; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 131, 64, 64);
-				textures[i + 8] = playerSheet.getSubimage(1 + i * 65, 196, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++) 
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 131, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
-			// TODO
-		case PlayerHammerAttack:
-		case PlayerUppercut:
-		case PlayerAttack:
+		case PlayerPunchJab:
 			textures = new BufferedImage[16];
-			for (int i = 0; i < 8; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 261, 64, 64);
-				textures[i + 8] = playerSheet.getSubimage(1 + i * 65, 326, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 196, 64, 64);
+			fillArrayWithFlippedImages(textures);
+			break;
+		case PlayerPunchCross:
+			textures = new BufferedImage[10];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 261, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerJump:
 			textures = new BufferedImage[4];
-			for (int i = 0; i < 2; i++) {
-				textures[i] = playerSheet.getSubimage(521 + i * 65, 131, 64, 64);
-				textures[i + 2] = playerSheet.getSubimage(521 + i * 65, 196, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(521 + i * 65, 326, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerDoubleJump:
 			textures = new BufferedImage[12];
-			for (int i = 0; i < 6; i++) {
-				textures[i] = playerSheet.getSubimage(586 + i * 65, 261, 64, 64);
-				textures[i + 6] = playerSheet.getSubimage(586 + i * 65, 326, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 326, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerDodge:
 			textures = new BufferedImage[14];
-			for (int i = 0; i < 7; i++) {
-				textures[i] = playerSheet.getSubimage(521 + i * 65, 521, 64, 64);
-				textures[i + 7] = playerSheet.getSubimage(521 + i * 65, 586, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 391, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerLand:
 			textures = new BufferedImage[18];
-			for (int i = 0; i < textures.length / 2; i++) {
-				textures[i] = playerSheet.getSubimage(716 + i * 65, 1, 64, 64);
-				textures[i + 9] = playerSheet.getSubimage(716 + i * 65, 66, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 66, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerPoisonGlow:
 			textures = new BufferedImage[9];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 1301, 64, 64);
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 1041, 64, 64);
 			break;
 		case PlayerIceGlow:
 			textures = new BufferedImage[9];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 1366, 64, 64);
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 1106, 64, 64);
 			break;
 		case PlayerSwordIdle:
 			textures = new BufferedImage[20];
-			for (int i = 0; i < 10; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 391, 64, 64);
-				textures[i + 10] = playerSheet.getSubimage(1 + i * 65, 456, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 456, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerSwordRun:
 			textures = new BufferedImage[16];
-			for (int i = 0; i < 8; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 521, 64, 64);
-				textures[i + 8] = playerSheet.getSubimage(1 + i * 65, 586, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 521, 64, 64);
+			fillArrayWithFlippedImages(textures);
+			break;
+		case PlayerSwordJump:
+			textures = new BufferedImage[4];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(521 + i * 65, 716, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerSwordAttack:
 			textures = new BufferedImage[12];
-			for (int i = 0; i < 6; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 651, 64, 64);
-				textures[i + 6] = playerSheet.getSubimage(1 + i * 65, 716, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 586, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerSwordStab:
 			textures = new BufferedImage[14];
-			for (int i = 0; i < 7; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 781, 64, 64);
-				textures[i + 7] = playerSheet.getSubimage(1 + i * 65, 846, 64, 64);
-			}
-			break;
-		case PlayerSwordSwing:
-			textures = new BufferedImage[12];
-			for (int i = 0; i < 6; i++) {
-				textures[i] = playerSheet.getSubimage(456 + i * 65, 651, 64, 64);
-				textures[i + 6] = playerSheet.getSubimage(456 + i * 65, 716, 64, 64);
-			}
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 651, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case PlayerSwordDash:
 			textures = new BufferedImage[4];
-			for (int i = 0; i < textures.length; i++) 
-				textures[i] = playerSheet.getSubimage(716 + i * 65, 391, 64, 64);
-			break;
-		case PlayerHammerIdle:
-			textures = new BufferedImage[14];
-			for (int i = 0; i < 7; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 911, 64, 64);
-				textures[i + 7] = playerSheet.getSubimage(1 + i * 65, 976, 64, 64);
-			}
-			break;
-		case PlayerHammerRun:
-			textures = new BufferedImage[16];
-			for (int i = 0; i < 8; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 1041, 64, 64);
-				textures[i + 8] = playerSheet.getSubimage(1 + i * 65, 1106, 64, 64);
-			}
-			break;
-		case PlayerHammerVerticalSlam:
-			textures = new BufferedImage[28];
-			for (int i = 0; i < 14; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 1041, 64, 64);
-				textures[i + 14] = playerSheet.getSubimage(1 + i * 65, 1106, 64, 64);
-			}
-			break;
-		case PlayerHammerSwing:
-			textures = new BufferedImage[20];
-			for (int i = 0; i < 10; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 1301, 64, 64);
-				textures[i + 10] = playerSheet.getSubimage(1 + i * 65, 1366, 64, 64);
-			}
-			break;
-		case PlayerHammerProjectile:
-			textures = new BufferedImage[1];
-			textures[0] = playerSheet.getSubimage(651, 1301, 64, 64);
+			for (int i = 0; i < textures.length / 2; i++) 
+				textures[i] = playerSheet.getSubimage(586 + i * 65, 651, 64, 64);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case BasicEnemyIdle:
 			textures = new BufferedImage[20];
@@ -373,13 +327,6 @@ public class TextureLoader {
 			textures = new BufferedImage[4];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(298 + i * 33, 34, 32, 32);
-			break;
-		case PlayerSwordThrow:
-			textures = new BufferedImage[6];
-			for (int i = 0; i < 3; i++) {
-				textures[i] = playerSheet.getSubimage(1 + i * 65, 651, 64, 64);
-				textures[i + 3] = playerSheet.getSubimage(1 + i * 65, 716, 64, 64);
-			}
 			break;
 		case ArrowProjectile:
 			textures = new BufferedImage[3];
@@ -537,5 +484,44 @@ public class TextureLoader {
 
 		return directionalTextures;
 	}
+	
+	/**
+	 * Copies the first half of the buffered image array to the second half,
+	 * after horizontally flipping each image.
+	 * This method keeps the order of images while copying, which results in
+	 * proper animations for both directions. If the order was also flipped,
+	 * this would result in the animation being played backwards for the other direction.
+	 */
+	private void fillArrayWithFlippedImages(BufferedImage[] array) {
+		int halfIndex = array.length / 2;
+		for (int i = halfIndex; i < array.length; i++) 
+			array[i] = flipHorizontally(array[i - halfIndex]);
+	}
+	
+	/**
+	 * Takes a buffered image and flips it horizontally.
+	 * @param image the buffered image to be flipped
+	 * @return the flipped buffered image
+	 */
+    public static BufferedImage flipHorizontally(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        // Create a new BufferedImage with the same dimensions
+        BufferedImage flippedImage = new BufferedImage(width, height, image.getType());
+
+        // Create an AffineTransform to perform the horizontal flip
+        AffineTransform transform = new AffineTransform();
+        transform.scale(-1, 1); // Flip horizontally
+        transform.translate(-width, 0); // Translate to the correct position
+
+        // Create an AffineTransformOp with the transform
+        AffineTransformOp flipOp = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+
+        // Apply the transformation to the original image and store the result in the new image
+        flipOp.filter(image, flippedImage);
+
+        return flippedImage;
+    }
 
 }

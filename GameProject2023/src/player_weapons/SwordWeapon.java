@@ -314,6 +314,7 @@ public class SwordWeapon extends Weapon {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordRun, 1), runDelay, false),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerSwordRun, -1), runDelay, false),
 		};
+		jumpSprites = textureLoader.getTextures(TextureName.PlayerSwordJump);
 	}
 
 	private void setupAbilities() {
@@ -346,8 +347,8 @@ public class SwordWeapon extends Weapon {
 
 		// TODO Ability 2
 		Animation[] tempAnims2 = new Animation[] {
-				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, 1), stabDelay, true),
-				new Animation(tex.getTexturesByDirection(TextureName.PlayerHammerSwing, -1), stabDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordStab, 1), stabDelay, true),
+				new Animation(tex.getTexturesByDirection(TextureName.PlayerSwordStab, -1), stabDelay, true),
 		};
 		abilities[3] = new WeaponAbility(2000, 15, tempAnims2);
 

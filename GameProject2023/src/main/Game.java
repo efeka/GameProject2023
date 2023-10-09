@@ -101,7 +101,6 @@ public class Game extends Canvas implements Runnable {
 				lastCheck = System.currentTimeMillis();
 				displayedFPS = frames;
 				displayedUPS = updates;
-				System.out.println("FPS: " + frames + " | UPS: " + updates);
 				frames = updates = 0;
 			}
 		}
