@@ -513,5 +513,7 @@ public class Inventory extends GameObject implements MouseInputObserver {
 	
 	@Override
 	public void onMouseClick(MouseEvent e) {}
+	@Override
+	public void onMouseRelease(MouseEvent e) {}
 
 }

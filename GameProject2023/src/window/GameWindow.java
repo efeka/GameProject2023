@@ -3,6 +3,7 @@ package window;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
@@ -12,9 +13,11 @@ import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import main.Game;
 
-public class GameWindow extends JFrame {
+public class GameWindow extends JFrame implements MouseInputObserver {
 
 	private static final long serialVersionUID = -7086381604555111950L;
+	
+	private Cursor[] cursors;
 	
 	/**
 	 * Creates the main application window.
@@ -37,6 +40,30 @@ public class GameWindow extends JFrame {
 		
 		setLocationRelativeTo(null);
 		setVisible(true);
+	}
+
+	@Override
+	public void onMousePress(MouseEvent e) {
+		if (cursors == null)
+			setupCursors();
+		setCursor(cursors[1]);
+	}
+
+	@Override
+	public void onMouseRelease(MouseEvent e) {
+		if (cursors == null)
+			setupCursors();
+		setCursor(cursors[0]);
+	}
+	
+	@Override
+	public void onMouseClick(MouseEvent e) {}
+	
+	private void setupCursors() {
+		BufferedImage[] cursorImages = TextureLoader.getInstance().getTextures(TextureName.Cursor);
+		cursors = new Cursor[2];
+		cursors[0] = Toolkit.getDefaultToolkit().createCustomCursor(cursorImages[0], new Point(0, 0),"custom_cursor_name1");
+		cursors[1] = Toolkit.getDefaultToolkit().createCustomCursor(cursorImages[1], new Point(0, 0),"custom_cursor_name2");
 	}
 
 }

@@ -30,6 +30,11 @@ public class MouseInput implements MouseListener, MouseMotionListener {
         for (MouseInputObserver observer : observers)
             observer.onMousePress(e);
     }
+    
+    private void notifyReleaseObservers(MouseEvent e) {
+    	for (MouseInputObserver observer : observers)
+    		observer.onMouseRelease(e);
+    }
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -41,6 +46,8 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		notifyReleaseObservers(e);
+		
 		if (e.getButton() == MouseEvent.BUTTON1)
 			attackButtonPressed = false;
 	}

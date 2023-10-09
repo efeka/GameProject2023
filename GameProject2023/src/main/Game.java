@@ -34,13 +34,14 @@ public class Game extends Canvas implements Runnable {
 		addKeyListener(keyInput);
 		addMouseListener(mouseInput);
 		addMouseMotionListener(mouseInput);
-		
-		window = new GameWindow(this);
 
+		window = new GameWindow(this);
+		mouseInput.registerObserver(window);
+		
 		// Load the first level
 		objectHandler = new ObjectHandler(keyInput, mouseInput);
 		objectHandler.setupGame(10);
-
+		
 		requestFocus();
 		start();
 	}

@@ -485,8 +485,9 @@ public class TextureLoader {
 			};
 			break;
 		case Cursor:
-			textures = new BufferedImage[1];
+			textures = new BufferedImage[2];
 			textures[0] = uiSheet.getSubimage(86, 1, 16, 16);
+			textures[1] = uiSheet.getSubimage(86, 18, 16, 16);
 			break;
 		case Inventory:
 			textures = new BufferedImage[18];
