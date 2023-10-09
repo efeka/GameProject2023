@@ -67,7 +67,8 @@ public class ArrowProjectile extends Projectile {
 	private void checkCollisions() {
 		// Player or player summon collision
 		ArrayList<Creature> targetList = objectHandler.getSummonsList();
-		for (Creature target : targetList) {
+		for (int i = targetList.size() - 1; i >= 0; i--) {
+			Creature target = targetList.get(i);
 			if (getBounds().intersects(target.getBounds())) {
 				target.applyKnockback(velX / 2, -3f);
 				target.takeDamage(damage, target.DEFAULT_INVULNERABILITY_DURATION);
