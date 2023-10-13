@@ -2,7 +2,7 @@ package floor_generation;
 
 import framework.ObjectId.Name;
 
-public enum Direction {
+public enum RoomDirection {
 	None(-1),
 	Up(0),
 	Down(1),
@@ -11,13 +11,13 @@ public enum Direction {
 
 	private int value;
 	
-	Direction(int value) {
+	RoomDirection(int value) {
 		this.value = value;
 	}
 	
-	public static Direction getOppositeDirection(Direction direction) {
-		Direction oppositeDirection = null;
-		switch (direction) {
+	public static RoomDirection getOppositeDirection(RoomDirection roomDirection) {
+		RoomDirection oppositeDirection = null;
+		switch (roomDirection) {
 		case Up:
 			oppositeDirection = Down;
 			break;
@@ -37,37 +37,37 @@ public enum Direction {
 		return oppositeDirection;
 	}
 
-	public static Direction convertNameToDirection(Name name) {
-		Direction direction;
+	public static RoomDirection convertNameToDirection(Name name) {
+		RoomDirection roomDirection;
 		switch (name) {
 		case RoomExitUp:
 		case PlayerExitDestinationUp:
-			direction = Up;
+			roomDirection = Up;
 			break;
 		case RoomExitDown:
 		case PlayerExitDestinationDown:
-			direction = Down;
+			roomDirection = Down;
 			break;
 		case RoomExitLeft:
 		case PlayerExitDestinationLeft:
-			direction = Left;
+			roomDirection = Left;
 			break;
 		case RoomExitRight:
 		case PlayerExitDestinationRight:
-			direction = Right;
+			roomDirection = Right;
 			break;
 		default:
-			direction = None;
+			roomDirection = None;
 		}
-		return direction;
+		return roomDirection;
 	}
 	
 	public int getValue() {
 		return value;
 	}
 	
-    public static Direction getByValue(int value) {
-        for (Direction dir : values())
+    public static RoomDirection getByValue(int value) {
+        for (RoomDirection dir : values())
             if (dir.getValue() == value)
                 return dir;
         return null;

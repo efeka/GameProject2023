@@ -1,6 +1,5 @@
 package floor_generation;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +51,7 @@ public class Room {
 		for (int i = middleLayer.size() - 1; i >= 0; i--) {
 			GameObject gameObject = middleLayer.get(i);
 			Name objectName = gameObject.getObjectId().getName();
-			int directionIndex = Direction.convertNameToDirection(objectName).getValue();
+			int directionIndex = RoomDirection.convertNameToDirection(objectName).getValue();
 			
 			if (directionIndex == -1)
 				continue;
@@ -66,11 +65,11 @@ public class Room {
 
 	/**
 	 * Checks if this room has an exit in the given direction.
-	 * @param direction of the exit to search for
+	 * @param roomDirection of the exit to search for
 	 * @return true if an exit in the given direction exists, false otherwise
 	 */
-	public boolean hasExitInDirection(Direction direction) {
-		int directionIndex = direction.getValue();
+	public boolean hasExitInDirection(RoomDirection roomDirection) {
+		int directionIndex = roomDirection.getValue();
 		return hasRoomExit[directionIndex];
 	}
 
@@ -78,19 +77,19 @@ public class Room {
 		return new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler);
 	}
 	
-	public PlayerExitDestination getPlayerExitDestination(Direction direction) {
-		int directionIndex = direction.getValue();
+	public PlayerExitDestination getPlayerExitDestination(RoomDirection roomDirection) {
+		int directionIndex = roomDirection.getValue();
 		return playerExitDestinations[directionIndex];
 	}
 
 	public void disableUnusedExits() {
-		List<Direction> unusedExitLocations = getAvailableExitDirections();
+		List<RoomDirection> unusedExitLocations = getAvailableExitDirections();
 		for (int i = middleLayer.size() - 1; i >= 0; i--) {
 			GameObject gameObject = middleLayer.get(i);
 			Name objectName = gameObject.getObjectId().getName();
 			if (gameObject.getObjectId().getCategory() == Category.RoomExit) {
 				for (int j = unusedExitLocations.size() - 1; j >= 0; j--) {
-					Direction locationFromName = Direction.convertNameToDirection(objectName);
+					RoomDirection locationFromName = RoomDirection.convertNameToDirection(objectName);
 					if (locationFromName == unusedExitLocations.get(j)) {
 						// TODO implement a better way of removing exits which is visually appealing
 						middleLayer.remove(i);
@@ -109,33 +108,33 @@ public class Room {
 	 * Retrieves the exits of this room which are not yet linked to other rooms.
 	 * @return the list of available exits
 	 */
-	public List<Direction> getAvailableExitDirections() {
-		List<Direction> list = new ArrayList<>();
+	public List<RoomDirection> getAvailableExitDirections() {
+		List<RoomDirection> list = new ArrayList<>();
 		for (int i = 0; i < neighbors.length; i++) {
-			Direction direction = Direction.getByValue(i);
-			if (hasExitInDirection(direction) && getNeighbor(direction) == null)
-				list.add(direction);
+			RoomDirection roomDirection = RoomDirection.getByValue(i);
+			if (hasExitInDirection(roomDirection) && getNeighbor(roomDirection) == null)
+				list.add(roomDirection);
 		}
 		return list;
 	}
 
 	/**
 	 * Returns the neighboring room at the given direction.
-	 * @param direction the direction towards the neighbor
+	 * @param roomDirection the direction towards the neighbor
 	 * @return the neighbor
 	 */
-	public Room getNeighbor(Direction direction) {
-		int directionIndex = direction.getValue();
+	public Room getNeighbor(RoomDirection roomDirection) {
+		int directionIndex = roomDirection.getValue();
 		return neighbors[directionIndex];
 	}
 
 	/**
 	 * Set the neighboring room that the given exit of this room leads to.
-	 * @param direction the direction of the exit that leads to the neighbor
+	 * @param roomDirection the direction of the exit that leads to the neighbor
 	 * @param neighbor the neighbor to be added at the given direction
 	 */
-	public void setNeighbor(Direction direction, Room neighbor) {
-		int directionIndex = direction.getValue();
+	public void setNeighbor(RoomDirection roomDirection, Room neighbor) {
+		int directionIndex = roomDirection.getValue();
 		neighbors[directionIndex] = neighbor;
 	}
 

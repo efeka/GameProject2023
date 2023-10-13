@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import abstracts.GameObject;
-import floor_generation.Direction;
+import floor_generation.RoomDirection;
 import floor_generation.Floor;
 import floor_generation.Room;
 import framework.GameConstants;
@@ -80,7 +80,7 @@ public class Minimap extends GameObject {
 			Room room = entry.getKey();
 			int connectionOffset = (roomSize - connectionWidth) / 2;
 			// Add rectangles between rooms to signify neighbor status
-			if (room.getNeighbor(Direction.Up) != null) {
+			if (room.getNeighbor(RoomDirection.Up) != null) {
 				Rectangle rect = new Rectangle(
 						boundsX + connectionOffset,
 						boundsY - connectionLength,
@@ -88,7 +88,7 @@ public class Minimap extends GameObject {
 						connectionLength);
 				neighborConnections.add(rect);
 			}
-			if (room.getNeighbor(Direction.Down) != null) {
+			if (room.getNeighbor(RoomDirection.Down) != null) {
 				Rectangle rect = new Rectangle(
 						boundsX + connectionOffset,
 						boundsY + roomSize,
@@ -96,7 +96,7 @@ public class Minimap extends GameObject {
 						connectionLength);
 				neighborConnections.add(rect);
 			}
-			if (room.getNeighbor(Direction.Left) != null) {
+			if (room.getNeighbor(RoomDirection.Left) != null) {
 				Rectangle rect = new Rectangle(
 						boundsX - connectionLength,
 						boundsY + connectionOffset,
@@ -104,7 +104,7 @@ public class Minimap extends GameObject {
 						connectionWidth);
 				neighborConnections.add(rect);
 			}
-			if (room.getNeighbor(Direction.Right) != null) {
+			if (room.getNeighbor(RoomDirection.Right) != null) {
 				Rectangle rect = new Rectangle(
 						boundsX + roomSize,
 						boundsY + connectionOffset,

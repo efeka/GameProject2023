@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import abstracts.Creature;
 import abstracts.GameObject;
 import abstracts.TileOrientation;
-import floor_generation.Direction;
+import floor_generation.RoomDirection;
 import floor_generation.Floor;
 import floor_generation.PlayerExitDestination;
 import floor_generation.Room;
@@ -289,12 +289,12 @@ public class ObjectHandler {
 	 * @param roomExit the roomExit that the player just went through
 	 * @param exitLocationToNeighbor the location of the exit leading to the neighbor
 	 */
-	public void loadNeighboringRoom(RoomExit roomExit, Direction exitLocationToNeighbor) {
+	public void loadNeighboringRoom(RoomExit roomExit, RoomDirection exitLocationToNeighbor) {
 		floor.getCurrentRoom().getMiddleLayer().remove(player);
 		floor.loadNextRoom(exitLocationToNeighbor);
 		floor.getCurrentRoom().getMiddleLayer().add(player);
 		// Move the player to the corresponding spawn location of the next rooms exit
-		Direction oppositeExitLocation = Direction.getOppositeDirection(exitLocationToNeighbor);
+		RoomDirection oppositeExitLocation = RoomDirection.getOppositeDirection(exitLocationToNeighbor);
 		PlayerExitDestination playerExitDestination = floor.getCurrentRoom().getPlayerExitDestination(oppositeExitLocation);
 		player.setX(playerExitDestination.getX());
 		player.setY(playerExitDestination.getY());

@@ -91,6 +91,7 @@ public class TextureLoader {
 		SmallHealthPotionIcon,
 		BigHealthPotionIcon,
 		Minimap,
+		CreatureHealthBar,
 	}
 
 	private BufferedImage playerSheet = null;
@@ -469,6 +470,13 @@ public class TextureLoader {
 			textures = new BufferedImage[4];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = uiSheet.getSubimage(1 + i * 17, 85, 16, 16);
+			break;
+		case CreatureHealthBar:
+			textures = new BufferedImage[] {
+					uiSheet.getSubimage(1, 143, 50, 7),
+					uiSheet.getSubimage(1, 151, 50, 7),
+					uiSheet.getSubimage(1, 159, 50, 7),
+			};
 			break;
 		}
 

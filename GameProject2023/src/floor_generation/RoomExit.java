@@ -55,8 +55,8 @@ public class RoomExit extends GameObject {
 	public void tick() {
 		// If the player is colliding with this object, move the them to the next room
 		if (getBounds().intersects(objectHandler.getPlayer().getBounds())) {
-			Direction direction = Direction.convertNameToDirection(objectId.getName());
-			objectHandler.loadNeighboringRoom(this, direction);
+			RoomDirection roomDirection = RoomDirection.convertNameToDirection(objectId.getName());
+			objectHandler.loadNeighboringRoom(this, roomDirection);
 		}
 	}
 	

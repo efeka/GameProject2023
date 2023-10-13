@@ -41,9 +41,7 @@ public class DebugConsole extends GameObject {
 
 			g.setColor(new Color(220, 80, 80));
 			g.drawString("Health......................" + player.getHealth(), x, y += 20);
-			g.setColor(new Color(80, 220, 80));
-			g.drawString("Stamina...................." + player.getStamina(), x, y += 20);
-
+			
 			g.setColor(Color.CYAN);
 			g.drawString("velX: " + player.getVelX(), x, y += 20);
 			g.drawString("velY: " + player.getVelY(), x, y += 20);

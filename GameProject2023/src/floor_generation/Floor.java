@@ -80,14 +80,14 @@ public class Floor {
 			Room randomLeafRoom = getRandomElement(leafRooms);
 			leafRooms.remove(randomLeafRoom);
 
-			List<Direction> availableExits = randomLeafRoom.getAvailableExitDirections();
+			List<RoomDirection> availableExits = randomLeafRoom.getAvailableExitDirections();
 			removeOverlappingExitDirection(availableExits, randomLeafRoom);
 			if (!availableExits.isEmpty()) { 
 				// Randomly select an unused exit of the randomLeafRoom
-				Direction selectedExit = getRandomElement(availableExits);
+				RoomDirection selectedExit = getRandomElement(availableExits);
 
 				// Randomly select a room from the room pool which has the opposite of the selected exit
-				Direction oppositeExit = Direction.getOppositeDirection(selectedExit);
+				RoomDirection oppositeExit = RoomDirection.getOppositeDirection(selectedExit);
 				Room newRoom = getRandomRoomWithExit(oppositeExit);
 
 				if (newRoom != null) {
@@ -119,26 +119,26 @@ public class Floor {
 
 	// Checks if adding a room in a direction selected from the list would cause an
 	// overlap between rooms. If so, removes that direction from the list.
-	private void removeOverlappingExitDirection(List<Direction> directions, Room room) {
+	private void removeOverlappingExitDirection(List<RoomDirection> roomDirections, Room room) {
 		Point2D roomPosition = roomPositions.get(room);
-		for (int i = directions.size() - 1; i >= 0; i--) {
-			Direction direction = directions.get(i);
-			Point2D neighborPosition = calculateNewPositionBasedOnDirection(direction, roomPosition);
+		for (int i = roomDirections.size() - 1; i >= 0; i--) {
+			RoomDirection roomDirection = roomDirections.get(i);
+			Point2D neighborPosition = calculateNewPositionBasedOnDirection(roomDirection, roomPosition);
 			if (roomPositions.containsValue(neighborPosition))
-				directions.remove(direction);
+				roomDirections.remove(roomDirection);
 		}
 	}
 
 	/**
 	 * Calculates and returns new coordinates based on the given direction and room size.
-	 * @param direction the direction in which to calculate the new coordinates
+	 * @param roomDirection the direction in which to calculate the new coordinates
 	 * @param position the position of the center room
 	 * @return a new Point2D representing the new point in the given direction
 	 */
-	private Point2D calculateNewPositionBasedOnDirection(Direction direction, Point2D position) {
+	private Point2D calculateNewPositionBasedOnDirection(RoomDirection roomDirection, Point2D position) {
 		int roomX = (int) position.getX();
 		int roomY = (int) position.getY();
-		switch (direction) {
+		switch (roomDirection) {
 		case None:
 			break;
 		case Up:
@@ -161,7 +161,7 @@ public class Floor {
 	 * Loads the neighboring room in the given direction.
 	 * @param exitDirectionToNextRoom the exiting direction towards the neighbor
 	 */
-	public void loadNextRoom(Direction exitDirectionToNextRoom) {
+	public void loadNextRoom(RoomDirection exitDirectionToNextRoom) {
 		currentRoom = currentRoom.getNeighbor(exitDirectionToNextRoom);
 	}
 
@@ -170,7 +170,7 @@ public class Floor {
 	 * @param neededExitDirection the exit direction to search for
 	 * @return the room which has an exit in the required direction
 	 */
-	private Room getRandomRoomWithExit(Direction neededExitDirection) {
+	private Room getRandomRoomWithExit(RoomDirection neededExitDirection) {
 		ArrayList<Room> eligibleRooms = new ArrayList<>();
 		for (Room room : roomPool)
 			if (room.hasExitInDirection(neededExitDirection))
