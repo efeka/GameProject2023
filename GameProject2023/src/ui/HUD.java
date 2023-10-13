@@ -3,14 +3,13 @@ package ui;
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import abstracts.GameObject;
+import framework.BufferedImageUtil;
+import framework.FontUtil;
 import framework.GameConstants.FontConstants;
 import framework.ObjectId;
 import framework.ObjectId.Category;
@@ -73,16 +72,24 @@ public class HUD extends GameObject {
 		// Health bar damage effect
 		if (healthDiff < 0) {
 			float playerHealthRatio = (float) (player.getHealth() - healthDiff) / player.getMaxHealth();
-			BufferedImage damageImage = getClippedImage(hudTextures[4], playerHealthRatio,
-					healthBarWidth, healthBarHeight);
-			g.drawImage(damageImage, x + portraitSize, y, null);
+			int newBarWidth = (int) (healthBarWidth * playerHealthRatio);
+			BufferedImage damagedBarImage = BufferedImageUtil.getScaledInstance(
+					hudTextures[4],
+					healthBarWidth,
+					healthBarHeight);
+			damagedBarImage = BufferedImageUtil.getLeftClippedImage(damagedBarImage, newBarWidth);
+			g.drawImage(damagedBarImage, x + portraitSize, y, null);
 		}
 
 		// Player health bar
 		if (player.getHealth() > 0) {
 			float playerHealthRatio = (float) player.getHealth() / player.getMaxHealth();
-			BufferedImage healthBarImage = getClippedImage(hudTextures[3], playerHealthRatio,
-					healthBarWidth, healthBarHeight);
+			int newBarWidth = (int) (healthBarWidth * playerHealthRatio);
+			BufferedImage healthBarImage = BufferedImageUtil.getScaledInstance(
+					hudTextures[3],
+					healthBarWidth,
+					healthBarHeight);
+			healthBarImage = BufferedImageUtil.getLeftClippedImage(healthBarImage, newBarWidth);
 			g.drawImage(healthBarImage, x + portraitSize, y, null);
 		}
 
@@ -95,63 +102,8 @@ public class HUD extends GameObject {
 		g.setFont(font);
 		String coinText = player.getCoinCount() + "";
 		Point textCenter = new Point(x + portraitSize + moneyBarWidth / 4, y + healthBarHeight + moneyBarHeight / 2);
-		Point alignedTextPosition = getTextPositionForLeftAlignment(g, font, textCenter, coinText);
+		Point alignedTextPosition = FontUtil.getTextPositionForLeftAlignment(g, font, textCenter, coinText);
 		g.drawString(coinText, alignedTextPosition.x, alignedTextPosition.y - 2);
 	}
 
-	private Point getTextPositionForCenterAlignment(Graphics g, Font font, Point center, String text) {
-	    FontMetrics metrics = g.getFontMetrics(font);
-	    int textWidth = metrics.stringWidth(text);
-	    int textHeight = metrics.getHeight();
-
-	    int verticalPosition = center.y + (textHeight / 2) - metrics.getDescent();
-	    int horizontalPosition = center.x - (textWidth / 2);
-	    return new Point(horizontalPosition, verticalPosition);
-	}
-	
-	private Point getTextPositionForLeftAlignment(Graphics g, Font font, Point left, String text) {
-	    FontMetrics metrics = g.getFontMetrics(font);
-	    int textHeight = metrics.getHeight();
-
-	    int verticalPosition = left.y + (textHeight / 2) - metrics.getDescent();
-	    int horizontalPosition = left.x;
-	    return new Point(horizontalPosition, verticalPosition);
-	}
-	
-	// Scale and clip the health bar image to match the player's actual health
-	private BufferedImage getClippedImage(BufferedImage image, float ratio, int width, int height) {
-		Image healthScaledImage = image.getScaledInstance(width, height, 0);
-		image = toBufferedImage(healthScaledImage);
-
-		int newWidth = (int) ((image.getWidth()) * ratio);
-		int newX = width - newWidth;
-		image = image.getSubimage(
-				Math.min(newX, width - 1),
-				0,
-				Math.max(newWidth, 1),
-				image.getHeight());
-		return image;
-	}
-
-	/**
-	 * Converts a given Image into a BufferedImage
-	 *
-	 * @param img The Image to be converted
-	 * @return The converted BufferedImage
-	 */
-	private BufferedImage toBufferedImage(Image img) {
-		if (img instanceof BufferedImage)
-			return (BufferedImage) img;
-
-		// Create a buffered image with transparency
-		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-		// Draw the image on to the buffered image
-		Graphics2D bGr = bimage.createGraphics();
-		bGr.drawImage(img, 0, 0, null);
-		bGr.dispose();
-
-		// Return the buffered image
-		return bimage;
-	}
 }
