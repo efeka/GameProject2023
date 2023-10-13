@@ -3,6 +3,7 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -30,7 +31,7 @@ public class ToadEnemy extends Creature {
 	private boolean tookDamage = false;
 
 	private boolean attacking = false;
-	private boolean startedAttacking = false;
+	private boolean startedAttackAnim = false;
 	private int attackCooldown = 2000;
 	private long lastAttackTimer = attackCooldown;
 
@@ -87,7 +88,7 @@ public class ToadEnemy extends Creature {
 		}
 		else {
 			handleAttacking(targetInVision);
-			if (!knockedBack && !dead && !startedAttacking && !attacking)
+			if (!knockedBack && !dead && !startedAttackAnim && !attacking)
 				handleMovement();
 		}
 		
@@ -155,18 +156,13 @@ public class ToadEnemy extends Creature {
 	}
 
 	private void handleAttacking(Creature target) {
-		if (startedAttacking && !attacking) { 
-			int currentFrame = Math.max(attackAnimation[0].getCurrentFrame(), attackAnimation[1].getCurrentFrame());
-			attacking = currentFrame == 3 || currentFrame == 4;
+		if (startedAttackAnim) {
+			int currentFrame = getCurrentAttackAnimationFrame();
+			attacking = (currentFrame == 3 || currentFrame == 4);
 		}
-		if (knockedBack || (attacking && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce()))) {
-			attacking = false;
-			startedAttacking = false;
-
-			attackAnimation[0].resetAnimation();
-			attackAnimation[1].resetAnimation();
-		}
-
+		if (isAttackAnimationFinished())
+			startedAttackAnim = attacking = false;
+		
 		// Try to attack the player or their summons
 		ArrayList<Creature> summonsList = objectHandler.getSummonsList();
 		for (int i = summonsList.size() - 1; i >= 0; i--) {
@@ -175,7 +171,8 @@ public class ToadEnemy extends Creature {
 			if (getGroundAttackBounds().intersects(otherCreature.getBounds())) {
 				if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
 					velX = 0;
-					startedAttacking = true;
+					resetAttackAnimations();
+					startedAttackAnim = true;
 					lastAttackTimer = System.currentTimeMillis();
 				}
 
@@ -233,7 +230,7 @@ public class ToadEnemy extends Creature {
 
 		if (health <= 0 && !dead) {
 			die(false);
-			startedAttacking = attacking = false;
+			startedAttackAnim = attacking = false;
 		}
 	}
 
@@ -317,7 +314,7 @@ public class ToadEnemy extends Creature {
 		else if (tookDamage)
 			hurtAnimation[directionToIndex].runAnimation();
 		// Attacking
-		else if (startedAttacking)
+		else if (startedAttackAnim)
 			attackAnimation[directionToIndex].runAnimation();
 		// Idle
 		else if (velX == 0)
@@ -346,7 +343,7 @@ public class ToadEnemy extends Creature {
 		else if (tookDamage)
 			hurtAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
 		// Attacking
-		else if (startedAttacking)
+		else if (startedAttackAnim)
 			attackAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
 		// Idle
 		else if (velX == 0)
@@ -358,6 +355,19 @@ public class ToadEnemy extends Creature {
 
 	public int getIndexFromDirection() {
 		return (-direction + 1) / 2;
+	}
+	
+	private boolean isAttackAnimationFinished() {
+		return attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce();
+	}
+	
+	private int getCurrentAttackAnimationFrame() {
+		return Math.max(attackAnimation[0].getCurrentFrame(), attackAnimation[1].getCurrentFrame());
+	}
+	
+	private void resetAttackAnimations() {
+		attackAnimation[0].resetAnimation();
+		attackAnimation[1].resetAnimation();
 	}
 
 	private AlphaComposite makeTransparent(float alpha) {
