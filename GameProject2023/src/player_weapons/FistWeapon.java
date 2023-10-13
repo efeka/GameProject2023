@@ -189,7 +189,7 @@ public class FistWeapon extends Weapon {
 	}
 
 	@Override
-	protected void setupAnimations() {
+	protected void setupBaseAnimations() {
 		TextureLoader textureLoader = TextureLoader.getInstance();
 		final int idleDelay = 8;
 		final int runDelay = 8;

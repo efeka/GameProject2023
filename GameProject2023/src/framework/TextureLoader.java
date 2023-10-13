@@ -31,6 +31,7 @@ public class TextureLoader {
 		PlayerSwordAttack,
 		PlayerSwordStab,
 		PlayerSwordDash,
+		PlayerSwordDarkGlow,
 
 		// Enemies
 		BasicEnemyRun,
@@ -78,9 +79,9 @@ public class TextureLoader {
 		IceSword,
 		IceCircle,
 
-		PoisonRatSummon,
-		PoisonRatRun,
-		PoisonRatAttack,
+		PlayerDarkSummonSpawn,
+		PlayerDarkSummonRun,
+		PlayerDarkSummonAttack,
 
 		// UI
 		HUD,
@@ -97,6 +98,7 @@ public class TextureLoader {
 	private BufferedImage enemySheet = null;
 	private BufferedImage itemSheet = null;
 	private BufferedImage uiSheet = null;
+	private BufferedImage creatureSheet = null;
 
 	private TextureLoader() {
 		try {
@@ -106,6 +108,7 @@ public class TextureLoader {
 			blockSheet = fileIO.loadSheet("block_sheet_16x16.png");
 			itemSheet = fileIO.loadSheet("item_sheet_32x32.png");
 			uiSheet = fileIO.loadSheet("ui_sheet.png");
+			creatureSheet = fileIO.loadSheet("creature_sheet.png");
 		} 
 		catch(IOException e) {
 			System.err.println("Failed to load an image file from the /res folder.");
@@ -219,6 +222,11 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length / 2; i++) 
 				textures[i] = playerSheet.getSubimage(586 + i * 65, 651, 64, 64);
 			fillArrayWithFlippedImages(textures);
+			break;
+		case PlayerSwordDarkGlow:
+			textures = new BufferedImage[9];
+			for (int i = 0; i < textures.length; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 846, 64, 64);
 			break;
 		case BasicEnemyIdle:
 			textures = new BufferedImage[8];
@@ -401,22 +409,23 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 65, 298, 64, 64);
 			break;
-		case PoisonRatSummon:
+		case PlayerDarkSummonSpawn:
 			textures = new BufferedImage[16];
 			for (int i = 0; i < textures.length / 2; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 33, 298, 32, 32);
-			for (int i = textures.length / 2; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + (i - textures.length / 2) * 33, 364, 32, 32);
+				textures[i] = creatureSheet.getSubimage(1 + i * 33, 67, 32, 32);
+			fillArrayWithFlippedImages(textures);
 			break;
-		case PoisonRatRun:
-			textures = new BufferedImage[8];
-			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(265 + i * 33, 298, 32, 32);
+		case PlayerDarkSummonRun:
+			textures = new BufferedImage[16];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = creatureSheet.getSubimage(1 + i * 33, 1, 32, 32);
+			fillArrayWithFlippedImages(textures);
 			break;
-		case PoisonRatAttack:
+		case PlayerDarkSummonAttack:
 			textures = new BufferedImage[12];
-			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 33, 331, 32, 32);
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = creatureSheet.getSubimage(1 + i * 33, 34, 32, 32);
+			fillArrayWithFlippedImages(textures);
 			break;
 		case HUD:
 			textures = new BufferedImage[] {
@@ -500,25 +509,25 @@ public class TextureLoader {
 	 * @param image the buffered image to be flipped
 	 * @return the flipped buffered image
 	 */
-    public static BufferedImage flipHorizontally(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
+	public BufferedImage flipHorizontally(BufferedImage image) {
+	    int width = image.getWidth();
+	    int height = image.getHeight();
 
-        // Create a new BufferedImage with the same dimensions
-        BufferedImage flippedImage = new BufferedImage(width, height, image.getType());
+	    // Create a new BufferedImage with transparency
+	    BufferedImage flippedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-        // Create an AffineTransform to perform the horizontal flip
-        AffineTransform transform = new AffineTransform();
-        transform.scale(-1, 1); // Flip horizontally
-        transform.translate(-width, 0); // Translate to the correct position
+	    // Create an AffineTransform to perform the horizontal flip
+	    AffineTransform transform = new AffineTransform();
+	    transform.scale(-1, 1); // Flip horizontally
+	    transform.translate(-width, 0); // Translate to the correct position
 
-        // Create an AffineTransformOp with the transform
-        AffineTransformOp flipOp = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+	    // Create an AffineTransformOp with the transform
+	    AffineTransformOp flipOp = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 
-        // Apply the transformation to the original image and store the result in the new image
-        flipOp.filter(image, flippedImage);
+	    // Apply the transformation to the original image and store the result in the new image
+	    flipOp.filter(image, flippedImage);
 
-        return flippedImage;
-    }
+	    return flippedImage;
+	}
 
 }

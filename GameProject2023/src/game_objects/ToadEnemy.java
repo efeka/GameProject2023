@@ -1,12 +1,14 @@
 package game_objects;
 
-import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
-import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
+import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.List;
 
 import abstracts.Creature;
 import framework.ObjectHandler;
@@ -15,11 +17,11 @@ import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import window.Animation;
 
-public class BasicEnemy extends Creature {
+public class ToadEnemy extends Creature {
 
 	private ObjectHandler objectHandler;
 
-	// After death, gradually fades out the enemy before removing 
+	// After death, gradually fades out the enemy before removing it from the game
 	private float alpha = 1;
 	private float fadingRate = 0.005f;
 
@@ -31,8 +33,16 @@ public class BasicEnemy extends Creature {
 	private int attackCooldown = 2000;
 	private long lastAttackTimer = attackCooldown;
 
-	//	private float runningSpeed = 3f;
-	//	private float jumpingSpeed = -9f;
+	// This creature slowly patrols around by slowly walking in 
+	// random directions while it does not have a target in its vision
+	private Creature targetInVision = null;
+	private int maxPatrolTime = 1500, patrolTimer;
+	private long patrolStartTimer;
+
+	private float walkingSpeed = 0.5f;
+	
+	private float runAcceleration = 0.01f;
+	private float runningSpeed = 2f;
 
 	private Animation[] idleAnimation;
 	private Animation[] runAnimation;
@@ -40,8 +50,8 @@ public class BasicEnemy extends Creature {
 	private Animation[] hurtAnimation;
 	private Animation[] deathAnimation;
 
-	public BasicEnemy(int x, int y, ObjectHandler objectHandler) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 29, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
+	public ToadEnemy(int x, int y, ObjectHandler objectHandler) {
+		super(x, y, (int) (TILE_SIZE * 1.5f), (int) (TILE_SIZE * 1.5f), 25, 100, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
 		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
@@ -52,13 +62,15 @@ public class BasicEnemy extends Creature {
 	public void tick() {
 		x += velX;
 		y += velY;
-		
+
 		if (falling || jumping) {
 			velY += GRAVITY;
 
 			if (velY > TERMINAL_VELOCITY)
 				velY = TERMINAL_VELOCITY;
 		}
+		
+		calculateDirection();
 
 		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
 			invulnerable = false;
@@ -66,17 +78,19 @@ public class BasicEnemy extends Creature {
 		if (tookDamage && (hurtAnimation[0].isPlayedOnce() || hurtAnimation[1].isPlayedOnce()))
 			tookDamage = false;
 
-		//if (!knockedBack)
-		//handleMovement();
-		handleAttacking();
-		basicBlockCollision();
-
 		if (dead) {
 			if (alpha > fadingRate) 
 				alpha -= fadingRate;
 			else
 				objectHandler.removeObject(this);
 		}
+		else {
+			handleAttacking(targetInVision);
+			if (!knockedBack && !dead && !startedAttacking && !attacking)
+				handleMovement();
+		}
+		
+		basicBlockCollision();
 
 		runAnimations();
 	}
@@ -85,16 +99,63 @@ public class BasicEnemy extends Creature {
 	public void render(Graphics g) {
 		drawAnimations(g);
 	}
+	
+	private void calculateDirection() {
+		if (velX > 0)
+			direction = 1;
+		else if (velX < 0)
+			direction = -1;
+		
+		if (knockedBack)
+			direction *= -1;
+	}
 
-	private void handleAttacking() {
+	private void handleMovement() {
+		checkForTargetsInVision();
+
+		// Chase and attack the target if it is in vision
+		if (targetInVision != null) {
+			patrolTimer = Integer.MIN_VALUE;
+
+			if (getGroundAttackBounds().intersects(targetInVision.getBounds()))
+				velX = 0;
+			else {
+				int xDiff = (int) (x - targetInVision.getX());
+				if (xDiff > 0)
+					velX += -runAcceleration;
+				else if (xDiff < 0)
+					velX += runAcceleration;
+				
+				if (Math.abs(velX) > runningSpeed)
+					velX = runningSpeed * direction;
+			}
+		}
+		// If there is no nearby target, patrol a small area
+		else {
+			if (patrolTimer == Integer.MIN_VALUE) {
+				patrolTimer = (int) (Math.random() * maxPatrolTime);
+				patrolStartTimer = System.currentTimeMillis();
+
+				// Select a random direction to walk towards
+				// Staying put is more probable than walking
+				int randomDirection = (int) (Math.random() * 100);
+				if (randomDirection >= 0 && randomDirection < 60)
+					velX = 0;
+				else if (randomDirection >= 60 && randomDirection < 80)
+					velX = walkingSpeed;
+				else
+					velX = -walkingSpeed;
+			}
+			if (System.currentTimeMillis() - patrolStartTimer > patrolTimer)
+				patrolTimer = Integer.MIN_VALUE;
+		}
+	}
+
+	private void handleAttacking(Creature target) {
 		if (startedAttacking && !attacking) { 
 			int currentFrame = Math.max(attackAnimation[0].getCurrentFrame(), attackAnimation[1].getCurrentFrame());
-			if (currentFrame == 3 || currentFrame == 4)
-				attacking = true;
-			else
-				attacking = false;
+			attacking = currentFrame == 3 || currentFrame == 4;
 		}
-
 		if (knockedBack || (attacking && (attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce()))) {
 			attacking = false;
 			startedAttacking = false;
@@ -110,6 +171,7 @@ public class BasicEnemy extends Creature {
 
 			if (getGroundAttackBounds().intersects(otherCreature.getBounds())) {
 				if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
+					velX = 0;
 					startedAttacking = true;
 					lastAttackTimer = System.currentTimeMillis();
 				}
@@ -121,7 +183,30 @@ public class BasicEnemy extends Creature {
 				}
 			}
 		}
+	}
 
+	private void checkForTargetsInVision() {
+		Player player = objectHandler.getPlayer();
+		if (player != null && getVisionBounds().intersects(player.getBounds()))
+			targetInVision = player;
+		else
+			targetInVision = null;
+
+		if (targetInVision == null) {
+			List<Creature> summonList = objectHandler.getSummonsList();
+			Creature closestTarget = null;
+			for (int i = summonList.size() - 1; i >= 0; i--) {
+				Creature target = summonList.get(i);
+				if (getVisionBounds().intersects(target.getBounds())) {
+					if (closestTarget == null)
+						closestTarget = target;
+					else if (Math.abs(x - closestTarget.getX()) > Math.abs(x - target.getX()))
+						closestTarget = target;
+					break;
+				}
+			}
+			targetInVision = closestTarget;
+		}
 	}
 
 	@Override
@@ -143,8 +228,10 @@ public class BasicEnemy extends Creature {
 		objectHandler.addObject(new DamageNumberPopup(x + width / 3, y - height / 5, damageAmount, objectHandler),
 				ObjectHandler.MENU_LAYER);
 
-		if (health <= 0 && !dead)
+		if (health <= 0 && !dead) {
 			die(false);
+			startedAttacking = attacking = false;
+		}
 	}
 
 	@Override
@@ -155,6 +242,22 @@ public class BasicEnemy extends Creature {
 		knockedBack = true;
 		this.velX = velX;
 		this.velY = velY;
+	}
+
+	// Vision range is longer on the front, but the enemy can still 
+	// see some distance behind itself
+	private Rectangle getVisionBounds() {
+		int visionWidth = TILE_SIZE * 20;
+		int visionHeight = TILE_SIZE * 4;
+		float visionFrontalRatio = 0.8f;
+		int visionY = (int) getBounds().getCenterY() - visionHeight / 2;
+		int visionX;
+		if (direction == 1)
+			 visionX = (int) (x + width / 2 - (visionWidth * (1 - visionFrontalRatio)));
+		else
+			visionX = (int) (x + width / 2 - (visionWidth * (visionFrontalRatio)));
+		
+		return new Rectangle(visionX, visionY, visionWidth, visionHeight);
 	}
 
 	private void setupAnimations() {

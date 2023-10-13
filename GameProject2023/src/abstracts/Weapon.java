@@ -30,7 +30,7 @@ public abstract class Weapon extends GameObject {
 		this.keyInput = keyInput;
 		this.mouseInput = mouseInput;
 		
-		setupAnimations();
+		setupBaseAnimations();
 	}
 	
 	public abstract void tick();
@@ -47,9 +47,14 @@ public abstract class Weapon extends GameObject {
 	public abstract Animation getCurrentAnimation();
 	
 	/**
-	 * Initialize the idle and run animations.
+	 * Setup the base animations and textures:
+	 * 	Idle
+	 * 	Run
+	 * 	Jump
+	 * 	TODO double jump
+	 * 	TODO dodge roll	
 	 */
-	protected abstract void setupAnimations();
+	protected abstract void setupBaseAnimations();
 	
 	protected void checkEnemyCollision(Rectangle attackBounds, HashSet<GameObject> enemiesHit, int damage, float knockbackVelX,
 			float knockbackVelY, int enemyInvulnerabilityDuration) {

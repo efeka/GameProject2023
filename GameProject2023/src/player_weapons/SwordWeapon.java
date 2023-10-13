@@ -255,10 +255,10 @@ public class SwordWeapon extends Weapon {
 					int ratHealth = 40;
 					int ratDamage = 5;
 					int ratExplosionDamage = 20;
-					objectHandler.addObject(new PoisonRat(ratX, (int) player.getY(), 
+					objectHandler.addObject(new DarkSummon(ratX, (int) player.getY(), 
 							1, ratDamage, ratExplosionDamage, ratHealth, objectHandler), ObjectHandler.MIDDLE_LAYER);
 					ratX = (int) player.getX() - TILE_SIZE; 
-					objectHandler.addObject(new PoisonRat(ratX, (int) player.getY(), 
+					objectHandler.addObject(new DarkSummon(ratX, (int) player.getY(), 
 							-1, ratDamage, ratExplosionDamage, ratHealth, objectHandler), ObjectHandler.MIDDLE_LAYER);	
 				}
 			}
@@ -309,7 +309,7 @@ public class SwordWeapon extends Weapon {
 	}
 
 	@Override
-	protected void setupAnimations() {
+	protected void setupBaseAnimations() {
 		TextureLoader textureLoader = TextureLoader.getInstance();
 		final int idleDelay = 8;
 		final int runDelay = 8;
@@ -370,8 +370,8 @@ public class SwordWeapon extends Weapon {
 
 		// Poison Rat Summon Ability
 		Animation[] poisonGlowAnims = new Animation[] {
-				new Animation(tex.getTextures(TextureName.PlayerPoisonGlow), glowDelay, true),
-				new Animation(tex.getTextures(TextureName.PlayerPoisonGlow), glowDelay, true),
+				new Animation(tex.getTextures(TextureName.PlayerSwordDarkGlow), glowDelay, true),
+				new Animation(tex.getTextures(TextureName.PlayerSwordDarkGlow), glowDelay, true),
 		};
 		abilities[5] = new WeaponAbility(2000, 5, poisonGlowAnims);
 	}

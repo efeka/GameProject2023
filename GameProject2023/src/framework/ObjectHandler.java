@@ -18,7 +18,7 @@ import floor_generation.RoomExit;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.ArcherEnemy;
-import game_objects.BasicEnemy;
+import game_objects.ToadEnemy;
 import game_objects.BullEnemy;
 import game_objects.DiagonalStoneTileBlock;
 import game_objects.GrassBackgroundTileBlock;
@@ -314,7 +314,7 @@ public class ObjectHandler {
 			summonsList.add(player);
 			break;
 		case BasicEnemy:
-			gameObject = new BasicEnemy(x, y, this);
+			gameObject = new ToadEnemy(x, y, this);
 			break;
 		case ArcherEnemy:
 			gameObject = new ArcherEnemy(x, y, this);

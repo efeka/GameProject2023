@@ -21,7 +21,7 @@ import game_objects.Explosion;
 import visual_effects.OneTimeAnimation;
 import window.Animation;
 
-public class PoisonRat extends Creature {
+public class DarkSummon extends Creature {
 
 	private boolean summonComplete = false;
 
@@ -39,7 +39,7 @@ public class PoisonRat extends Creature {
 	private int attackCooldown = 1000;
 	private long lastAttackTimer = 0;
 
-	public PoisonRat(int x, int y, int direction, int damage, int explosionDamage, int maxHealth, ObjectHandler objectHandler) {
+	public DarkSummon(int x, int y, int direction, int damage, int explosionDamage, int maxHealth, ObjectHandler objectHandler) {
 		super(x, y, TILE_SIZE, TILE_SIZE, damage, maxHealth, 0, objectHandler, new ObjectId(Category.FriendlySummon, Name.Missing));
 		this.direction = direction;
 		this.explosionDamage = explosionDamage;
@@ -90,14 +90,20 @@ public class PoisonRat extends Creature {
 	@Override
 	public void render(Graphics g) {
 		int directionIndex = direction == 1 ? 0 : 1;
+		
+		final int renderWidth = (int) (width * 1.5f);
+		final int renderHeight = (int) (height * 1.5f);
+		final int renderX = (int) (x - (renderWidth - width));
+		final int renderY = (int) (y - (renderHeight - height));
+		
 		if (!summonComplete)
-			summonAnimation[directionIndex].drawAnimation(g, (int) x, (int) y, width, height);
+			summonAnimation[directionIndex].drawAnimation(g, renderX, renderY, renderWidth, renderHeight);
 		else if (attacking)
-			attackAnimation[directionIndex].drawAnimation(g, (int) x, (int) y, width, height);
+			attackAnimation[directionIndex].drawAnimation(g, renderX, renderY, renderWidth, renderHeight);
 		else if (falling)
-			g.drawImage(jumpSprites[directionIndex], (int) x, (int) y, width, height, null);
+			g.drawImage(jumpSprites[directionIndex], renderX, renderY, renderWidth, renderHeight, null);
 		else
-			runAnimation[directionIndex].drawAnimation(g, (int) x, (int) y, width, height);
+			runAnimation[directionIndex].drawAnimation(g, renderX, renderY, renderWidth, renderHeight);
 	}
 
 	private void handleCollisions() {
@@ -212,15 +218,15 @@ public class PoisonRat extends Creature {
 		int smokeSize = (int) (TILE_SIZE * 2f);
 		int smokeX = (int) ((x + width / 2) - smokeSize / 2);
 		int smokeY = (int) ((y + height / 2) - smokeSize / 2);
-		OneTimeAnimation poisonSmokeAnimation = new OneTimeAnimation(smokeX, smokeY, smokeSize, smokeSize,
-				TextureName.PoisonSmokeEffect, 8, objectHandler);
-		Explosion explosion = new Explosion(poisonSmokeAnimation, explosionDamage, 
+		OneTimeAnimation darkSmokeAnimation = new OneTimeAnimation(smokeX, smokeY, smokeSize, smokeSize,
+				TextureName.DarkSmokeEffect, 8, objectHandler);
+		Explosion explosion = new Explosion(darkSmokeAnimation, explosionDamage, 
 				new Category[] {Category.Enemy}, objectHandler);
 		objectHandler.addObject(explosion, ObjectHandler.MIDDLE_LAYER);
 	}
 
 	private Rectangle getJumpCheckBounds() {
-		int boundsWidth = (int) (width * 1.1f);
+		int boundsWidth = (int) (width);
 		int boundsX;
 		if (direction == 1)
 			boundsX = (int) (x + width);
@@ -241,25 +247,25 @@ public class PoisonRat extends Creature {
 		TextureLoader textureLoader = TextureLoader.getInstance();
 		int summonDelay = 6;
 		summonAnimation = new Animation[] {
-			new Animation(textureLoader.getTexturesByDirection(TextureName.PoisonRatSummon, 1), summonDelay, true),
-			new Animation(textureLoader.getTexturesByDirection(TextureName.PoisonRatSummon, -1), summonDelay, true),
+			new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonSpawn, 1), summonDelay, true),
+			new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonSpawn, -1), summonDelay, true),
 		};
 
 		int runDelay = 8;
 		runAnimation = new Animation[] {
-				new Animation(textureLoader.getTexturesByDirection(TextureName.PoisonRatRun, 1), runDelay, false),
-				new Animation(textureLoader.getTexturesByDirection(TextureName.PoisonRatRun, -1), runDelay, false),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonRun, 1), runDelay, false),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonRun, -1), runDelay, false),
 		};
 
-		int attackDelay = 6;
+		int attackDelay = 8;
 		attackAnimation = new Animation[] {
-				new Animation(textureLoader.getTexturesByDirection(TextureName.PoisonRatAttack, 1), attackDelay, true),
-				new Animation(textureLoader.getTexturesByDirection(TextureName.PoisonRatAttack, -1), attackDelay, true),	
+				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonAttack, 1), attackDelay, true),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonAttack, -1), attackDelay, true),	
 		};
 
 		jumpSprites = new BufferedImage[] {
-				textureLoader.getTextures(TextureName.PoisonRatRun)[2],
-				textureLoader.getTextures(TextureName.PoisonRatRun)[6],
+				textureLoader.getTextures(TextureName.PlayerDarkSummonRun)[1],
+				textureLoader.getTextures(TextureName.PlayerDarkSummonRun)[9],
 		};
 	}
 
