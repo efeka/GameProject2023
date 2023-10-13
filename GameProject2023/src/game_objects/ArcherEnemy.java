@@ -28,7 +28,7 @@ public class ArcherEnemy extends Creature {
 	private Animation[] shootAnimationTorso, shootAnimationLegs;
 
 	public ArcherEnemy(int x, int y, ObjectHandler objectHandler) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
 		setupAnimations();

@@ -8,7 +8,6 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
-import game_objects.Player;
 
 public abstract class Creature extends GameObject {
 
@@ -32,14 +31,11 @@ public abstract class Creature extends GameObject {
 
 	public final int DEFAULT_INVULNERABILITY_DURATION = 700;
 
-	public Creature(int x, int y, int width, int height, int damage, int maxHealth, int maxStamina, ObjectHandler objectHandler, ObjectId objectId) {
+	public Creature(int x, int y, int width, int height, int damage, int maxHealth, ObjectHandler objectHandler, ObjectId objectId) {
 		super(x, y, width, height, objectId);
 		this.objectHandler = objectHandler; 
-
-		health = this.maxHealth = maxHealth;
-		stamina = this.maxStamina = maxStamina;
-		staminaRegen = (int) (stamina / 200f);
 		this.damage = damage;
+		health = this.maxHealth = maxHealth;
 
 		falling = true;
 		jumping = false;

@@ -28,7 +28,7 @@ public class BullEnemy extends Creature {
 	private Animation[] stunAnimation;
 	
 	public BullEnemy(int x, int y, ObjectHandler objectHandler) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 150, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BullEnemy));		
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 150, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BullEnemy));		
 		this.objectHandler = objectHandler;
 
 		velX = -runningSpeed;

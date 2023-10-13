@@ -53,7 +53,7 @@ public class Player extends Creature {
 	private int coinCount = 0;
 
 	public Player(int x, int y, Inventory inventory, ObjectHandler objectHandler, KeyInput keyInput, MouseInput mouseInput) {
-		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, 70, objectHandler, new ObjectId(Category.Player, Name.Player));
+		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 40, 100, objectHandler, new ObjectId(Category.Player, Name.Player));
 		this.objectHandler = objectHandler;
 		this.keyInput = keyInput;
 		objectHandler.setPlayer(this);

@@ -3,7 +3,6 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -51,7 +50,7 @@ public class ToadEnemy extends Creature {
 	private Animation[] deathAnimation;
 
 	public ToadEnemy(int x, int y, ObjectHandler objectHandler) {
-		super(x, y, (int) (TILE_SIZE * 1.5f), (int) (TILE_SIZE * 1.5f), 25, 100, 70, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
+		super(x, y, (int) (TILE_SIZE * 1.5f), (int) (TILE_SIZE * 1.5f), 25, 100, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
 		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
