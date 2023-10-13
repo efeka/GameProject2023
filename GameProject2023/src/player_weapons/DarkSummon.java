@@ -2,7 +2,9 @@ package player_weapons;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.HashSet;
 
 import abstracts.Creature;
 import abstracts.GameObject;
+import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
@@ -18,6 +21,7 @@ import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.DamageNumberPopup;
 import game_objects.Explosion;
+import ui.CreatureHealthBar;
 import visual_effects.OneTimeAnimation;
 import window.Animation;
 
@@ -40,7 +44,7 @@ public class DarkSummon extends Creature {
 	private long lastAttackTimer = 0;
 
 	public DarkSummon(int x, int y, int direction, int damage, int explosionDamage, int maxHealth, ObjectHandler objectHandler) {
-		super(x, y, TILE_SIZE, TILE_SIZE, damage, maxHealth, 0, objectHandler, new ObjectId(Category.FriendlySummon, Name.Missing));
+		super(x, y, TILE_SIZE, TILE_SIZE, damage, maxHealth, objectHandler, new ObjectId(Category.FriendlySummon, Name.Missing));
 		this.direction = direction;
 		this.explosionDamage = explosionDamage;
 		enemiesHit = new HashSet<>();
@@ -85,15 +89,19 @@ public class DarkSummon extends Creature {
 
 		handleCollisions();
 		runAnimations();
+		healthBar.tick();
 	}
 
 	@Override
 	public void render(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setColor(Color.white);
+		g2d.draw(getBounds());
 		int directionIndex = direction == 1 ? 0 : 1;
 		
 		final int renderWidth = (int) (width * 1.5f);
 		final int renderHeight = (int) (height * 1.5f);
-		final int renderX = (int) (x - (renderWidth - width));
+		final int renderX = (int) (x - (renderWidth - width) / 2);
 		final int renderY = (int) (y - (renderHeight - height));
 		
 		if (!summonComplete)
@@ -104,6 +112,8 @@ public class DarkSummon extends Creature {
 			g.drawImage(jumpSprites[directionIndex], renderX, renderY, renderWidth, renderHeight, null);
 		else
 			runAnimation[directionIndex].drawAnimation(g, renderX, renderY, renderWidth, renderHeight);
+		
+		healthBar.render(g);
 	}
 
 	private void handleCollisions() {
@@ -289,6 +299,11 @@ public class DarkSummon extends Creature {
 		attackAnimation[1].resetAnimation();
 		runAnimation[0].resetAnimation();
 		runAnimation[1].resetAnimation();
+	}
+	
+	@Override
+	public void setupHealthBar() {
+		healthBar = new CreatureHealthBar(this, -GameConstants.ScaleConstants.TILE_SIZE / 3);
 	}
 
 }

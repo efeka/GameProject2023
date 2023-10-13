@@ -8,6 +8,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import ui.CreatureHealthBar;
 
 public abstract class Creature extends GameObject {
 
@@ -26,10 +27,11 @@ public abstract class Creature extends GameObject {
 	protected float health, stamina;
 	protected float staminaRegen;
 
+	public final int DEFAULT_INVULNERABILITY_DURATION = 700;
 	protected int invulnerableDuration = 700;
 	protected long lastInvulnerableTimer = 0;
 
-	public final int DEFAULT_INVULNERABILITY_DURATION = 700;
+	protected CreatureHealthBar healthBar;
 
 	public Creature(int x, int y, int width, int height, int damage, int maxHealth, ObjectHandler objectHandler, ObjectId objectId) {
 		super(x, y, width, height, objectId);
@@ -41,6 +43,8 @@ public abstract class Creature extends GameObject {
 		jumping = false;
 		knockedBack = false;
 		invulnerable = false;
+		
+		setupHealthBar();
 	}
 
 	public void regenerateStamina() {
@@ -60,12 +64,17 @@ public abstract class Creature extends GameObject {
 	/**
 	 * Applies force in the given direction to this creature.
 	 * Important: Depending on the implementation, it might be necessary
-	 * to call this method BEFORE {@code takeDamage} because of invulerability.
+	 * to call this method before {@code takeDamage} because of invulnerability.
 	 * @param velX the x component of the force.
 	 * @param velY the y component of the force.
 	 */
 	public abstract void applyKnockback(float velX, float velY);
 
+	/**
+	 * Initialize the CreatureHealthBar with according to this object.
+	 */
+	public abstract void setupHealthBar();
+	
 	public void die() {
 		dead = true;
 		objectHandler.removeObject(this);

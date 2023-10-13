@@ -379,4 +379,7 @@ public class Player extends Creature {
 		this.lockMovementInputs = lockMovementInputs;
 	}
 
+	@Override
+	public void setupHealthBar() {}
+	
 }

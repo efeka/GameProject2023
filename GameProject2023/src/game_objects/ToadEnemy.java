@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import abstracts.Creature;
+import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import ui.CreatureHealthBar;
 import window.Animation;
 
 public class ToadEnemy extends Creature {
@@ -92,11 +94,13 @@ public class ToadEnemy extends Creature {
 		basicBlockCollision();
 
 		runAnimations();
+		healthBar.tick();
 	}
 
 	@Override
 	public void render(Graphics g) {
 		drawAnimations(g);
+		healthBar.render(g);
 	}
 	
 	private void calculateDirection() {
@@ -359,6 +363,11 @@ public class ToadEnemy extends Creature {
 	private AlphaComposite makeTransparent(float alpha) {
 		int type = AlphaComposite.SRC_OVER;
 		return(AlphaComposite.getInstance(type, alpha));
+	}
+	
+	@Override
+	public void setupHealthBar() {
+		healthBar = new CreatureHealthBar(this, -GameConstants.ScaleConstants.TILE_SIZE / 2);
 	}
 
 }

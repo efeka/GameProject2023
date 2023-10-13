@@ -8,10 +8,12 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import abstracts.Creature;
+import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import ui.CreatureHealthBar;
 import window.Animation;
 
 public class ArcherEnemy extends Creature {
@@ -68,12 +70,14 @@ public class ArcherEnemy extends Creature {
 
 		basicBlockCollision();
 		runAnimations();
+		healthBar.tick();
 	}
 
 
 	@Override
 	public void render(Graphics g) {
 		drawAnimations(g);
+		healthBar.render(g);
 	}
 
 	@Override
@@ -227,6 +231,11 @@ public class ArcherEnemy extends Creature {
 
 	public int getIndexFromDirection() {
 		return (-direction + 1) / 2;
+	}
+
+	@Override
+	public void setupHealthBar() {
+		healthBar = new CreatureHealthBar(this, -GameConstants.ScaleConstants.TILE_SIZE / 2);
 	}
 
 }

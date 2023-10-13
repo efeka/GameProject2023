@@ -9,12 +9,14 @@ import java.util.ArrayList;
 
 import abstracts.Creature;
 import abstracts.GameObject;
+import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import main.Game;
+import ui.CreatureHealthBar;
 import window.Animation;
 
 public class BullEnemy extends Creature {
@@ -67,11 +69,13 @@ public class BullEnemy extends Creature {
 		handleBlockCollision();
 		
 		runAnimations();
+		healthBar.tick();
 	}
 	
 	@Override
 	public void render(Graphics g) {
 		drawAnimations(g);
+		healthBar.render(g);
 	}
 
 	private void handleAttacking() {
@@ -200,6 +204,11 @@ public class BullEnemy extends Creature {
 	
 	public int getIndexFromDirection() {
 		return (-direction + 1) / 2;
+	}
+	
+	@Override
+	public void setupHealthBar() {
+		healthBar = new CreatureHealthBar(this, -GameConstants.ScaleConstants.TILE_SIZE / 2);
 	}
 
 }
