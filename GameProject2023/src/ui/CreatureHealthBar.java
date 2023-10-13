@@ -29,11 +29,11 @@ public class CreatureHealthBar extends GameObject {
 		this.parentObject = parentObject;
 		this.yOffset = yOffset;
 		
-		float unitHealthWidth = TILE_SIZE / 50f;
+		float unitHealthWidth = TILE_SIZE / 70f;
 		width = (int) (unitHealthWidth * parentObject.getMaxHealth());
-		height = (int) (TILE_SIZE * 0.3f);
+		height = (int) (TILE_SIZE * 0.15f);
 		
-		loadTextures();
+		textures = TextureLoader.getInstance().getTextures(TextureName.CreatureHealthBar);
 	}
 	
 	@Override
@@ -60,18 +60,20 @@ public class CreatureHealthBar extends GameObject {
 		int health = parentObject.getHealth();
 		int maxHealth = parentObject.getMaxHealth();
 		// Don't display the health bar if health is full or at 0
-		/*
 		if (health == parentObject.getMaxHealth())
 			return;
 		if (health == 0)
 			return;
-		*/
+
+		// Health bar background
+		g.drawImage(textures[0], (int) x - 3, (int) y - 3, width + 6, height + 6, null);
+		
 		// Health bar damage effect
 		if (healthDiff < 0) {
 			float healthRatio = (float) (health - healthDiff) / maxHealth;
 			int newBarWidth = (int) (width * healthRatio);
 			BufferedImage damagedBarImage = BufferedImageUtil.getScaledInstance(
-					textures[1],
+					textures[2],
 					width,
 					height);
 			damagedBarImage = BufferedImageUtil.getLeftClippedImage(damagedBarImage, newBarWidth);
@@ -82,19 +84,11 @@ public class CreatureHealthBar extends GameObject {
 		float healthRatio = (float) health / parentObject.getMaxHealth();
 		int newBarWidth = (int) (width * healthRatio);
 		BufferedImage healthBarImage = BufferedImageUtil.getScaledInstance(
-				textures[0],
+				textures[1],
 				width,
 				height);
 		healthBarImage = BufferedImageUtil.getLeftClippedImage(healthBarImage, newBarWidth);
 		g.drawImage(healthBarImage, (int) x, (int) y, null);
-	}
-	
-	private void loadTextures() {
-		TextureLoader textureLoader = TextureLoader.getInstance();
-		textures = new BufferedImage[] {
-				textureLoader.getTextures(TextureName.HUD)[3],
-				textureLoader.getTextures(TextureName.HUD)[4],
-		};
 	}
 
 }
