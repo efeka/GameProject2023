@@ -12,6 +12,7 @@ public class CreatureAnimationManager {
 		Attack,
 		Hurt,
 		Death,
+		Summon,
 	}
 	
 	private Map<AnimationType, Animation[]> animationMap;

@@ -2,9 +2,7 @@ package player_weapons;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -13,6 +11,8 @@ import java.util.HashSet;
 import abstracts.Creature;
 import abstracts.GameObject;
 import framework.Animation;
+import framework.CreatureAnimationManager;
+import framework.CreatureAnimationManager.AnimationType;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -27,12 +27,10 @@ import visual_effects.OneTimeAnimation;
 
 public class DarkSummon extends Creature {
 
-	private boolean summonComplete = false;
-
-	private Animation[] summonAnimation;
-	private Animation[] runAnimation;
-	private Animation[] attackAnimation;
+	private CreatureAnimationManager animationManager;
 	private BufferedImage[] jumpSprites;
+	
+	private boolean summonComplete = false;
 
 	private int explosionDamage;
 	private float runningSpeed = 2f;
@@ -48,22 +46,23 @@ public class DarkSummon extends Creature {
 		this.direction = direction;
 		this.explosionDamage = explosionDamage;
 		enemiesHit = new HashSet<>();
+		
+		animationManager = new CreatureAnimationManager();
 		setupAnimations();
 	}
 
 	@Override
 	public void tick() {
 		if (!summonComplete) {
-			int directionIndex = direction == 1 ? 0 : 1;
-			if (summonAnimation[directionIndex].isPlayedOnce() || summonAnimation[directionIndex].isPlayedOnce())
+			if (animationManager.isAnimationPlayedOnce(AnimationType.Summon))
 				summonComplete = true;
 			else {
-				summonAnimation[directionIndex].runAnimation();
+				animationManager.runAnimation(AnimationType.Summon);
 				return;
 			}
 		}
 
-		if (attacking && attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce())
+		if (attacking && animationManager.isAnimationPlayedOnce(AnimationType.Attack))
 			resetAnimations();
 
 		x += velX;
@@ -94,24 +93,20 @@ public class DarkSummon extends Creature {
 
 	@Override
 	public void render(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(Color.white);
-		g2d.draw(getBounds());
 		int directionIndex = direction == 1 ? 0 : 1;
-		
-		final int renderWidth = (int) (width * 1.5f);
-		final int renderHeight = (int) (height * 1.5f);
-		final int renderX = (int) (x - (renderWidth - width) / 2);
-		final int renderY = (int) (y - (renderHeight - height));
+		final int width = (int) (this.width * 1.5f);
+		final int height = (int) (this.height * 1.5f);
+		final int x = (int) (this.x - (width - this.width) / 2);
+		final int y = (int) (this.y - (height - this.height));
 		
 		if (!summonComplete)
-			summonAnimation[directionIndex].drawAnimation(g, renderX, renderY, renderWidth, renderHeight);
+			animationManager.drawAnimation(AnimationType.Summon, g, direction, x, y, width, height);
 		else if (attacking)
-			attackAnimation[directionIndex].drawAnimation(g, renderX, renderY, renderWidth, renderHeight);
+			animationManager.drawAnimation(AnimationType.Attack, g, direction, x, y, width, height);
 		else if (falling)
-			g.drawImage(jumpSprites[directionIndex], renderX, renderY, renderWidth, renderHeight, null);
+			g.drawImage(jumpSprites[directionIndex], x, y, width, height, null);
 		else
-			runAnimation[directionIndex].drawAnimation(g, renderX, renderY, renderWidth, renderHeight);
+			animationManager.drawAnimation(AnimationType.Run, g, direction, x, y, width, height);
 		
 		healthBar.render(g);
 	}
@@ -133,7 +128,7 @@ public class DarkSummon extends Creature {
 					direction = 1;
 
 				if (isAttackReady()) {
-					int currentAnimFrame = direction == 1 ? attackAnimation[0].getCurrentFrame() : attackAnimation[1].getCurrentFrame();
+					int currentAnimFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack);
 					if (!enemiesHit.contains(other) && attacking && currentAnimFrame == 3) {
 						((Creature) other).takeDamage(damage, 0);
 						enemiesHit.add(other);
@@ -255,23 +250,27 @@ public class DarkSummon extends Creature {
 
 	private void setupAnimations() {
 		TextureLoader textureLoader = TextureLoader.getInstance();
-		int summonDelay = 6;
-		summonAnimation = new Animation[] {
+		
+		final int summonDelay = 6;
+		Animation[] summonAnimation = new Animation[] {
 			new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonSpawn, 1), summonDelay, true),
 			new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonSpawn, -1), summonDelay, true),
 		};
+		animationManager.addAnimation(AnimationType.Summon, summonAnimation);
 
-		int runDelay = 8;
-		runAnimation = new Animation[] {
+		final int runDelay = 8;
+		Animation[] runAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonRun, 1), runDelay, false),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonRun, -1), runDelay, false),
 		};
+		animationManager.addAnimation(AnimationType.Run, runAnimation);
 
-		int attackDelay = 8;
-		attackAnimation = new Animation[] {
+		final int attackDelay = 8;
+		Animation[] attackAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonAttack, 1), attackDelay, true),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonAttack, -1), attackDelay, true),	
 		};
+		animationManager.addAnimation(AnimationType.Attack, attackAnimation);
 
 		jumpSprites = new BufferedImage[] {
 				textureLoader.getTextures(TextureName.PlayerDarkSummonRun)[1],
@@ -280,11 +279,10 @@ public class DarkSummon extends Creature {
 	}
 
 	private void runAnimations() {
-		int directionIndex = direction == 1 ? 0 : 1;
 		if (velX != 0)
-			runAnimation[directionIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Run);
 		if (attacking)
-			attackAnimation[directionIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Attack);
 	}
 
 	private boolean isAttackReady() {
@@ -295,10 +293,8 @@ public class DarkSummon extends Creature {
 		attacking = false;
 		lastAttackTimer = System.currentTimeMillis();
 		enemiesHit.clear();
-		attackAnimation[0].resetAnimation();
-		attackAnimation[1].resetAnimation();
-		runAnimation[0].resetAnimation();
-		runAnimation[1].resetAnimation();
+		animationManager.resetAnimation(AnimationType.Attack);
+		animationManager.resetAnimation(AnimationType.Run);
 	}
 	
 	@Override
