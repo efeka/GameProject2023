@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import framework.Animation;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -15,7 +16,6 @@ import framework.ObjectId.Name;
 import framework.TextureLoader.TextureName;
 import ui.Inventory;
 import visual_effects.OneTimeAnimation;
-import window.Animation;
 
 public abstract class Item extends GameObject {
 

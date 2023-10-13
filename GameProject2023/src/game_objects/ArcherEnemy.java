@@ -8,13 +8,13 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import abstracts.Creature;
+import framework.Animation;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import ui.CreatureHealthBar;
-import window.Animation;
 
 public class ArcherEnemy extends Creature {
 

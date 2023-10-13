@@ -12,6 +12,7 @@ import java.util.HashSet;
 
 import abstracts.Creature;
 import abstracts.GameObject;
+import framework.Animation;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -23,7 +24,6 @@ import game_objects.DamageNumberPopup;
 import game_objects.Explosion;
 import ui.CreatureHealthBar;
 import visual_effects.OneTimeAnimation;
-import window.Animation;
 
 public class DarkSummon extends Creature {
 

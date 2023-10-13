@@ -4,12 +4,12 @@ import java.awt.image.BufferedImage;
 
 import abstracts.Weapon;
 import abstracts.WeaponItem;
+import framework.Animation;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import player_weapons.SwordWeapon;
-import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
 

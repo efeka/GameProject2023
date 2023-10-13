@@ -6,11 +6,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import framework.Animation;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
-import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
 

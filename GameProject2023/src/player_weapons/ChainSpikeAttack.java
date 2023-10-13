@@ -7,13 +7,13 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 
 import abstracts.GameObject;
+import framework.Animation;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import window.Animation;
 
 public class ChainSpikeAttack extends GameObject {
 

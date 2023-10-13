@@ -144,6 +144,10 @@ public class Game extends Canvas implements Runnable {
 			g.drawString("FPS: " + displayedFPS, GameConstants.ScaleConstants.GAME_WIDTH - 77, 15);
 			g.drawString("UPS: " + displayedUPS, GameConstants.ScaleConstants.GAME_WIDTH - 80, 35);
 		}
+		if (Math.min(displayedFPS, displayedUPS) < 115 && Math.min(displayedFPS, displayedUPS) > 0)
+			System.err.println("Performance drop! FPS: " + displayedFPS + " | UPS: " + displayedUPS);
+		else if (Math.max(displayedFPS, displayedUPS) > 125)
+			System.err.println("FPS Limit Exceeded! FPS: " + displayedFPS + " | UPS: " + displayedUPS);
 		
 		g.dispose();
 		bs.show();

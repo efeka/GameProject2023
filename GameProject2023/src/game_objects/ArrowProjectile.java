@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import abstracts.Creature;
 import abstracts.GameObject;
 import abstracts.Projectile;
+import framework.Animation;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import window.Animation;
 
 public class ArrowProjectile extends Projectile {
 

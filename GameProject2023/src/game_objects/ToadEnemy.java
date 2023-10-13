@@ -3,7 +3,6 @@ package game_objects;
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -11,13 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import abstracts.Creature;
+import framework.Animation;
+import framework.CreatureAnimationManager;
+import framework.CreatureAnimationManager.AnimationType;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import ui.CreatureHealthBar;
-import window.Animation;
 
 public class ToadEnemy extends Creature {
 
@@ -46,17 +47,14 @@ public class ToadEnemy extends Creature {
 	private float runAcceleration = 0.01f;
 	private float runningSpeed = 2f;
 
-	private Animation[] idleAnimation;
-	private Animation[] runAnimation;
-	private Animation[] attackAnimation;
-	private Animation[] hurtAnimation;
-	private Animation[] deathAnimation;
-
+	private CreatureAnimationManager animationManager;
+	
 	public ToadEnemy(int x, int y, ObjectHandler objectHandler) {
 		super(x, y, (int) (TILE_SIZE * 1.5f), (int) (TILE_SIZE * 1.5f), 25, 100, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
 		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
+		animationManager = new CreatureAnimationManager();
 		setupAnimations();
 	}
 
@@ -77,7 +75,7 @@ public class ToadEnemy extends Creature {
 		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
 			invulnerable = false;
 
-		if (tookDamage && (hurtAnimation[0].isPlayedOnce() || hurtAnimation[1].isPlayedOnce()))
+		if (tookDamage && animationManager.isAnimationPlayedOnce(AnimationType.Hurt))
 			tookDamage = false;
 
 		if (dead) {
@@ -157,10 +155,10 @@ public class ToadEnemy extends Creature {
 
 	private void handleAttacking(Creature target) {
 		if (startedAttackAnim) {
-			int currentFrame = getCurrentAttackAnimationFrame();
+			int currentFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack);
 			attacking = (currentFrame == 3 || currentFrame == 4);
 		}
-		if (isAttackAnimationFinished())
+		if (animationManager.isAnimationPlayedOnce(AnimationType.Attack))
 			startedAttackAnim = attacking = false;
 		
 		// Try to attack the player or their summons
@@ -171,7 +169,7 @@ public class ToadEnemy extends Creature {
 			if (getGroundAttackBounds().intersects(otherCreature.getBounds())) {
 				if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
 					velX = 0;
-					resetAttackAnimations();
+					animationManager.resetAnimation(AnimationType.Attack);
 					startedAttackAnim = true;
 					lastAttackTimer = System.currentTimeMillis();
 				}
@@ -220,8 +218,7 @@ public class ToadEnemy extends Creature {
 			invulnerable = true;
 
 			tookDamage = true;
-			hurtAnimation[0].resetAnimation();
-			hurtAnimation[1].resetAnimation();
+			animationManager.resetAnimation(AnimationType.Hurt);
 		}
 
 		setHealth(health - damageAmount);
@@ -264,69 +261,70 @@ public class ToadEnemy extends Creature {
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
 		final int idleDelay = 20;
-		idleAnimation = new Animation[] {
+		Animation[] idleAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyIdle, 1),
 						idleDelay, false),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyIdle, -1),
 						idleDelay, false),
 		};
+		animationManager.addAnimation(AnimationType.Idle, idleAnimation);
 
 		final int runDelay = 15;
-		runAnimation = new Animation[] {
+		Animation[] runAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyRun, 1),
 						runDelay, false),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyRun, -1),
 						runDelay, false),
 		};
-
+		animationManager.addAnimation(AnimationType.Run, runAnimation);
+		
 		final int attackDelay = 10;
-		attackAnimation = new Animation[] {
+		Animation[] attackAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, 1),
 						attackDelay, true),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, -1),
 						attackDelay, true),
 		};
-
+		animationManager.addAnimation(AnimationType.Attack, attackAnimation);
+		
 		final int hurtDelay = 10;
-		hurtAnimation = new Animation[] {
+		Animation[] hurtAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyHurt, 1),
 						hurtDelay, true),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyHurt, -1),
 						hurtDelay, true),
 		};
+		animationManager.addAnimation(AnimationType.Hurt, hurtAnimation);
 
 		final int deathDelay = 10;
-		deathAnimation = new Animation[] {
+		Animation[] deathAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyDeath, 1),
 						deathDelay, true),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyDeath, -1),
 						deathDelay, true),	
 		};
+		animationManager.addAnimation(AnimationType.Death, deathAnimation);
 	}
 
 	private void runAnimations() {
-		int directionToIndex = getIndexFromDirection();
-
 		// Dead
 		if (dead)
-			deathAnimation[directionToIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Death);
 		// Taken damage
 		else if (tookDamage)
-			hurtAnimation[directionToIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Hurt);
 		// Attacking
 		else if (startedAttackAnim)
-			attackAnimation[directionToIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Attack);
 		// Idle
 		else if (velX == 0)
-			idleAnimation[directionToIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Idle);
 		// Running
 		else if (velX != 0)
-			runAnimation[directionToIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Run);
 	}
 
 	private void drawAnimations(Graphics g) {
-		int directionToIndex = getIndexFromDirection();
-
 		final int x = (int) this.x - width / 2;
 		final int y = (int) this.y - height / 2;
 		final int width = this.width * 2;
@@ -336,38 +334,21 @@ public class ToadEnemy extends Creature {
 		if (dead) {
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setComposite(makeTransparent(alpha));
-			deathAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
+			animationManager.drawAnimation(AnimationType.Death, g, direction, x, y, width, height);
 			g2d.setComposite(makeTransparent(1));
 		}
 		// Taken damage
 		else if (tookDamage)
-			hurtAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
+			animationManager.drawAnimation(AnimationType.Hurt, g, direction, x, y, width, height);
 		// Attacking
 		else if (startedAttackAnim)
-			attackAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
+			animationManager.drawAnimation(AnimationType.Attack, g, direction, x, y, width, height);
 		// Idle
 		else if (velX == 0)
-			idleAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
+			animationManager.drawAnimation(AnimationType.Idle, g, direction, x, y, width, height);
 		// Running
 		else
-			runAnimation[directionToIndex].drawAnimation(g, x, y, width, height);
-	}
-
-	public int getIndexFromDirection() {
-		return (-direction + 1) / 2;
-	}
-	
-	private boolean isAttackAnimationFinished() {
-		return attackAnimation[0].isPlayedOnce() || attackAnimation[1].isPlayedOnce();
-	}
-	
-	private int getCurrentAttackAnimationFrame() {
-		return Math.max(attackAnimation[0].getCurrentFrame(), attackAnimation[1].getCurrentFrame());
-	}
-	
-	private void resetAttackAnimations() {
-		attackAnimation[0].resetAnimation();
-		attackAnimation[1].resetAnimation();
+			animationManager.drawAnimation(AnimationType.Run, g, direction, x, y, width, height);
 	}
 
 	private AlphaComposite makeTransparent(float alpha) {

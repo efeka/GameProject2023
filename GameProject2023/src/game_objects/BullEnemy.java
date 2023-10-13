@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import abstracts.Creature;
 import abstracts.GameObject;
+import framework.Animation;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -17,7 +18,6 @@ import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import main.Game;
 import ui.CreatureHealthBar;
-import window.Animation;
 
 public class BullEnemy extends Creature {
 	

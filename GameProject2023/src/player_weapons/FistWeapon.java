@@ -5,11 +5,11 @@ import java.util.HashSet;
 
 import abstracts.GameObject;
 import abstracts.Weapon;
+import framework.Animation;
 import framework.ObjectHandler;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Player;
-import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
 

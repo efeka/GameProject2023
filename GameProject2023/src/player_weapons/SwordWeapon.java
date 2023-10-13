@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 import abstracts.GameObject;
 import abstracts.Weapon;
+import framework.Animation;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId.Category;
@@ -17,7 +18,6 @@ import game_objects.Explosion;
 import game_objects.Player;
 import visual_effects.FadingTrailEffect;
 import visual_effects.OneTimeAnimation;
-import window.Animation;
 import window.KeyInput;
 import window.MouseInput;
 

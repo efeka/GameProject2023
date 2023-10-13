@@ -1,6 +1,6 @@
 package player_weapons;
 
-import window.Animation;
+import framework.Animation;
 
 public class WeaponAbility {
 

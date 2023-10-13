@@ -5,13 +5,13 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 import java.awt.image.BufferedImage;
 
 import abstracts.Item;
+import framework.Animation;
 import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Player;
 import visual_effects.OneTimeAnimation;
-import window.Animation;
 
 public class Coin extends Item {
 

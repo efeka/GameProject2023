@@ -6,9 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import abstracts.Weapon;
+import framework.Animation;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import window.Animation;
 
 public class PlayerAnimationHandler {
 
