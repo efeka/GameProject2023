@@ -69,7 +69,7 @@ public abstract class Item extends GameObject {
 	
 	/**
 	 * The image that represents this item in the inventory.
-	 * @return the buffered image
+	 * @return The buffered image for how this item looks in the inventory.
 	 */
 	public abstract BufferedImage getItemIcon();
 	

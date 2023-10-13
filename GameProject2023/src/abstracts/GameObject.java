@@ -35,7 +35,7 @@ public abstract class GameObject {
 	
 	/**
 	 * Draw the object onto the screen.
-	 * @param g the graphics object to draw into.
+	 * @param g The graphics object to draw into.
 	 */
 	public abstract void render(Graphics g);
 
@@ -47,7 +47,7 @@ public abstract class GameObject {
 	 * Returns an image which represents this game object.
 	 * This is for coupling GameObjects with textures, which is used in the Level Designer program.
 	 * This image does not always have to exactly match how the object is rendered into the game.
-	 * @return image representing this object.
+	 * @return The image representing this object.
 	 */
 	public BufferedImage getTexture() {
 		if (texture == null)
@@ -57,8 +57,8 @@ public abstract class GameObject {
 	
 	/**
 	 * Compares this object's Name with the given object.
-	 * @param gameObject the GameObject to compare Names with.
-	 * @return true if the Names match, false otherwise.
+	 * @param gameObject The GameObject to compare Names with.
+	 * @return True if the names match, false otherwise.
 	 */
 	public boolean compareObjectName(GameObject gameObject) {
 		return objectId.getName() == gameObject.objectId.getName();
@@ -66,14 +66,13 @@ public abstract class GameObject {
 	
 	/**
 	 * Compares this object's Category with the given Category.
-	 * @param category the Category to be compared
-	 * @return true if the Categories match, false otherwise.
+	 * @param category The Category to be compared
+	 * @return True if the categories match, false otherwise.
 	 */
 	public boolean compareCategory(Category category) {
 		return objectId.getCategory() == category;
 	}
-	
-	// Getters & Setters
+
 	public float getX() {
 		return x;
 	}

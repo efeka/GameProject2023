@@ -23,9 +23,8 @@ public abstract class Creature extends GameObject {
 	protected float velX, velY;
 
 	protected int damage;
-	protected int maxHealth, maxStamina;
-	protected float health, stamina;
-	protected float staminaRegen;
+	protected int maxHealth;
+	protected float health;
 
 	public final int DEFAULT_INVULNERABILITY_DURATION = 700;
 	protected int invulnerableDuration = 700;
@@ -33,6 +32,17 @@ public abstract class Creature extends GameObject {
 
 	protected CreatureHealthBar healthBar;
 
+	/**
+	 * The creature class is a base for all objects that can move, attack and be killed.
+	 * @param x				The x coordinate of the creature.
+	 * @param y				The y coordinate of the creature.
+	 * @param width			The width of the creature.
+	 * @param height		The height of the creature.
+	 * @param damage		The damage dealth by the creature.
+	 * @param maxHealth		The maximum health of the creature.
+	 * @param objectHandler Reference to the ObjectHandler.
+	 * @param objectId		The object id for the creature.
+	 */
 	public Creature(int x, int y, int width, int height, int damage, int maxHealth, ObjectHandler objectHandler, ObjectId objectId) {
 		super(x, y, width, height, objectId);
 		this.objectHandler = objectHandler; 
@@ -47,31 +57,27 @@ public abstract class Creature extends GameObject {
 		setupHealthBar();
 	}
 
-	public void regenerateStamina() {
-		if (stamina < maxStamina)
-			stamina += staminaRegen;
-		if (stamina > maxStamina)
-			stamina = maxStamina;
-	}
-
 	/**
-	 * Reduces this creatures health by the given damage amount.
-	 * @param damageAmount the amount of health to be reduced on this creature.
-	 * @param invulnerabilityDuration duration of the invulnerability state after the damage is taken.
+	 * Reduces this creature's health by the given damage amount.
+	 * 
+	 * @param damageAmount 			  The amount of health to be reduced on this creature.
+	 * @param invulnerabilityDuration The duration for how long this creature stays invulnerable
+	 * 								  after taking this damage.
 	 */
 	public abstract void takeDamage(int damageAmount, int invulnerabilityDuration);
 
 	/**
 	 * Applies force in the given direction to this creature.
-	 * Important: Depending on the implementation, it might be necessary
-	 * to call this method before {@code takeDamage} because of invulnerability.
-	 * @param velX the x component of the force.
-	 * @param velY the y component of the force.
+	 * Important: Depending on the implementation, knock back may not happen due to invulnerability.
+	 * Calling this before {@code takeDamage} solves this problem.
+	 * 
+	 * @param velX The x component of the force.
+	 * @param velY The y component of the force.
 	 */
 	public abstract void applyKnockback(float velX, float velY);
 
 	/**
-	 * Initialize the CreatureHealthBar with according to this object.
+	 * Initialize the CreatureHealthBar based on this object.
 	 */
 	public abstract void setupHealthBar();
 	
@@ -94,6 +100,9 @@ public abstract class Creature extends GameObject {
 			objectHandler.addObject(objectHandler.createObjectByName(Name.Coin, (int) x, (int) y), ObjectHandler.MIDDLE_LAYER);
 	}
 
+	/**
+	 * Handles collision with blocks in all 4 directions.
+	 */
 	protected void basicBlockCollision() {
 		falling = true;
 
@@ -216,22 +225,6 @@ public abstract class Creature extends GameObject {
 		this.health = clamp(0f, health, maxHealth);
 	}
 
-	public int getMaxStamina() {
-		return maxStamina;
-	}
-
-	public void setMaxStamina(int maxStamina) {
-		this.maxStamina = maxStamina;
-	}
-
-	public int getStamina() {
-		return (int) stamina;
-	}
-
-	public void setStamina(float stamina) {
-		this.stamina = clamp(0f, stamina, maxStamina);
-	}
-
 	public boolean isFalling() {
 		return falling;
 	}
@@ -286,14 +279,6 @@ public abstract class Creature extends GameObject {
 
 	public void setVelY(float velY) {
 		this.velY = velY;
-	}
-
-	public float getStaminaRegen() {
-		return staminaRegen;
-	}
-
-	public void setStaminaRegen(float staminaRegen) {
-		this.staminaRegen = staminaRegen;
 	}
 
 	private float clamp(float min, float num, float max) {
