@@ -68,8 +68,6 @@ public class Player extends Creature {
 
 	@Override
 	public void tick() {
-		regenerateStamina();
-
 		x += velX;
 		y += velY;
 
