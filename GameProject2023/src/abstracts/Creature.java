@@ -3,11 +3,16 @@ package abstracts;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
+import framework.Animation;
+import framework.CreatureAnimationManager;
+import framework.CreatureAnimationManager.AnimationType;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 import ui.CreatureHealthBar;
 
 public abstract class Creature extends GameObject {
@@ -30,7 +35,9 @@ public abstract class Creature extends GameObject {
 	protected int invulnerableDuration = 700;
 	protected long lastInvulnerableTimer = 0;
 
+	protected CreatureAnimationManager animationManager;
 	protected CreatureHealthBar healthBar;
+	protected Animation spawnAnimation;
 
 	/**
 	 * The creature class is a base for all objects that can move, attack and be killed.
@@ -49,6 +56,10 @@ public abstract class Creature extends GameObject {
 		this.damage = damage;
 		health = this.maxHealth = maxHealth;
 
+		animationManager = new CreatureAnimationManager();
+		spawnAnimation = new Animation(TextureLoader.getInstance().getTextures(TextureName.EnemySpawnEffect), 10, true);
+		animationManager.addAnimation(AnimationType.Spawn, new Animation[] {spawnAnimation, spawnAnimation});
+		
 		falling = true;
 		jumping = false;
 		knockedBack = false;

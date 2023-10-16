@@ -10,15 +10,14 @@ import java.util.ArrayList;
 import abstracts.Creature;
 import abstracts.GameObject;
 import abstracts.TileOrientation;
-import floor_generation.RoomDirection;
 import floor_generation.Floor;
 import floor_generation.PlayerExitDestination;
 import floor_generation.Room;
+import floor_generation.RoomDirection;
 import floor_generation.RoomExit;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import game_objects.ArcherEnemy;
-import game_objects.ToadEnemy;
 import game_objects.BullEnemy;
 import game_objects.DiagonalStoneTileBlock;
 import game_objects.GrassBackgroundTileBlock;
@@ -26,9 +25,11 @@ import game_objects.GrassTileBlock;
 import game_objects.Player;
 import game_objects.RockTileBlock;
 import game_objects.StoneTileBlock;
+import game_objects.ToadEnemy;
 import game_objects.WoodJumpThroughTileBlock;
 import items.BigHealthPotionItem;
 import items.Coin;
+import items.KatanaWeaponItem;
 import items.SmallHealthPotionItem;
 import items.SwordWeaponItem;
 import ui.DebugConsole;
@@ -515,6 +516,9 @@ public class ObjectHandler {
 			break;
 		case SwordWeaponItem:
 			gameObject = new SwordWeaponItem(x, y, this, keyInput, mouseInput);
+			break;
+		case KatanaWeaponItem:
+			gameObject = new KatanaWeaponItem(x, y, this, keyInput, mouseInput);
 			break;
 		case SmallHealthPotionItem:
 			gameObject = new SmallHealthPotionItem(x, y, this);

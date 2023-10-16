@@ -15,6 +15,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.TextureLoader;
+import framework.CreatureAnimationManager.AnimationType;
 import framework.TextureLoader.TextureName;
 import main.Game;
 import ui.CreatureHealthBar;
@@ -25,10 +26,7 @@ public class BullEnemy extends Creature {
 
 	private float runningSpeed = 3f;
 	private boolean stunnedByWall = false;
-	
-	private Animation[] runAnimation;
-	private Animation[] stunAnimation;
-	
+
 	public BullEnemy(int x, int y, ObjectHandler objectHandler) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 150, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BullEnemy));		
 		this.objectHandler = objectHandler;
@@ -41,6 +39,11 @@ public class BullEnemy extends Creature {
 
 	@Override
 	public void tick() {
+		if (!animationManager.isAnimationPlayedOnce(AnimationType.Spawn)) {
+			animationManager.runAnimation(AnimationType.Spawn);
+			return;
+		}
+		
 		x += velX;
 		y += velY;
 
@@ -55,7 +58,7 @@ public class BullEnemy extends Creature {
 			direction = velX < 0 ? -1 : 1;
 		else {
 			// Get rid of the stun if the stun animation is finished.
-			if (stunAnimation[getIndexFromDirection()].isPlayedOnce()) {
+			if (animationManager.isAnimationPlayedOnce(AnimationType.Stun)) {
 				stunnedByWall = false;
 				direction *= -1;
 			}
@@ -113,7 +116,7 @@ public class BullEnemy extends Creature {
 					if (getWallCollisionBounds().intersects(otherBounds)) {
 						stunnedByWall = true;
 						Game.shakeCamera(15, 10);
-						resetStunAnimations();
+						animationManager.resetAnimation(AnimationType.Stun);
 						velX = 0;
 					}
 					// If only the body hits a wall, turn back and keep running. 
@@ -165,43 +168,54 @@ public class BullEnemy extends Creature {
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
 		final int runDelay = 13;
-		runAnimation = new Animation[2];
-		runAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.BullEnemyRun, 1),
-				runDelay, false);
-		runAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.BullEnemyRun, -1),
-				runDelay, false);
+		Animation[] runAnimation = new Animation[] {
+				new Animation(textureLoader.getTexturesByDirection(TextureName.BullEnemyRun, 1),
+						runDelay, false),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.BullEnemyRun, -1),
+						runDelay, false),
+		};
+		animationManager.addAnimation(AnimationType.Run, runAnimation);
 		
-		final int stuckDelay = 12;
-		stunAnimation = new Animation[2];
-		stunAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.BullEnemyStunned, 1),
-				stuckDelay, true);
-		stunAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.BullEnemyStunned, -1),
-				stuckDelay, true);
+		final int stunDelay = 12;
+		Animation[] stunAnimation = new Animation[] {
+				new Animation(textureLoader.getTexturesByDirection(TextureName.BullEnemyStunned, 1),
+						stunDelay, true),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.BullEnemyStunned, -1),
+						stunDelay, true),
+		};
+		animationManager.addAnimation(AnimationType.Stun, stunAnimation);
 	}
 	
 	private void runAnimations() {
-		int directionToIndex = getIndexFromDirection();
-		
 		if (!stunnedByWall)
-			runAnimation[directionToIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Run);
 		else
-			stunAnimation[directionToIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Stun);
 	}
 
 	private void drawAnimations(Graphics g) {
-		int directionToIndex = getIndexFromDirection();
+		final int x = (int) this.x - width / 2;
+		final int y = (int) this.y - height / 2;
+		final int width = this.width * 2;
+		final int height = this.height * 2;
 		
-		if (!stunnedByWall)
-			runAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-		else
-			stunAnimation[directionToIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		if (animationManager.getCurrentAnimationFrame(AnimationType.Spawn) >= 13) {
+			if (!stunnedByWall)
+				animationManager.drawAnimation(AnimationType.Run, g, direction, x, y, width, height);
+			else
+				animationManager.drawAnimation(AnimationType.Stun, g, direction, x, y, width, height);
+		}
+		
+		if (!animationManager.isAnimationPlayedOnce(AnimationType.Spawn)) {
+			int spawnWidth = (int) (width * 0.8f);
+			int spawnHeight = (int) (height * 0.8f);
+			int spawnX = (int) (x + (width - spawnWidth) / 2);
+			int spawnY = (int) (y + (height - spawnHeight) / 2); 
+			animationManager.drawAnimation(AnimationType.Spawn, g, 1, 
+					spawnX, spawnY, spawnWidth, spawnHeight);
+		}
 	}
-	
-	private void resetStunAnimations() {
-		stunAnimation[0].resetAnimation();
-		stunAnimation[1].resetAnimation();
-	}
-	
+
 	public int getIndexFromDirection() {
 		return (-direction + 1) / 2;
 	}

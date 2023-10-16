@@ -33,6 +33,12 @@ public class TextureLoader {
 		PlayerSwordDash,
 		PlayerSwordDarkGlow,
 
+		PlayerKatanaIdle,
+		PlayerKatanaRun,
+		PlayerKatanaJump,
+		PlayerKatanaAttack1,
+		PlayerKatanaAttack2,
+		
 		// Enemies
 		BasicEnemyRun,
 		BasicEnemyAttack,
@@ -60,10 +66,9 @@ public class TextureLoader {
 		BronzeCoin,
 		SilverCoin,
 		GoldCoin,
-		FisticuffsItem,
 		SwordItem,
-		HammerItem,
-
+		KatanaItem,
+		
 		// Projectiles
 		SwordProjectile,
 		ArrowProjectile,
@@ -74,6 +79,7 @@ public class TextureLoader {
 		DarkSmokeEffect,
 		PoisonSmokeEffect,
 		LightningEffect,
+		EnemySpawnEffect,
 
 		SpikeAttack,
 		IceSword,
@@ -88,6 +94,7 @@ public class TextureLoader {
 		Cursor,
 		Inventory,
 		SwordWeaponIcon,
+		KatanaWeaponIcon,
 		SmallHealthPotionIcon,
 		BigHealthPotionIcon,
 		Minimap,
@@ -229,6 +236,36 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = playerSheet.getSubimage(66 + i * 65, 846, 64, 64);
 			break;
+		case PlayerKatanaIdle:
+			textures = new BufferedImage[20];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 1106, 64, 64);
+			fillArrayWithFlippedImages(textures);
+			break;
+		case PlayerKatanaRun:
+			textures = new BufferedImage[16];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 1171, 64, 64);
+			fillArrayWithFlippedImages(textures);
+			break;
+		case PlayerKatanaJump:
+			textures = new BufferedImage[4];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(521 + i * 65, 1366, 64, 64);
+			fillArrayWithFlippedImages(textures);
+			break;
+		case PlayerKatanaAttack1:
+			textures = new BufferedImage[8];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(66 + i * 65, 1236, 64, 64);
+			fillArrayWithFlippedImages(textures);
+			break;
+		case PlayerKatanaAttack2:
+			textures = new BufferedImage[10];
+			for (int i = 0; i < textures.length / 2; i++)
+				textures[i] = playerSheet.getSubimage(326 + i * 65, 1236, 64, 64);
+			fillArrayWithFlippedImages(textures);
+			break;
 		case BasicEnemyIdle:
 			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length / 2; i++)
@@ -309,20 +346,15 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(199 + i * 33, 166, 32, 32);
 			break;
-		case FisticuffsItem:
-			textures = new BufferedImage[10];
-			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 33, 1, 32, 32);
-			break;
 		case SwordItem:
 			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 65, 463, 64, 64);
 			break;
-		case HammerItem:
-			textures = new BufferedImage[6];
+		case KatanaItem:
+			textures = new BufferedImage[8];
 			for (int i = 0; i < textures.length; i++)
-				textures[i] = itemSheet.getSubimage(1 + i * 33, 67, 32, 32);
+				textures[i] = itemSheet.getSubimage(1 + i * 65, 528, 64, 64);
 			break;
 		case SwordProjectile:
 			textures = new BufferedImage[8];
@@ -396,6 +428,13 @@ public class TextureLoader {
 			for (int i = 0; i < textures.length; i++)
 				textures[i] = itemSheet.getSubimage(1 + i * 33, 397, 32, 32);
 			break;
+		case EnemySpawnEffect:
+			textures = new BufferedImage[20];
+			for (int i = 0; i < 10; i++)
+				textures[i] = enemySheet.getSubimage(1 + i * 65, 391, 64, 64);
+			for (int i = 10; i < textures.length; i++)
+				textures[i] = enemySheet.getSubimage(1 + (i - 10) * 65, 456, 64, 64);
+			break;
 		case SpikeAttack:
 			textures = new BufferedImage[14];
 			for (int i = 0; i < textures.length; i++)
@@ -456,6 +495,9 @@ public class TextureLoader {
 			for (int i = 0; i < 3; i++)
 				textures[i + 14] = uiSheet.getSubimage(52 + i * 17, 35, 16, 16);
 			textures[17] = uiSheet.getSubimage(66, 52, 48, 32);
+			break;
+		case KatanaWeaponIcon:
+			textures = new BufferedImage[] {uiSheet.getSubimage(103, 18, 16, 16)};
 			break;
 		case SwordWeaponIcon:
 			textures = new BufferedImage[] {uiSheet.getSubimage(103, 1, 16, 16)};

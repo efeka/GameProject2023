@@ -1,4 +1,4 @@
-package player_weapons;
+package player_weapons.abilities;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
@@ -62,7 +62,7 @@ public class DarkSummon extends Creature {
 			}
 		}
 
-		if (attacking && animationManager.isAnimationPlayedOnce(AnimationType.Attack))
+		if (attacking && animationManager.isAnimationPlayedOnce(AnimationType.Attack1))
 			resetAnimations();
 
 		x += velX;
@@ -102,7 +102,7 @@ public class DarkSummon extends Creature {
 		if (!summonComplete)
 			animationManager.drawAnimation(AnimationType.Summon, g, direction, x, y, width, height);
 		else if (attacking)
-			animationManager.drawAnimation(AnimationType.Attack, g, direction, x, y, width, height);
+			animationManager.drawAnimation(AnimationType.Attack1, g, direction, x, y, width, height);
 		else if (falling)
 			g.drawImage(jumpSprites[directionIndex], x, y, width, height, null);
 		else
@@ -119,7 +119,7 @@ public class DarkSummon extends Creature {
 			GameObject other = midLayer.get(i);
 			Rectangle otherBounds = other.getBounds();
 
-			// Attack enemies when they get in range
+			// Attack1 enemies when they get in range
 			if (!knockedBack && getGroundAttackBounds().intersects(otherBounds) && other.getObjectId().getCategory() == Category.Enemy) {
 				velX = 0;
 				if (x > other.getX())
@@ -128,7 +128,7 @@ public class DarkSummon extends Creature {
 					direction = 1;
 
 				if (isAttackReady()) {
-					int currentAnimFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack);
+					int currentAnimFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack1);
 					if (!enemiesHit.contains(other) && attacking && currentAnimFrame == 3) {
 						((Creature) other).takeDamage(damage, 0);
 						enemiesHit.add(other);
@@ -270,7 +270,7 @@ public class DarkSummon extends Creature {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonAttack, 1), attackDelay, true),
 				new Animation(textureLoader.getTexturesByDirection(TextureName.PlayerDarkSummonAttack, -1), attackDelay, true),	
 		};
-		animationManager.addAnimation(AnimationType.Attack, attackAnimation);
+		animationManager.addAnimation(AnimationType.Attack1, attackAnimation);
 
 		jumpSprites = new BufferedImage[] {
 				textureLoader.getTextures(TextureName.PlayerDarkSummonRun)[1],
@@ -282,7 +282,7 @@ public class DarkSummon extends Creature {
 		if (velX != 0)
 			animationManager.runAnimation(AnimationType.Run);
 		if (attacking)
-			animationManager.runAnimation(AnimationType.Attack);
+			animationManager.runAnimation(AnimationType.Attack1);
 	}
 
 	private boolean isAttackReady() {
@@ -293,7 +293,7 @@ public class DarkSummon extends Creature {
 		attacking = false;
 		lastAttackTimer = System.currentTimeMillis();
 		enemiesHit.clear();
-		animationManager.resetAnimation(AnimationType.Attack);
+		animationManager.resetAnimation(AnimationType.Attack1);
 		animationManager.resetAnimation(AnimationType.Run);
 	}
 	

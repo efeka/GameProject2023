@@ -5,10 +5,12 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import abstracts.Creature;
 import framework.Animation;
+import framework.CreatureAnimationManager.AnimationType;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -26,8 +28,7 @@ public class ArcherEnemy extends Creature {
 
 	private float shootVelX, shootVelY;
 
-	private Animation[] idleAnimation;
-	private Animation[] shootAnimationTorso, shootAnimationLegs;
+	private BufferedImage[] legsShootingTextures;
 
 	public ArcherEnemy(int x, int y, ObjectHandler objectHandler) {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
@@ -39,6 +40,11 @@ public class ArcherEnemy extends Creature {
 
 	@Override
 	public void tick() {
+		if (!animationManager.isAnimationPlayedOnce(AnimationType.Spawn)) {
+			animationManager.runAnimation(AnimationType.Spawn);
+			return;
+		}
+
 		x += velX;
 		y += velY;
 
@@ -57,14 +63,13 @@ public class ArcherEnemy extends Creature {
 		if (System.currentTimeMillis() - lastShotTimer >= shootCooldown)
 			isShotReady = true;
 		if (isShotReady) {
-			int animationFrame1 = shootAnimationTorso[0].getCurrentFrame();
-			int animationFrame2 = shootAnimationTorso[1].getCurrentFrame();
-			if (!didShoot && (animationFrame1 == 7 || animationFrame2 == 7)) {
+			int animationFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack1);
+			if (!didShoot && animationFrame == 7) {
 				shootArrow(8f);
 				didShoot = true;
 			}
 
-			if (shootAnimationTorso[0].isPlayedOnce() || shootAnimationTorso[1].isPlayedOnce())
+			if (animationManager.isAnimationPlayedOnce(AnimationType.Attack1))
 				resetShootingSystem();
 		}
 
@@ -159,74 +164,87 @@ public class ArcherEnemy extends Creature {
 	}
 
 	private void runAnimations() {
-		int animationIndex = getIndexFromDirection();
-		if (isShotReady) {
-			shootAnimationLegs[animationIndex].runAnimation();
-			shootAnimationTorso[animationIndex].runAnimation();
-		}
+		if (isShotReady)
+			animationManager.runAnimation(AnimationType.Attack1);
 		else
-			idleAnimation[animationIndex].runAnimation();
+			animationManager.runAnimation(AnimationType.Idle);
 	}
 
 	private void drawAnimations(Graphics g) {
-		int animationIndex = getIndexFromDirection();
+		int directionIndex = getIndexFromDirection();
 
-		if (isShotReady) {
-			float centerX = (float) getBounds().getCenterX();
-			float centerY = (float) getBounds().getCenterY();
-
-			// Calculate the angle that this enemy will be rotated at
-			double rotationAngle;
-			if (shootVelX < 0)
-				rotationAngle = Math.atan2(shootVelY, shootVelX) + Math.PI;
+		final int x = (int) this.x - width / 2;
+		final int y = (int) this.y - height / 2;
+		final int width = this.width * 2;
+		final int height = this.height * 2;
+		
+		if (animationManager.getCurrentAnimationFrame(AnimationType.Spawn) >= 13) {
+			if (isShotReady) {
+				float centerX = (float) getBounds().getCenterX();
+				float centerY = (float) getBounds().getCenterY();
+	
+				// Calculate the angle that this enemy will be rotated at
+				double rotationAngle;
+				if (shootVelX < 0)
+					rotationAngle = Math.atan2(shootVelY, shootVelX) + Math.PI;
+				else
+					rotationAngle = -Math.atan2(shootVelY, -shootVelX) + Math.PI * 3;
+	
+				// Draw the legs, but dont rotate them
+				g.drawImage(legsShootingTextures[directionIndex], x, y, width, height, null);
+	
+				// Rotate the torso
+				Graphics2D g2d = (Graphics2D) g;
+				g2d.rotate(rotationAngle, centerX, centerY);
+				animationManager.drawAnimation(AnimationType.Attack1, g, direction, x, y, width, height);
+				g2d.rotate(-rotationAngle, centerX, centerY);
+			}
 			else
-				rotationAngle = -Math.atan2(shootVelY, -shootVelX) + Math.PI * 3;
-
-			// Draw the legs, but dont rotate them
-			shootAnimationLegs[animationIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-
-			// Rotate the torso
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.rotate(rotationAngle, centerX, centerY);
-			shootAnimationTorso[animationIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
-			g2d.rotate(-rotationAngle, centerX, centerY);
+				animationManager.drawAnimation(AnimationType.Idle, g, direction, x, y, width, height);
 		}
-		else
-			idleAnimation[animationIndex].drawAnimation(g, (int) x - width / 2, (int) y - height / 2, width * 2, height * 2);
+		
+		if (!animationManager.isAnimationPlayedOnce(AnimationType.Spawn)) {
+			int spawnWidth = (int) (width * 0.8f);
+			int spawnHeight = (int) (height * 0.8f);
+			int spawnX = (int) (x + (width - spawnWidth) / 2);
+			int spawnY = (int) (y + (height - spawnHeight) / 2); 
+			animationManager.drawAnimation(AnimationType.Spawn, g, 1, 
+					spawnX, spawnY, spawnWidth, spawnHeight);
+		}
 	}
 
 	private void setupAnimations() {
 		TextureLoader textureLoader = TextureLoader.getInstance();
 
+		legsShootingTextures = new BufferedImage[] {
+				textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootLegs, 1)[0],
+				textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootLegs, -1)[0],
+		};
+		
 		int idleDelay = 20;
-		idleAnimation = new Animation[2];
-		idleAnimation[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyIdle, 1),
-				idleDelay, false);
-		idleAnimation[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyIdle, -1),
-				idleDelay, false);
+		Animation[] idleAnimation = new Animation[] {
+				new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyIdle, 1),
+						idleDelay, false),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyIdle, -1),
+						idleDelay, false),
+		};
+		animationManager.addAnimation(AnimationType.Idle, idleAnimation);
 
 		int shootDelay = 6;
-		shootAnimationTorso = new Animation[2];
-		shootAnimationTorso[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootTorso, 1),
-				shootDelay, true);
-		shootAnimationTorso[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootTorso, -1),
-				shootDelay, true);
-
-		shootAnimationLegs = new Animation[2];
-		shootAnimationLegs[0] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootLegs, 1),
-				shootDelay, true);
-		shootAnimationLegs[1] = new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootLegs, -1),
-				shootDelay, true);
+		Animation[] shootAnimationTorso = new Animation[] {
+				new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootTorso, 1),
+						shootDelay, true),
+				new Animation(textureLoader.getTexturesByDirection(TextureName.ArcherEnemyShootTorso, -1),
+						shootDelay, true),
+		};
+		animationManager.addAnimation(AnimationType.Attack1, shootAnimationTorso);
 	}
 
 	private void resetShootingSystem() {
 		isShotReady = didShoot = false;
 		lastShotTimer = System.currentTimeMillis();
 
-		shootAnimationLegs[0].resetAnimation();
-		shootAnimationLegs[1].resetAnimation();
-		shootAnimationTorso[0].resetAnimation();
-		shootAnimationTorso[1].resetAnimation();
+		animationManager.resetAnimation(AnimationType.Attack1);
 	}
 
 	public int getIndexFromDirection() {

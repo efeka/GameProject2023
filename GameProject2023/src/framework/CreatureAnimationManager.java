@@ -9,10 +9,14 @@ public class CreatureAnimationManager {
 	public enum AnimationType {
 		Idle,
 		Run,
-		Attack,
+		Attack1,
+		Attack2,
 		Hurt,
 		Death,
+		Dodge,
 		Summon,
+		Spawn,
+		Stun,
 	}
 	
 	// The animation array stores the left and right direction variations of the same animation.

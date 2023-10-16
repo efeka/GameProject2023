@@ -11,7 +11,6 @@ import java.util.List;
 
 import abstracts.Creature;
 import framework.Animation;
-import framework.CreatureAnimationManager;
 import framework.CreatureAnimationManager.AnimationType;
 import framework.GameConstants;
 import framework.ObjectHandler;
@@ -43,23 +42,26 @@ public class ToadEnemy extends Creature {
 	private long patrolStartTimer;
 
 	private float walkingSpeed = 0.5f;
-	
+
 	private float runAcceleration = 0.01f;
 	private float runningSpeed = 2f;
 
-	private CreatureAnimationManager animationManager;
-	
 	public ToadEnemy(int x, int y, ObjectHandler objectHandler) {
 		super(x, y, (int) (TILE_SIZE * 1.5f), (int) (TILE_SIZE * 1.5f), 25, 100, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
 		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
-		animationManager = new CreatureAnimationManager();
+
 		setupAnimations();
 	}
 
 	@Override
 	public void tick() {
+		if (!animationManager.isAnimationPlayedOnce(AnimationType.Spawn)) {
+			animationManager.runAnimation(AnimationType.Spawn);
+			return;
+		}
+
 		x += velX;
 		y += velY;
 
@@ -69,7 +71,7 @@ public class ToadEnemy extends Creature {
 			if (velY > TERMINAL_VELOCITY)
 				velY = TERMINAL_VELOCITY;
 		}
-		
+
 		calculateDirection();
 
 		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
@@ -89,7 +91,7 @@ public class ToadEnemy extends Creature {
 			if (!knockedBack && !dead && !startedAttackAnim && !attacking)
 				handleMovement();
 		}
-		
+
 		basicBlockCollision();
 
 		runAnimations();
@@ -101,13 +103,13 @@ public class ToadEnemy extends Creature {
 		drawAnimations(g);
 		healthBar.render(g);
 	}
-	
+
 	private void calculateDirection() {
 		if (velX > 0)
 			direction = 1;
 		else if (velX < 0)
 			direction = -1;
-		
+
 		if (knockedBack)
 			direction *= -1;
 	}
@@ -127,7 +129,7 @@ public class ToadEnemy extends Creature {
 					velX += -runAcceleration;
 				else if (xDiff < 0)
 					velX += runAcceleration;
-				
+
 				if (Math.abs(velX) > runningSpeed)
 					velX = runningSpeed * direction;
 			}
@@ -155,12 +157,12 @@ public class ToadEnemy extends Creature {
 
 	private void handleAttacking(Creature target) {
 		if (startedAttackAnim) {
-			int currentFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack);
+			int currentFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack1);
 			attacking = (currentFrame == 3 || currentFrame == 4);
 		}
-		if (animationManager.isAnimationPlayedOnce(AnimationType.Attack))
+		if (animationManager.isAnimationPlayedOnce(AnimationType.Attack1))
 			startedAttackAnim = attacking = false;
-		
+
 		// Try to attack the player or their summons
 		ArrayList<Creature> summonsList = objectHandler.getSummonsList();
 		for (int i = summonsList.size() - 1; i >= 0; i--) {
@@ -169,7 +171,7 @@ public class ToadEnemy extends Creature {
 			if (getGroundAttackBounds().intersects(otherCreature.getBounds())) {
 				if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
 					velX = 0;
-					animationManager.resetAnimation(AnimationType.Attack);
+					animationManager.resetAnimation(AnimationType.Attack1);
 					startedAttackAnim = true;
 					lastAttackTimer = System.currentTimeMillis();
 				}
@@ -250,10 +252,10 @@ public class ToadEnemy extends Creature {
 		int visionY = (int) getBounds().getCenterY() - visionHeight / 2;
 		int visionX;
 		if (direction == 1)
-			 visionX = (int) (x + width / 2 - (visionWidth * (1 - visionFrontalRatio)));
+			visionX = (int) (x + width / 2 - (visionWidth * (1 - visionFrontalRatio)));
 		else
 			visionX = (int) (x + width / 2 - (visionWidth * (visionFrontalRatio)));
-		
+
 		return new Rectangle(visionX, visionY, visionWidth, visionHeight);
 	}
 
@@ -277,7 +279,7 @@ public class ToadEnemy extends Creature {
 						runDelay, false),
 		};
 		animationManager.addAnimation(AnimationType.Run, runAnimation);
-		
+
 		final int attackDelay = 10;
 		Animation[] attackAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, 1),
@@ -285,8 +287,8 @@ public class ToadEnemy extends Creature {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, -1),
 						attackDelay, true),
 		};
-		animationManager.addAnimation(AnimationType.Attack, attackAnimation);
-		
+		animationManager.addAnimation(AnimationType.Attack1, attackAnimation);
+
 		final int hurtDelay = 10;
 		Animation[] hurtAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyHurt, 1),
@@ -315,7 +317,7 @@ public class ToadEnemy extends Creature {
 			animationManager.runAnimation(AnimationType.Hurt);
 		// Attacking
 		else if (startedAttackAnim)
-			animationManager.runAnimation(AnimationType.Attack);
+			animationManager.runAnimation(AnimationType.Attack1);
 		// Idle
 		else if (velX == 0)
 			animationManager.runAnimation(AnimationType.Idle);
@@ -330,32 +332,43 @@ public class ToadEnemy extends Creature {
 		final int width = this.width * 2;
 		final int height = this.height * 2;
 
-		// Dead
-		if (dead) {
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.setComposite(makeTransparent(alpha));
-			animationManager.drawAnimation(AnimationType.Death, g, direction, x, y, width, height);
-			g2d.setComposite(makeTransparent(1));
+		if (animationManager.getCurrentAnimationFrame(AnimationType.Spawn) >= 13) {
+			// Dead
+			if (dead) {
+				Graphics2D g2d = (Graphics2D) g;
+				g2d.setComposite(makeTransparent(alpha));
+				animationManager.drawAnimation(AnimationType.Death, g, direction, x, y, width, height);
+				g2d.setComposite(makeTransparent(1));
+			}
+			// Taken damage
+			else if (tookDamage)
+				animationManager.drawAnimation(AnimationType.Hurt, g, direction, x, y, width, height);
+			// Attacking
+			else if (startedAttackAnim)
+				animationManager.drawAnimation(AnimationType.Attack1, g, direction, x, y, width, height);
+			// Idle
+			else if (velX == 0)
+				animationManager.drawAnimation(AnimationType.Idle, g, direction, x, y, width, height);
+			// Running
+			else
+				animationManager.drawAnimation(AnimationType.Run, g, direction, x, y, width, height);
 		}
-		// Taken damage
-		else if (tookDamage)
-			animationManager.drawAnimation(AnimationType.Hurt, g, direction, x, y, width, height);
-		// Attacking
-		else if (startedAttackAnim)
-			animationManager.drawAnimation(AnimationType.Attack, g, direction, x, y, width, height);
-		// Idle
-		else if (velX == 0)
-			animationManager.drawAnimation(AnimationType.Idle, g, direction, x, y, width, height);
-		// Running
-		else
-			animationManager.drawAnimation(AnimationType.Run, g, direction, x, y, width, height);
+
+		if (!animationManager.isAnimationPlayedOnce(AnimationType.Spawn)) {
+			int spawnWidth = (int) (width * 0.8f);
+			int spawnHeight = (int) (height * 0.8f);
+			int spawnX = (int) (x + (width - spawnWidth) / 2);
+			int spawnY = (int) (y + (height - spawnHeight) / 2); 
+			animationManager.drawAnimation(AnimationType.Spawn, g, 1, 
+					spawnX, spawnY, spawnWidth, spawnHeight);
+		}
 	}
 
 	private AlphaComposite makeTransparent(float alpha) {
 		int type = AlphaComposite.SRC_OVER;
 		return(AlphaComposite.getInstance(type, alpha));
 	}
-	
+
 	@Override
 	public void setupHealthBar() {
 		healthBar = new CreatureHealthBar(this, -GameConstants.ScaleConstants.TILE_SIZE / 2);

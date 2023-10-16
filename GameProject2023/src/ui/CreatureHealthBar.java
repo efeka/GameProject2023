@@ -66,7 +66,7 @@ public class CreatureHealthBar extends GameObject {
 			return;
 
 		// Health bar background
-		g.drawImage(textures[0], (int) x - 3, (int) y - 3, width + 6, height + 6, null);
+		g.drawImage(textures[0], (int) x - 4, (int) y - 3, width + 6, height + 6, null);
 		
 		// Health bar damage effect
 		if (healthDiff < 0) {

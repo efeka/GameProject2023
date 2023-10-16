@@ -10,6 +10,7 @@ import framework.ObjectHandler;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Player;
+import player_weapons.abilities.WeaponAbility;
 import window.KeyInput;
 import window.MouseInput;
 
@@ -209,7 +210,7 @@ public class FistWeapon extends Weapon {
 		abilities = new WeaponAbility[3];
 		TextureLoader tex = TextureLoader.getInstance();
 
-		// Attack Chain 1
+		// Attack1 Chain 1
 		int firstJabDelay = 6;
 		Animation[] jabAnims = new Animation[] {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchJab, 1), firstJabDelay, true),
@@ -217,7 +218,7 @@ public class FistWeapon extends Weapon {
 		};
 		abilities[0] = new WeaponAbility(150, 7, jabAnims);
 		
-		// Attack Chain 2
+		// Attack1 Chain 2
 		int secondJabDelay = 2;
 		Animation[] jabAnims2 = new Animation[] {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchJab, 1), secondJabDelay, true),
@@ -225,7 +226,7 @@ public class FistWeapon extends Weapon {
 		};
 		abilities[1] = new WeaponAbility(150, 7, jabAnims2);
 		
-		// Attack Chain 3
+		// Attack1 Chain 3
 		int crossDelay = 6;
 		Animation[] crossAnims = new Animation[] {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchCross, 1), crossDelay, true),

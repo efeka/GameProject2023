@@ -1,4 +1,4 @@
-package player_weapons;
+package player_weapons.abilities;
 
 import framework.Animation;
 

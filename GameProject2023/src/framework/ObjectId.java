@@ -125,6 +125,7 @@ public class ObjectId {
 		// Items
 		Coin(2999),
 		SwordWeaponItem(3000),
+		KatanaWeaponItem(3001),
 		SmallHealthPotionItem(3003),
 		BigHealthPotionItem(3004),
 		;

@@ -4,6 +4,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.time.LocalDateTime;
 
 import framework.GameConstants;
 import framework.ObjectHandler;
@@ -144,10 +145,13 @@ public class Game extends Canvas implements Runnable {
 			g.drawString("FPS: " + displayedFPS, GameConstants.ScaleConstants.GAME_WIDTH - 77, 15);
 			g.drawString("UPS: " + displayedUPS, GameConstants.ScaleConstants.GAME_WIDTH - 80, 35);
 		}
+		
+		LocalDateTime now = LocalDateTime.now();
+		String time = now.getHour() + ":" + now.getMinute() + ":" + now.getSecond();
 		if (Math.min(displayedFPS, displayedUPS) < 115 && Math.min(displayedFPS, displayedUPS) > 0)
-			System.err.println("Performance drop! FPS: " + displayedFPS + " | UPS: " + displayedUPS);
+			System.err.println("Performance drop! FPS: " + displayedFPS + " | UPS: " + displayedUPS + " | " + time);
 		else if (Math.max(displayedFPS, displayedUPS) > 125)
-			System.err.println("FPS Limit Exceeded! FPS: " + displayedFPS + " | UPS: " + displayedUPS);
+			System.err.println("FPS Limit Exceeded! FPS: " + displayedFPS + " | UPS: " + displayedUPS + " | " + time);
 		
 		g.dispose();
 		bs.show();
