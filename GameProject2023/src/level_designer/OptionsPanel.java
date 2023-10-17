@@ -44,7 +44,7 @@ public class OptionsPanel extends JPanel {
 		void onGridToggle(boolean toggle);
 		void onLayerSelect(int index);
 		void onTransparencySelect(float transparency);
-		void clearLayer();
+		void clearGrids();
 		void saveDesign();
 	}
 	
@@ -93,7 +93,14 @@ public class OptionsPanel extends JPanel {
 		JPanel layerSelectionPanel = new JPanel();
 		layerSelectionPanel.setLayout(new FlowLayout());
 		JLabel layerSelectionLabel = new JLabel("Selected Layer: ");
-		JComboBox<String> layerComboBox = new JComboBox<>(new String[] {"Background Layer", "Middle Layer", "Foreground Layer", "All Layers (Read only)"});
+		JComboBox<String> layerComboBox = new JComboBox<>(new String[] {
+				"Background Layer",
+				"Middle Layer",
+				"Foreground Layer",
+				"Enemy Wave 1", 
+				"Enemy Wave 2",
+				"Enemy Wave 3",
+				"All Layers (Read only)"});
         layerComboBox.setSelectedIndex(1);
 		layerComboBox.addActionListener(e -> {
         	if (optionSelectionListener != null)
@@ -151,10 +158,10 @@ public class OptionsPanel extends JPanel {
 		bottomPanelLayout.setHgap(30);
 		bottomPanel.setLayout(bottomPanelLayout);
 		
-		JButton clearButton = new JButton("Delete Design");
+		JButton clearButton = new JButton("Clear Layers");
 		clearButton.addActionListener(e -> {
 			if (optionSelectionListener != null)
-				optionSelectionListener.clearLayer();
+				optionSelectionListener.clearGrids();
 		});
 		
 		JButton saveButton = new JButton("Save Design");

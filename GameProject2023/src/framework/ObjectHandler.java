@@ -198,8 +198,7 @@ public class ObjectHandler {
 		for (int i = menuLayer.size() - 1; i >= 0; i--) 
 			menuLayer.get(i).tick();
 		
-		// Check if the current enemy wave is cleared
-		
+		floor.handleEnemyWaves();
 	}
 
 	/**

@@ -50,15 +50,24 @@ public class Floor {
 		FileIO fileIO = new FileIO();
 		try {
 			for (int i = 0; ; i++) {
-				int[][] bottomLayerUIDs = fileIO.loadLevel("levels_bg.txt", i);
-				int[][] middleLayerUIDs = fileIO.loadLevel("levels.txt", i);
-				int[][] topLayerUIDs = fileIO.loadLevel("levels_fg.txt", i);
+				int[][] bottomLayerUIDs = fileIO.loadLevel("levels/levels_bg.txt", i);
+				int[][] middleLayerUIDs = fileIO.loadLevel("levels/levels.txt", i);
+				int[][] topLayerUIDs = fileIO.loadLevel("levels/levels_fg.txt", i);
+				int[][][] enemyWavesUIDs = new int[][][] {
+					fileIO.loadLevel("levels/enemy_waves1.txt", i),
+					fileIO.loadLevel("levels/enemy_waves2.txt", i),
+					fileIO.loadLevel("levels/enemy_waves3.txt", i),
+				};
+
 				if (i == 0)
-					startingRoom = new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler);
+					startingRoom = new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, enemyWavesUIDs, objectHandler);
 				else
-					roomPool.add(new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler));
+					roomPool.add(new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, enemyWavesUIDs, objectHandler));
 			}
-		} catch (EOFException e) {}
+		} catch (EOFException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		currentRoom = startingRoom;
 	}
@@ -163,6 +172,24 @@ public class Floor {
 	 */
 	public void loadNextRoom(RoomDirection exitDirectionToNextRoom) {
 		currentRoom = currentRoom.getNeighbor(exitDirectionToNextRoom);
+		if (!currentRoom.areAllEnemyWavesCleared()) {
+			currentRoom.lockExits();
+			currentRoom.spawnNextEnemyWave();
+		}
+	}
+	
+	/**
+	 * Controls when to spawn the enemy waves and when to unlock the exits.
+	 */
+	public void handleEnemyWaves() {
+		// Unlock the exists once all waves of the current room are cleared
+		if (currentRoom.areAllEnemyWavesCleared()) {
+			if (currentRoom.areExitsLocked())
+				currentRoom.unlockExits();
+		}
+		// Spawn the next wave once the current one is cleared
+		else if (currentRoom.isCurrentWaveCleared()) 
+			currentRoom.spawnNextEnemyWave();		
 	}
 
 	/**

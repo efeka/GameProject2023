@@ -3,6 +3,7 @@ package floor_generation;
 import java.util.ArrayList;
 import java.util.List;
 
+import abstracts.Creature;
 import abstracts.GameObject;
 import framework.ObjectHandler;
 import framework.ObjectId.Category;
@@ -12,9 +13,16 @@ public class Room {
 
 	private ObjectHandler objectHandler;
 	private int[][] bottomLayerUIDs, middleLayerUIDs, topLayerUIDs;
-	private ArrayList<GameObject> bottomLayer, middleLayer, topLayer;
-
+	private int[][][] enemyWavesUIDs;
+	private List<GameObject> bottomLayer, middleLayer, topLayer;
+	
+	private List<List<Creature>> enemyWaves;
+	private int currentWave = -1;
+	
+	private boolean areExistsLocked = false;
+	
 	private Room[] neighbors;
+	private List<RoomExit> roomExits;
 	private boolean[] hasRoomExit;
 	private PlayerExitDestination[] playerExitDestinations;
 
@@ -28,26 +36,30 @@ public class Room {
 	 * @param topLayerUIDs the uid's of the objects on the top layer of this level
 	 * @param objectHandler the reference to the ObjectHandler
 	 */
-	public Room(int[][] bottomLayerUIDs, int[][] middleLayerUIDs, int[][] topLayerUIDs, ObjectHandler objectHandler) {
+	public Room(int[][] bottomLayerUIDs, int[][] middleLayerUIDs, int[][] topLayerUIDs, 
+			int[][][] enemyWavesUIDs, ObjectHandler objectHandler) {
 		this.bottomLayerUIDs = bottomLayerUIDs;
 		this.middleLayerUIDs = middleLayerUIDs;
 		this.topLayerUIDs = topLayerUIDs;
+		this.enemyWavesUIDs = enemyWavesUIDs;
 		this.objectHandler = objectHandler;
 
-		ArrayList<ArrayList<GameObject>> layers = objectHandler.loadLevel(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs);
+		List<List<GameObject>> layers = objectHandler.loadLevel(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs);
 		bottomLayer = layers.get(0);
 		middleLayer = layers.get(1);
 		topLayer = layers.get(2);
-
+		enemyWaves = objectHandler.loadEnemyWaves(enemyWavesUIDs[0], enemyWavesUIDs[1], enemyWavesUIDs[2]);
+		
 		neighbors = new Room[4];
 		hasRoomExit = new boolean[4];
+		roomExits = new ArrayList<>(4);
 		playerExitDestinations = new PlayerExitDestination[4];
 		findExits(middleLayer);
 	}
 
 	// Search the objects in the middle layer to determine the room's
 	// exit directions and player exit destinations.
-	private void findExits(ArrayList<GameObject> middleLayer) {
+	private void findExits(List<GameObject> middleLayer) {
 		for (int i = middleLayer.size() - 1; i >= 0; i--) {
 			GameObject gameObject = middleLayer.get(i);
 			Name objectName = gameObject.getObjectId().getName();
@@ -56,8 +68,10 @@ public class Room {
 			if (directionIndex == -1)
 				continue;
 			
-			if (gameObject.getObjectId().getCategory() == Category.RoomExit)
+			if (gameObject.compareCategory(Category.RoomExit)) {
 				hasRoomExit[directionIndex] = true;
+				roomExits.add((RoomExit) gameObject);
+			}
 			else if (gameObject.getObjectId().getCategory() == Category.PlayerExitDestination)
 				playerExitDestinations[directionIndex] = (PlayerExitDestination) gameObject;
 		}
@@ -74,7 +88,7 @@ public class Room {
 	}
 
 	public Room createDeepCopy() {
-		return new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, objectHandler);
+		return new Room(bottomLayerUIDs, middleLayerUIDs, topLayerUIDs, enemyWavesUIDs, objectHandler);
 	}
 	
 	public PlayerExitDestination getPlayerExitDestination(RoomDirection roomDirection) {
@@ -138,15 +152,82 @@ public class Room {
 		neighbors[directionIndex] = neighbor;
 	}
 
-	public ArrayList<GameObject> getBottomLayer() {
+	public void lockExits() {
+		areExistsLocked = true;
+		for (RoomExit roomExit : roomExits)
+			roomExit.setLocked(true);
+	}
+	
+	public void unlockExits() {
+		areExistsLocked = false;
+		for (RoomExit roomExit : roomExits)
+			roomExit.setLocked(false);
+	}
+	
+	public boolean areExitsLocked() {
+		return areExistsLocked;
+	}
+	
+	public void removeEnemyFromCurrentWave(Creature creature) {
+		if (enemyWaves == null)
+			return;
+		if (enemyWaves.get(currentWave).contains(creature))
+			enemyWaves.get(currentWave).remove(creature);
+	}
+	
+	public boolean areAllEnemyWavesCleared() {
+		if (enemyWaves == null)
+			return true;
+		
+		boolean allWavesCompleted = true;
+		for (List<Creature> wave : enemyWaves) {
+			if (wave.size() != 0) {
+				allWavesCompleted = false;
+				break;
+			}
+		}
+		return allWavesCompleted;
+	}
+	
+	/**
+	 * Spawn the next wave of enemies, if it exists.
+	 */
+	public void spawnNextEnemyWave() {
+		if (enemyWaves == null)
+			return;
+		
+		boolean nextWaveExists = false;
+		for (currentWave += 1; currentWave < enemyWaves.size(); currentWave++) {
+			List<Creature> enemyWave = enemyWaves.get(currentWave);
+			if (enemyWave != null && !enemyWave.isEmpty()) {
+				nextWaveExists = true;
+				break;
+			}
+		}
+		
+		if (nextWaveExists) {
+			List<Creature> nextWave = enemyWaves.get(currentWave);
+			for (int i = 0; i < nextWave.size(); i++)
+				objectHandler.addObject(nextWave.get(i), ObjectHandler.MIDDLE_LAYER);
+		}
+	}
+	
+	public boolean isCurrentWaveCleared() {
+	    return enemyWaves == null ||
+	           currentWave >= enemyWaves.size() ||
+	           enemyWaves.get(currentWave) == null ||
+	           enemyWaves.get(currentWave).isEmpty();
+	}
+	
+	public List<GameObject> getBottomLayer() {
 		return bottomLayer;
 	}
 
-	public ArrayList<GameObject> getMiddleLayer() {
+	public List<GameObject> getMiddleLayer() {
 		return middleLayer;
 	}
 
-	public ArrayList<GameObject> getTopLayer() {
+	public List<GameObject> getTopLayer() {
 		return topLayer;
 	}
 

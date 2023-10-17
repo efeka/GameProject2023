@@ -44,7 +44,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	}
 
 	private void setupGrid() {
-		levelGrids = new LevelGrid[3];
+		levelGrids = new LevelGrid[6];
 		for (int i = 0; i < levelGrids.length; i++)
 			levelGrids[i] = new LevelGrid(0, 0, getWidth(), getHeight());
 
@@ -79,36 +79,71 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		g.setColor(cellBorderColor);
 		Graphics2D g2d = (Graphics2D) g.create();
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, nonselectedLayerTransparency));
-		
+
 		GridCell[][] gridBg = levelGrids[0].getGrid();
 		GridCell[][] grid = levelGrids[1].getGrid();
 		GridCell[][] gridFg = levelGrids[2].getGrid();
-		
+		GridCell[][] wave1 = levelGrids[3].getGrid();
+		GridCell[][] wave2 = levelGrids[4].getGrid();
+		GridCell[][] wave3 = levelGrids[5].getGrid();
+
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[i].length; j++) {
 				GridCell cellBg = gridBg[i][j];
 				GridCell cell = grid[i][j];
 				GridCell cellFg = gridFg[i][j];
+				GridCell cellWave1 = wave1[i][j];
+				GridCell cellWave2 = wave2[i][j];
+				GridCell cellWave3 = wave3[i][j];
 
+
+				// Background layer
 				if (cellBg.image != null) {
-					if (selectedLayer == 0 || selectedLayer == 3)
+					if (selectedLayer == 0 || selectedLayer == 6)
 						g.drawImage(cellBg.image, cellBg.x, cellBg.y, cellBg.size, cellBg.size, null);
 					else
 						g2d.drawImage(cellBg.image, cellBg.x, cellBg.y, cellBg.size, cellBg.size, null);
 				}
+
 				if (cell.image != null) {
-					if (selectedLayer == 1 || selectedLayer == 3)
+					// Middle layer
+					if (selectedLayer == 1 || selectedLayer == 6)
 						g.drawImage(cell.image, cell.x, cell.y, cell.size, cell.size, null);
 					else
 						g2d.drawImage(cell.image, cell.x, cell.y, cell.size, cell.size, null);
 				}
+
+				// Foreground layer
 				if (cellFg.image != null) {
-					if (selectedLayer == 2 || selectedLayer == 3)
+					if (selectedLayer == 2 || selectedLayer == 6)
 						g.drawImage(cellFg.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
 					else
 						g2d.drawImage(cellFg.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
 				}
 
+				// Enemy waves
+				if (cellWave1.image != null) {
+					if (selectedLayer == 3 || selectedLayer == 6)
+						g.drawImage(cellWave1.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
+					else
+						g2d.drawImage(cellWave1.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
+				}
+
+				if (cellWave2.image != null) {
+					if (selectedLayer == 4 || selectedLayer == 6)
+						g.drawImage(cellWave2.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
+					else
+						g2d.drawImage(cellWave2.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
+				}
+
+				if (cellWave3.image != null) {
+					if (selectedLayer == 5 || selectedLayer == 6)
+						g.drawImage(cellWave3.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
+					else
+						g2d.drawImage(cellWave3.image, cellFg.x, cellFg.y, cellFg.size, cellFg.size, null);
+				}
+
+				// Grid cells
 				if (showGrid)
 					g.drawRect(cell.x, cell.y, cell.size, cell.size);	
 			}
@@ -146,7 +181,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		selectedLayer = index;
 		repaint();
 	}
-	
+
 	@Override
 	public void onTransparencySelect(float transparency) {
 		nonselectedLayerTransparency = transparency;
@@ -154,19 +189,9 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	}
 
 	@Override
-	public void clearLayer() {
-		// Clear all layers
-		if (selectedLayer == 3) {
-			for (int i = 0; i < levelGrids.length; i++) {
-				GridCell[][] grid = levelGrids[i].getGrid();
-				for (int j = 0; j < grid.length; j++)
-					for (int k = 0; k < grid[j].length; k++)
-						grid[j][k].clear();
-			}
-		}
-		// Only clear the selected layer
-		else {
-			GridCell[][] grid = levelGrids[selectedLayer].getGrid();
+	public void clearGrids() {
+		for (int i = 0; i < levelGrids.length; i++) {
+			GridCell[][] grid = levelGrids[i].getGrid();
 			for (int j = 0; j < grid.length; j++)
 				for (int k = 0; k < grid[j].length; k++)
 					grid[j][k].clear();
@@ -182,34 +207,46 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 		int rows = levelGrids[0].rows;
 		int cols = levelGrids[0].cols;
 
-		int[][][] objectUIDs = new int[3][rows][cols];
+		int[][][] objectUIDs = new int[6][rows][cols];
 		GridCell[][] gridBg = levelGrids[0].getGrid();
 		GridCell[][] grid = levelGrids[1].getGrid();
 		GridCell[][] gridFg = levelGrids[2].getGrid();
+		GridCell[][] gridWave1 = levelGrids[3].getGrid();
+		GridCell[][] gridWave2 = levelGrids[4].getGrid();
+		GridCell[][] gridWave3 = levelGrids[5].getGrid();
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				Name objectNameBg = gridBg[i][j].objectName;
 				Name objectName = grid[i][j].objectName;
 				Name objectNameFg = gridFg[i][j].objectName;
+				Name objectNameWave1 = gridWave1[i][j].objectName;
+				Name objectNameWave2 = gridWave2[i][j].objectName;
+				Name objectNameWave3 = gridWave3[i][j].objectName;
 
 				objectUIDs[0][i][j] = objectNameBg != null ? objectNameBg.getUID() : 0;
 				objectUIDs[1][i][j] = objectName != null ? objectName.getUID() : 0;
 				objectUIDs[2][i][j] = objectNameFg != null ? objectNameFg.getUID() : 0;
+				objectUIDs[3][i][j] = objectNameWave1 != null ? objectNameWave1.getUID() : 0;
+				objectUIDs[4][i][j] = objectNameWave2 != null ? objectNameWave2.getUID() : 0;
+				objectUIDs[5][i][j] = objectNameWave3 != null ? objectNameWave3.getUID() : 0;
 			}
 		}
 
-		new FileIO().saveLevel("levels_bg.txt", objectUIDs[0]);
-		new FileIO().saveLevel("levels.txt", objectUIDs[1]);
-		new FileIO().saveLevel("levels_fg.txt", objectUIDs[2]);
+		FileIO fileIO = new FileIO();
+		fileIO.saveLevel("levels/levels_bg.txt", objectUIDs[0]);
+		fileIO.saveLevel("levels/levels.txt", objectUIDs[1]);
+		fileIO.saveLevel("levels/levels_fg.txt", objectUIDs[2]);
+		fileIO.saveLevel("levels/enemy_waves1.txt", objectUIDs[3]);
+		fileIO.saveLevel("levels/enemy_waves2.txt", objectUIDs[4]);
+		fileIO.saveLevel("levels/enemy_waves3.txt", objectUIDs[5]);
 
 		JOptionPane.showMessageDialog(this, "Save successful");
-
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (selectedLayer == 3)
+		if (selectedLayer == 6)
 			return;
 
 		if (e.getButton() == MouseEvent.BUTTON1) {
@@ -243,7 +280,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (selectedLayer == 3)
+		if (selectedLayer == 6)
 			return;
 		if (!leftMousePressed && !rightMousePressed)
 			return;

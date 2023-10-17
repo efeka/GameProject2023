@@ -3,6 +3,7 @@ package floor_generation;
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import abstracts.GameObject;
 import framework.ObjectHandler;
@@ -15,6 +16,9 @@ import framework.TextureLoader.TextureName;
 public class RoomExit extends GameObject {
 	
 	private ObjectHandler objectHandler;
+	
+	private boolean locked = false;
+	private BufferedImage lockedImage;
 	
 	/**
 	 * These objects are placed in rooms that are connected to other rooms on the floor.
@@ -48,11 +52,17 @@ public class RoomExit extends GameObject {
 			imageIndex = -1;
 			break;		
 		}
-		texture = TextureLoader.getInstance().getTextures(TextureName.ExitTiles)[imageIndex];
+		
+		TextureLoader textureLoader = TextureLoader.getInstance();
+		texture = textureLoader.getTextures(TextureName.ExitTiles)[imageIndex];
+		lockedImage = textureLoader.getTextures(TextureName.Missing)[0];
 	}
 
 	@Override
 	public void tick() {
+		if (locked)
+			return;
+		
 		// If the player is colliding with this object, move the them to the next room
 		if (getBounds().intersects(objectHandler.getPlayer().getBounds())) {
 			RoomDirection roomDirection = RoomDirection.convertNameToDirection(objectId.getName());
@@ -62,7 +72,12 @@ public class RoomExit extends GameObject {
 	
 	@Override
 	public void render(Graphics g) {
-		g.drawImage(texture, (int) x, (int) y, width, height, null);
+		BufferedImage image = locked ? lockedImage : texture;
+		g.drawImage(image, (int) x, (int) y, width, height, null);
+	}
+	
+	public void setLocked(boolean locked) {
+		this.locked = locked;
 	}
 
 }
