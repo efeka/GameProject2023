@@ -7,6 +7,7 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.List;
 
 import abstracts.Creature;
 import abstracts.GameObject;
@@ -77,7 +78,7 @@ public class ArrowProjectile extends Projectile {
 		}
 		
 		// Block collision
-		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 			if (other.equals(this))

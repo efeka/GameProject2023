@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import abstracts.Creature;
 import abstracts.GameObject;
@@ -110,7 +111,7 @@ public class SwordIceAttack extends GameObject {
 	}
 	
 	private void checkEnemyCollision() {
-		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 			

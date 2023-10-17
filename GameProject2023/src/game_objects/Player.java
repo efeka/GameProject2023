@@ -5,7 +5,7 @@ import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.util.ArrayList;
+import java.util.List;
 
 import abstracts.Creature;
 import abstracts.DiagonalTileBlock;
@@ -218,7 +218,7 @@ public class Player extends Creature {
 
 	// Handles collision with other objects and item pick ups.
 	private void handleObjectInteraction() {
-		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		falling = true;
 
 		for (int i = midLayer.size() - 1; i >= 0; i--) {

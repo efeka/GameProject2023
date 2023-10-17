@@ -1,7 +1,7 @@
 package abstracts;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
+import java.util.List;
 
 import framework.Animation;
 import framework.CreatureAnimationManager;
@@ -117,7 +117,7 @@ public abstract class Creature extends GameObject {
 	protected void basicBlockCollision() {
 		falling = true;
 
-		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 

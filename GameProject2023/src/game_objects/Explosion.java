@@ -1,8 +1,8 @@
 package game_objects;
 
 import java.awt.Graphics;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import abstracts.Creature;
 import abstracts.GameObject;
@@ -90,7 +90,7 @@ public class Explosion extends GameObject {
 	}
 	
 	private void handleExplosionCollisions() {
-		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 			for (Category category : targets) {

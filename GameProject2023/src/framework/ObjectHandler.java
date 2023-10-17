@@ -6,6 +6,7 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.List;
 
 import abstracts.Creature;
 import abstracts.GameObject;
@@ -99,8 +100,8 @@ public class ObjectHandler {
 	 * 		   Index 1 contains the middle layer.
 	 *		   Index 2 contain the top layer. 
 	 */
-	public ArrayList<ArrayList<GameObject>> loadLevel(int[][] bottomLayerUIDs, int[][] middleLayerUIDs, int[][] topLayerUIDs) {
-		ArrayList<ArrayList<GameObject>> layers = new ArrayList<>();
+	public List<List<GameObject>> loadLevel(int[][] bottomLayerUIDs, int[][] middleLayerUIDs, int[][] topLayerUIDs) {
+		List<List<GameObject>> layers = new ArrayList<>();
 		// Bottom layer on index 0
 		layers.add(new ArrayList<GameObject>());
 		// Middle layer on index 1
@@ -135,6 +136,48 @@ public class ObjectHandler {
 		return layers;
 	}
 	
+	public List<List<Creature>> loadEnemyWaves(int[][] wave1UIDs, int[][] wave2UIDs, int[][] wave3UIDs) {
+		List<Creature> wave1 = new ArrayList<>();
+		List<Creature> wave2 = new ArrayList<>();
+		List<Creature> wave3 = new ArrayList<>();
+
+		for (int i = 0; i < TILE_ROWS; i++) {
+			for (int j = 0; j < TILE_COLUMNS; j++) {
+				Name enemy1Name = ObjectId.Name.getByUID(wave1UIDs[i][j]);
+				Name enemy2Name = ObjectId.Name.getByUID(wave2UIDs[i][j]);
+				Name enemy3Name = ObjectId.Name.getByUID(wave3UIDs[i][j]);
+
+				int x = j * TILE_SIZE;
+				int y = i * TILE_SIZE;
+				
+				if (enemy1Name != null) {
+					GameObject gameObject = createObjectByName(enemy1Name, x, y);
+					if (gameObject.getObjectId().getCategory() == Category.Enemy)
+						wave1.add((Creature) gameObject);
+				}
+				if (enemy2Name != null) {
+					GameObject gameObject = createObjectByName(enemy2Name, x, y);
+					if (gameObject.getObjectId().getCategory() == Category.Enemy)
+						wave2.add((Creature) gameObject);
+				}
+				if (enemy3Name != null) {
+					GameObject gameObject = createObjectByName(enemy3Name, x, y);
+					if (gameObject.getObjectId().getCategory() == Category.Enemy)
+						wave3.add((Creature) gameObject);
+				}
+			}
+		}
+		
+		List<List<Creature>> enemyWaves = new ArrayList<>();
+		if (!wave1.isEmpty())
+			enemyWaves.add(wave1);
+		if (!wave2.isEmpty())
+			enemyWaves.add(wave2);
+		if (!wave3.isEmpty())
+			enemyWaves.add(wave3);
+		return enemyWaves.isEmpty() ? null : enemyWaves;
+	}
+	
 	/**
 	 * Update the GameObjects in the current room.
 	 * This method should be called in every update of the game loop.
@@ -144,6 +187,7 @@ public class ObjectHandler {
 		if (floor == null)
 			return;
 		
+		// Update the objects of the current room
 		Room currentRoom = floor.getCurrentRoom();
 		for (int i = currentRoom.getBottomLayer().size() - 1; i >= 0; i--) 
 			currentRoom.getBottomLayer().get(i).tick();
@@ -153,6 +197,9 @@ public class ObjectHandler {
 			currentRoom.getTopLayer().get(i).tick();
 		for (int i = menuLayer.size() - 1; i >= 0; i--) 
 			menuLayer.get(i).tick();
+		
+		// Check if the current enemy wave is cleared
+		
 	}
 
 	/**
@@ -225,6 +272,9 @@ public class ObjectHandler {
 		
 		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.FriendlySummon)
 			summonsList.remove((Creature) object);
+		
+		if (object.compareCategory(Category.Enemy))
+			currentRoom.removeEnemyFromCurrentWave((Creature) object);
 	}
 	
 	/**
@@ -258,6 +308,9 @@ public class ObjectHandler {
 		
 		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.FriendlySummon)
 			summonsList.add((Creature) object);
+		
+		if (object.compareCategory(Category.Enemy))
+			currentRoom.removeEnemyFromCurrentWave((Creature) object);
 	}
 	
 	/**
@@ -265,7 +318,7 @@ public class ObjectHandler {
 	 * @param layer the layer to retrieve
 	 * @return list objects in the selected layer
 	 */
-	public ArrayList<GameObject> getLayer(int layer) {
+	public List<GameObject> getLayer(int layer) {
 		if (floor == null)
 			return null;
 		

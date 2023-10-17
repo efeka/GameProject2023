@@ -5,8 +5,8 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import abstracts.Creature;
 import abstracts.GameObject;
@@ -114,7 +114,7 @@ public class DarkSummon extends Creature {
 	private void handleCollisions() {
 		falling = true;
 
-		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 			Rectangle otherBounds = other.getBounds();

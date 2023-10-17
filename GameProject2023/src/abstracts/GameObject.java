@@ -70,7 +70,7 @@ public abstract class GameObject {
 	 * @return True if the categories match, false otherwise.
 	 */
 	public boolean compareCategory(Category category) {
-		return objectId.getCategory() == category;
+		return objectId != null && objectId.getCategory() == category;
 	}
 
 	public float getX() {
