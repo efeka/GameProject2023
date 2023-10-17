@@ -296,6 +296,8 @@ public class Player extends Creature {
 	private void checkJumpThroughBlockCollision(GameObject other) {
 		if (velY < 0)
 			return;
+		if (keyInput.isCrouchKeyPressed())
+			return;
 		
 		Rectangle otherBounds = other.getBounds();
 
