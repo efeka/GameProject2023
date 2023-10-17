@@ -17,6 +17,7 @@ import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import ui.CreatureHealthBar;
+import visual_effects.DamageNumberPopup;
 
 public class ArcherEnemy extends Creature {
 

@@ -1,4 +1,4 @@
-package game_objects;
+package visual_effects;
 
 import java.awt.Color;
 import java.awt.Graphics;

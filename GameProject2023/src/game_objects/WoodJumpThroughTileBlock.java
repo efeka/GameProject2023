@@ -5,8 +5,8 @@ import java.awt.image.BufferedImage;
 
 import abstracts.JumpThroughTileBlock;
 import abstracts.TileOrientation;
-import framework.TextureLoader;
 import framework.ObjectId.Name;
+import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 
 public class WoodJumpThroughTileBlock extends JumpThroughTileBlock {

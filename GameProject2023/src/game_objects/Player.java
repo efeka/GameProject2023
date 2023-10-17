@@ -20,6 +20,7 @@ import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import player_weapons.FistWeapon;
 import ui.Inventory;
+import visual_effects.DamageNumberPopup;
 import window.KeyInput;
 import window.MouseInput;
 

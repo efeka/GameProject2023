@@ -5,7 +5,7 @@ import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.util.List;
 
 import framework.Animation;
 import framework.GameConstants;
@@ -105,7 +105,7 @@ public abstract class Item extends GameObject {
 	}
 	
 	private void checkCollision() {
-		ArrayList<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 			if (other.equals(this))

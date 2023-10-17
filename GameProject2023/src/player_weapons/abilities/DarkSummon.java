@@ -20,9 +20,9 @@ import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import game_objects.DamageNumberPopup;
 import game_objects.Explosion;
 import ui.CreatureHealthBar;
+import visual_effects.DamageNumberPopup;
 import visual_effects.OneTimeAnimation;
 
 public class DarkSummon extends Creature {

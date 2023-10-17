@@ -19,6 +19,7 @@ import framework.CreatureAnimationManager.AnimationType;
 import framework.TextureLoader.TextureName;
 import main.Game;
 import ui.CreatureHealthBar;
+import visual_effects.DamageNumberPopup;
 
 public class BullEnemy extends Creature {
 	
