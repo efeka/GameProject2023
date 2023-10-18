@@ -22,7 +22,7 @@ public abstract class Item extends GameObject {
 	protected Animation animation = null;
 	protected ObjectHandler objectHandler;
 
-	private boolean jumping = true;
+	private boolean falling = true;
 	protected float velX;
 	protected float velY = -3f;
 
@@ -83,7 +83,7 @@ public abstract class Item extends GameObject {
 		x += velX;
 		y += velY;
 
-		if (jumping) {
+		if (falling) {
 			velY += GameConstants.PhysicsConstants.GRAVITY;
 
 			if (velY > GameConstants.PhysicsConstants.TERMINAL_VELOCITY)
@@ -93,7 +93,7 @@ public abstract class Item extends GameObject {
 		checkCollision();
 		
 		if (animation != null)
-			animation.runAnimation();		
+			animation.runAnimation();	
 	}
 
 	@Override
@@ -105,6 +105,8 @@ public abstract class Item extends GameObject {
 	}
 	
 	private void checkCollision() {
+		falling = true;
+		
 		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
@@ -112,6 +114,13 @@ public abstract class Item extends GameObject {
 				continue;
 			
 			if (other.getObjectId().getCategory() == Category.Block) {
+				if (getGroundCheckBounds().intersects(other.getBounds()))
+					falling = false;
+				
+				if (getBottomBounds().intersects(other.getBounds())) {
+					y = other.getY() - height;
+					velX = velY = 0;
+				}
 				if (getHorizontalBounds().intersects(other.getBounds())) {
 					velX = 0;
 					if (x < other.getX())
@@ -119,11 +128,15 @@ public abstract class Item extends GameObject {
 					else
 						x = other.getX() + other.getWidth(); 
 				}
+			}
+			
+			if (other.getObjectId().getCategory() == Category.JumpThroughBlock) {
+				if (getGroundCheckBounds().intersects(other.getBounds()))
+					falling = false;
 				
 				if (getBottomBounds().intersects(other.getBounds())) {
 					y = other.getY() - height;
 					velX = velY = 0;
-					jumping = false;
 				}
 			}
 		}
@@ -149,6 +162,14 @@ public abstract class Item extends GameObject {
 		float height = 3 * this.height / 5f;
 		float yOffset = this.height / 5f; 
 		return new Rectangle((int) (x + velX), (int) (y + yOffset), width, (int) height);
+	}
+	
+	protected Rectangle getGroundCheckBounds() {
+		float width = 3 * this.width / 5f;
+		float xOffset = (this.width - width) / 2;
+		float height = this.height / 5f;
+		float yOffset = this.height;
+		return new Rectangle((int) (x + xOffset), (int) (y + yOffset), (int) width, (int) height);
 	}
 	
 	protected void playPickupAnimation() {
