@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import abstracts.Creature;
+import abstracts.GameObject;
 import framework.Animation;
 import framework.CreatureAnimationManager.AnimationType;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
+import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import ui.CreatureHealthBar;
@@ -40,6 +42,7 @@ public class ToadEnemy extends Creature {
 	// random directions while it does not have a target in its vision
 	private Creature targetInVision = null;
 	private int maxPatrolTime = 1500, patrolTimer;
+	private boolean patrolling = false;
 	private long patrolStartTimer;
 
 	private float walkingSpeed = 0.5f;
@@ -63,6 +66,14 @@ public class ToadEnemy extends Creature {
 			return;
 		}
 
+		// While patrolling, check to see if there is blocks on the walking path
+		// that can be walked on to avoid walking off of cliffs.
+		if (patrolling && !checkPatrolPath())
+			// If there is no valid path in the current direction,
+			// avoid moving in that direction.
+			if (velX * direction > 0)
+				velX = 0;
+		
 		x += velX;
 		y += velY;
 
@@ -120,7 +131,7 @@ public class ToadEnemy extends Creature {
 
 		// Chase and attack the target if it is in vision
 		if (targetInVision != null) {
-			patrolTimer = Integer.MIN_VALUE;
+			patrolling = false;
 
 			if (getGroundAttackBounds().intersects(targetInVision.getBounds()))
 				velX = 0;
@@ -137,7 +148,8 @@ public class ToadEnemy extends Creature {
 		}
 		// If there is no nearby target, patrol a small area
 		else {
-			if (patrolTimer == Integer.MIN_VALUE) {
+			if (!patrolling) {
+				patrolling = true;
 				patrolTimer = (int) (Math.random() * maxPatrolTime);
 				patrolStartTimer = System.currentTimeMillis();
 
@@ -152,7 +164,7 @@ public class ToadEnemy extends Creature {
 					velX = -walkingSpeed;
 			}
 			if (System.currentTimeMillis() - patrolStartTimer > patrolTimer)
-				patrolTimer = Integer.MIN_VALUE;
+				patrolling = false;
 		}
 	}
 
@@ -209,6 +221,25 @@ public class ToadEnemy extends Creature {
 			targetInVision = closestTarget;
 		}
 	}
+	
+	/**
+	 * Checks to see if there are blocks in the current patrolling path.
+	 * @return True if there is a path that can be walked on, false otherwise.
+	 */
+	private boolean checkPatrolPath() {
+		boolean pathExists = false;
+		List<GameObject> midLayer = objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER);
+		for (int i = midLayer.size() - 1; i >= 0; i--) {
+			GameObject other = midLayer.get(i);
+			if (other.compareCategory(Category.Block) || other.compareCategory(Category.JumpThroughBlock)) {
+				if (getWalkPathCheckBounds().intersects(other.getBounds())) {
+					pathExists = true;
+					break;
+				}
+			}
+		}
+		return pathExists;
+	}
 
 	@Override
 	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
@@ -258,6 +289,23 @@ public class ToadEnemy extends Creature {
 			visionX = (int) (x + width / 2 - (visionWidth * (visionFrontalRatio)));
 
 		return new Rectangle(visionX, visionY, visionWidth, visionHeight);
+	}
+	
+	/**
+	 * Used for checking if there is a block to walk on in front of this creature,
+	 * so that it avoids walking off of cliffs.
+	 * @return The bounds to check the path.
+	 */
+	private Rectangle getWalkPathCheckBounds() {
+		int width = TILE_SIZE / 2;
+		int height = TILE_SIZE;
+		int y = (int) (this.y + this.height - height / 2);
+		int x;
+		if (direction == 1)
+			x = (int) (this.x + this.width - width);
+		else
+			x = (int) (this.x);
+		return new Rectangle(x, y, width, height);
 	}
 
 	private void setupAnimations() {
