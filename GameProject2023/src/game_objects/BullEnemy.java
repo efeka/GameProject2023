@@ -99,7 +99,7 @@ public class BullEnemy extends Creature {
 		
 		for (GameObject other : objectHandler.getLayer(ObjectHandler.MIDDLE_LAYER)) {
 			// Collision with Blocks
-			if (other.getObjectId().getCategory() == Category.Block) {
+			if (other.compareCategory(Category.Block)) {
 				Rectangle otherBounds = other.getBounds();
 
 				// Bottom collision

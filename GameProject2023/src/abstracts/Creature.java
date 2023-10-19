@@ -122,7 +122,7 @@ public abstract class Creature extends GameObject {
 			GameObject other = midLayer.get(i);
 
 			// Collision with Blocks
-			if (other.getObjectId().getCategory() == Category.Block) {
+			if (other.compareCategory(Category.Block)) {
 				Rectangle otherBounds = other.getBounds();
 
 				if (getGroundCheckBounds().intersects(otherBounds))
@@ -159,7 +159,7 @@ public abstract class Creature extends GameObject {
 				}
 			}
 			// Collision with Jump Through Blocks
-			else if (other.getObjectId().getCategory() == Category.JumpThroughBlock && getVelY() >= 0) {
+			else if (other.compareCategory(Category.JumpThroughBlock) && getVelY() >= 0) {
 				Rectangle otherBounds = other.getBounds();
 
 				if (getGroundCheckBounds().intersects(otherBounds))

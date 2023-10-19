@@ -69,7 +69,7 @@ public class ChainSpikeAttack extends GameObject {
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 
-			if (other.getObjectId().getCategory() == Category.Block) {
+			if (other.compareCategory(Category.Block)) {
 				if (getGroundCheckBounds().intersects(other.getBounds())) {
 					isOnBlock = true;
 					x = other.getX();

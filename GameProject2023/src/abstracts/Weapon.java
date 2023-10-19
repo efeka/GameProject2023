@@ -65,14 +65,16 @@ public abstract class Weapon extends GameObject {
 			if (enemiesHit != null && enemiesHit.contains(other))
 				continue;
 
-			if (attackBounds.intersects(other.getBounds()) && other.getObjectId().getCategory() == Category.Enemy) {
-				Creature otherCreature = (Creature) other;
-				if (knockbackVelX != 0 || knockbackVelY != 0)
-					otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
-				otherCreature.takeDamage(damage, enemyInvulnerabilityDuration);
-
-				if (enemiesHit != null)
-					enemiesHit.add(other);
+			if (other.compareCategory(Category.Enemy)) {
+				if (attackBounds.intersects(other.getBounds())) {
+					Creature otherCreature = (Creature) other;
+					if (knockbackVelX != 0 || knockbackVelY != 0)
+						otherCreature.applyKnockback(knockbackVelX, knockbackVelY);
+					otherCreature.takeDamage(damage, enemyInvulnerabilityDuration);
+	
+					if (enemiesHit != null)
+						enemiesHit.add(other);
+				}
 			}
 		}
 	}

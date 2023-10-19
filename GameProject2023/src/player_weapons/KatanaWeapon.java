@@ -1,14 +1,11 @@
 package player_weapons;
 
-import java.awt.image.BufferedImage;
-
 import abstracts.Weapon;
 import framework.Animation;
 import framework.ObjectHandler;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Player;
-import player_weapons.SwordWeapon.ActionState;
 import player_weapons.abilities.WeaponAbility;
 import window.KeyInput;
 import window.MouseInput;

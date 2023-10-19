@@ -152,17 +152,17 @@ public class ObjectHandler {
 				
 				if (enemy1Name != null) {
 					GameObject gameObject = createObjectByName(enemy1Name, x, y);
-					if (gameObject.getObjectId().getCategory() == Category.Enemy)
+					if (gameObject.compareCategory(Category.Enemy))
 						wave1.add((Creature) gameObject);
 				}
 				if (enemy2Name != null) {
 					GameObject gameObject = createObjectByName(enemy2Name, x, y);
-					if (gameObject.getObjectId().getCategory() == Category.Enemy)
+					if (gameObject.compareCategory(Category.Enemy))
 						wave2.add((Creature) gameObject);
 				}
 				if (enemy3Name != null) {
 					GameObject gameObject = createObjectByName(enemy3Name, x, y);
-					if (gameObject.getObjectId().getCategory() == Category.Enemy)
+					if (gameObject.compareCategory(Category.Enemy))
 						wave3.add((Creature) gameObject);
 				}
 			}
@@ -247,7 +247,7 @@ public class ObjectHandler {
 			break;
 		}
 		
-		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.FriendlySummon)
+		if (object != null && object.compareCategory(Category.FriendlySummon))
 			summonsList.add((Creature) object);
 	}
 
@@ -269,7 +269,7 @@ public class ObjectHandler {
 		else if (menuLayer.contains(object))
 			menuLayer.remove(object);
 		
-		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.FriendlySummon)
+		if (object != null && object.compareCategory(Category.FriendlySummon))
 			summonsList.remove((Creature) object);
 		
 		if (object.compareCategory(Category.Enemy))
@@ -305,7 +305,7 @@ public class ObjectHandler {
 			break;
 		}
 		
-		if (object != null && object.getObjectId() != null && object.getObjectId().getCategory() == Category.FriendlySummon)
+		if (object != null && object.compareCategory(Category.FriendlySummon))
 			summonsList.add((Creature) object);
 		
 		if (object.compareCategory(Category.Enemy))

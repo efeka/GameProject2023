@@ -115,7 +115,7 @@ public class SwordIceAttack extends GameObject {
 		for (int i = midLayer.size() - 1; i >= 0; i--) {
 			GameObject other = midLayer.get(i);
 			
-			if (other.getObjectId().getCategory() == Category.Enemy) {
+			if (other.compareCategory(Category.Enemy)) {
 				Rectangle[] swordBounds = getSwordBounds();
 				for (int j = 0; j < swordCount; j++) {
 					Rectangle bounds = swordBounds[j];

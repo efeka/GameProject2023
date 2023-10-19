@@ -113,7 +113,7 @@ public abstract class Item extends GameObject {
 			if (other.equals(this))
 				continue;
 			
-			if (other.getObjectId().getCategory() == Category.Block) {
+			if (other.compareCategory(Category.Block)) {
 				if (getGroundCheckBounds().intersects(other.getBounds()))
 					falling = false;
 				
@@ -130,7 +130,7 @@ public abstract class Item extends GameObject {
 				}
 			}
 			
-			if (other.getObjectId().getCategory() == Category.JumpThroughBlock) {
+			if (other.compareCategory(Category.JumpThroughBlock)) {
 				if (getGroundCheckBounds().intersects(other.getBounds()))
 					falling = false;
 				

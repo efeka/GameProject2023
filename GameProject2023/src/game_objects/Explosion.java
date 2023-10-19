@@ -99,7 +99,7 @@ public class Explosion extends GameObject {
 					continue;
 				
 				// Damage objects with the given category
-				if (other.getObjectId().getCategory() == category) {
+				if (other.compareCategory(category)) {
 					if (getBounds().intersects(other.getBounds())) {
 						((Creature) other).takeDamage(damage, 0);
 						targetsHit.add(other);

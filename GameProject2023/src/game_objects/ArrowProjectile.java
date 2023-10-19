@@ -15,7 +15,7 @@ import abstracts.Projectile;
 import framework.Animation;
 import framework.GameConstants;
 import framework.ObjectHandler;
-import framework.ObjectId;
+import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 
@@ -84,7 +84,7 @@ public class ArrowProjectile extends Projectile {
 			if (other.equals(this))
 				continue;
 
-			if (other.getObjectId().getCategory() == ObjectId.Category.Block) {
+			if (other.compareCategory(Category.Block)) {
 				if (getBounds().intersects(other.getBounds())) {
 					stopUpdating = true;
 					

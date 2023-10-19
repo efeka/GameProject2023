@@ -72,7 +72,7 @@ public class Room {
 				hasRoomExit[directionIndex] = true;
 				roomExits.add((RoomExit) gameObject);
 			}
-			else if (gameObject.getObjectId().getCategory() == Category.PlayerExitDestination)
+			else if (gameObject.compareCategory(Category.PlayerExitDestination))
 				playerExitDestinations[directionIndex] = (PlayerExitDestination) gameObject;
 		}
 	}
@@ -101,7 +101,7 @@ public class Room {
 		for (int i = middleLayer.size() - 1; i >= 0; i--) {
 			GameObject gameObject = middleLayer.get(i);
 			Name objectName = gameObject.getObjectId().getName();
-			if (gameObject.getObjectId().getCategory() == Category.RoomExit) {
+			if (gameObject.compareCategory(Category.RoomExit)) {
 				for (int j = unusedExitLocations.size() - 1; j >= 0; j--) {
 					RoomDirection locationFromName = RoomDirection.convertNameToDirection(objectName);
 					if (locationFromName == unusedExitLocations.get(j)) {
