@@ -16,7 +16,7 @@ import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import game_objects.Player;
+import game_objects.player.Player;
 
 public class HUD extends GameObject {
 

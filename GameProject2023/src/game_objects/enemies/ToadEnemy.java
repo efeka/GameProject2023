@@ -1,4 +1,4 @@
-package game_objects;
+package game_objects.enemies;
 
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
@@ -19,6 +19,7 @@ import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import game_objects.player.Player;
 import ui.CreatureHealthBar;
 import visual_effects.DamageNumberPopup;
 

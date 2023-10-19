@@ -1,4 +1,4 @@
-package game_objects;
+package game_objects.tiles;
 
 import java.awt.Graphics;
 

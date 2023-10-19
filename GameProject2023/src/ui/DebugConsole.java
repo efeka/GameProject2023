@@ -10,7 +10,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
-import game_objects.Player;
+import game_objects.player.Player;
 import window.KeyInput;
 
 public class DebugConsole extends GameObject {

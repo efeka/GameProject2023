@@ -1,4 +1,4 @@
-package game_objects;
+package game_objects.enemies;
 
 import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;
@@ -16,6 +16,7 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import game_objects.ArrowProjectile;
 import ui.CreatureHealthBar;
 import visual_effects.DamageNumberPopup;
 

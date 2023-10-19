@@ -1,4 +1,4 @@
-package game_objects;
+package game_objects.tiles;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -6,15 +6,15 @@ import java.awt.image.BufferedImage;
 import abstracts.TileBlock;
 import abstracts.TileOrientation;
 import framework.ObjectId.Name;
-import framework.TextureLoader.TextureName;
 import framework.TextureLoader;
+import framework.TextureLoader.TextureName;
 
-public class GrassTileBlock extends TileBlock {
+public class GrassBackgroundTileBlock extends TileBlock {
 
-	public GrassTileBlock(int x, int y, Name objectName, TileOrientation orientation) {
+	public GrassBackgroundTileBlock(int x, int y, Name objectName, TileOrientation orientation) {
 		super(x, y, objectName, orientation);
 		
-		BufferedImage[] tileSet = TextureLoader.getInstance().getTextures(TextureName.GrassTiles);
+		BufferedImage[] tileSet = TextureLoader.getInstance().getTextures(TextureName.GrassBackgroundTiles);
 		texture = getImageByOrientation(tileSet, orientation);
 	}
 

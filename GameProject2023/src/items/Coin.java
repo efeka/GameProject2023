@@ -10,7 +10,7 @@ import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import game_objects.Player;
+import game_objects.player.Player;
 import visual_effects.OneTimeAnimation;
 
 public class Coin extends Item {

@@ -15,7 +15,7 @@ import framework.ObjectId.Category;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.Explosion;
-import game_objects.Player;
+import game_objects.player.Player;
 import player_weapons.abilities.ChainSpikeAttack;
 import player_weapons.abilities.DarkSummon;
 import player_weapons.abilities.SwordIceAttack;

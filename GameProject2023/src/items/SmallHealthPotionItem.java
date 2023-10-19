@@ -7,7 +7,7 @@ import framework.ObjectHandler;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import game_objects.Player;
+import game_objects.player.Player;
 
 public class SmallHealthPotionItem extends Item {
 

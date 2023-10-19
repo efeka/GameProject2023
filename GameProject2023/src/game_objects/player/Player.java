@@ -1,4 +1,4 @@
-package game_objects;
+package game_objects.player;
 
 import static framework.GameConstants.ScaleConstants.PLAYER_HEIGHT;
 import static framework.GameConstants.ScaleConstants.PLAYER_WIDTH;

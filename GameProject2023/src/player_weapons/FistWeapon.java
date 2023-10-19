@@ -9,7 +9,7 @@ import framework.Animation;
 import framework.ObjectHandler;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
-import game_objects.Player;
+import game_objects.player.Player;
 import player_weapons.abilities.WeaponAbility;
 import window.KeyInput;
 import window.MouseInput;
@@ -216,7 +216,9 @@ public class FistWeapon extends Weapon {
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchJab, 1), firstJabDelay, true),
 				new Animation(tex.getTexturesByDirection(TextureName.PlayerPunchJab, -1), firstJabDelay, true),
 		};
-		abilities[0] = new WeaponAbility(150, 7, jabAnims);
+		// TODO for testing
+		abilities[0] = new WeaponAbility(150, 700000, jabAnims);
+		// abilities[0] = new WeaponAbility(150, 7, jabAnims);
 		
 		// Attack1 Chain 2
 		int secondJabDelay = 2;
