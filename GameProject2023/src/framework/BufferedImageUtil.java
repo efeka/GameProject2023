@@ -1,5 +1,6 @@
 package framework;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -31,9 +32,9 @@ public class BufferedImageUtil {
 	/**
 	 * Scales the given BufferedImage to the specified dimensions.
 	 *
-	 * @param image The original BufferedImage to be scaled.
-	 * @param scaledWidth The desired width of the scaled image.
-	 * @param scaledHeight The desired height of the scaled image.
+	 * @param image 		The original BufferedImage to be scaled.
+	 * @param scaledWidth 	The desired width of the scaled image.
+	 * @param scaledHeight 	The desired height of the scaled image.
 	 * @return A new BufferedImage representing the scaled version of the original image.
 	 */
 	public static BufferedImage getScaledInstance(BufferedImage image, int scaledWidth, int scaledHeight) {
@@ -44,8 +45,8 @@ public class BufferedImageUtil {
 	/**
 	 * Returns a left-clipped BufferedImage by trimming the left side of the original image.
 	 *
-	 * @param image The original BufferedImage to be clipped.
-	 * @param clippedWidth The desired width of the resulting image after clipping.
+	 * @param image 		The original BufferedImage to be clipped.
+	 * @param clippedWidth 	The desired width of the resulting image after clipping.
 	 * @return A new BufferedImage representing the left-clipped portion of the original image.
 	 */
 	public static BufferedImage getLeftClippedImage(BufferedImage image, int clippedWidth) {
@@ -57,6 +58,30 @@ public class BufferedImageUtil {
 				Math.max(clippedWidth, 1),
 				image.getHeight());
 		return image;
+	}
+	
+	/**
+	 * Paints the non-transparent pixels of the given image to a white color.
+	 * Mainly used for invulnerability effects.
+	 * 
+	 * @param g2d 	The Graphics2D object
+	 * @param image The image to be painted white
+	 * @return The white image
+	 */
+	public static BufferedImage getImageInWhite(Graphics2D g2d, BufferedImage image) {
+	    BufferedImage whiteImage = new BufferedImage(image.getWidth(), image.getHeight(), 
+	    		BufferedImage.TYPE_INT_ARGB);
+
+	    for (int y = 0; y < image.getHeight(); y++) {
+	        for (int x = 0; x < image.getWidth(); x++) {
+	            int pixel = image.getRGB(x, y);
+	            int alpha = (pixel >> 24) & 0xFF;
+	            if (alpha != 0)
+	                whiteImage.setRGB(x, y, new Color(199, 207, 204).getRGB());
+	        }
+	    }
+
+	    return whiteImage;
 	}
 	
 }

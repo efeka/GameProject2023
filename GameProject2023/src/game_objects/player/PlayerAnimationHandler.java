@@ -1,12 +1,12 @@
 package game_objects.player;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import abstracts.Weapon;
 import framework.Animation;
+import framework.BufferedImageUtil;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 
@@ -71,7 +71,7 @@ public class PlayerAnimationHandler {
 		// If the player is invulnerable, display a periodic white flash as an indicator
 		BufferedImage currentImage = getCurrentAnimationImage();
 		if (player.isInvulnerable() && flashWhiteToggle)
-			currentImage = getImageInWhite((Graphics2D) g, currentImage);
+			currentImage = BufferedImageUtil.getImageInWhite((Graphics2D) g, currentImage);
 		
 		g.drawImage(currentImage, imageX, imageY, imageWidth, imageHeight, null);
 	}
@@ -180,28 +180,6 @@ public class PlayerAnimationHandler {
 	public void resetLandAnimations() {
 		landAnimations[0].resetAnimation();
 		landAnimations[1].resetAnimation();
-	}
-
-	/**
-	 * Paints the non-transparent pixels of the given image to a white color.
-	 * @param g2d the Graphics2D object
-	 * @param image the image to be painted white
-	 * @return the white image
-	 */
-	private BufferedImage getImageInWhite(Graphics2D g2d, BufferedImage image) {
-	    BufferedImage whiteImage = new BufferedImage(image.getWidth(), image.getHeight(), 
-	    		BufferedImage.TYPE_INT_ARGB);
-
-	    for (int y = 0; y < image.getHeight(); y++) {
-	        for (int x = 0; x < image.getWidth(); x++) {
-	            int pixel = image.getRGB(x, y);
-	            int alpha = (pixel >> 24) & 0xFF;
-	            if (alpha != 0)
-	                whiteImage.setRGB(x, y, new Color(199, 207, 204).getRGB());
-	        }
-	    }
-
-	    return whiteImage;
 	}
 	
 	/**

@@ -3,7 +3,6 @@ package ui;
 import static framework.GameConstants.ScaleConstants.GAME_WIDTH;
 import static framework.GameConstants.ScaleConstants.TILE_SIZE;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -14,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 import abstracts.GameObject;
-import floor_generation.RoomDirection;
 import floor_generation.Floor;
 import floor_generation.Room;
+import floor_generation.RoomDirection;
 import framework.GameConstants;
 import framework.ObjectId;
-import framework.TextureLoader;
 import framework.ObjectId.Category;
 import framework.ObjectId.Name;
+import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 
 public class Minimap extends GameObject {
@@ -74,7 +73,7 @@ public class Minimap extends GameObject {
 		for (Map.Entry<Room, Point2D> entry : roomPositions.entrySet()) {
 			Point2D roomPosition = entry.getValue();
 			int boundsX = (int) x + (int) roomPosition.getX() * (roomSize + connectionLength / 2);
-			int boundsY = (int) y + (int) roomPosition.getY() * (roomSize + connectionLength / 2) + 200; //TODO center
+			int boundsY = (int) y + (int) roomPosition.getY() * (roomSize + connectionLength / 2);
 			roomBounds.put(entry.getKey(), new Rectangle(boundsX, boundsY, roomSize, roomSize));
 
 			Room room = entry.getKey();
