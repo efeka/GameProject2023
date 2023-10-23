@@ -12,6 +12,7 @@ import abstracts.DiagonalTileBlock;
 import abstracts.GameObject;
 import abstracts.Item;
 import abstracts.Weapon;
+import framework.DurationTracker;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
@@ -40,16 +41,13 @@ public class Player extends Creature {
 
 	private int availableJumps = 2;
 	private boolean doubleJumping = false;
+	
+	private DurationTracker dodgeDurationTracker;
 	private boolean dodging = false;
-	private int dodgeCooldownMillis = 1000;
-	private long lastDodgeTimer = 0;
-
-	private boolean lockMovementInputs = false; 
-
-	// Object Interaction
+	private DurationTracker interactDurationTracker;
 	private boolean canInteract = true;
-	private int interactCooldownMillis = 600;
-	private long lastInteractTimer;
+	
+	private boolean lockMovementInputs = false; 
 	
 	private int coinCount = 0;
 
@@ -59,6 +57,9 @@ public class Player extends Creature {
 		this.keyInput = keyInput;
 		objectHandler.setPlayer(this);
 
+		dodgeDurationTracker = new DurationTracker(1000);
+		interactDurationTracker = new DurationTracker(600);
+		
 		weapon = new FistWeapon(objectHandler, keyInput, mouseInput);
 
 		animationHandler = new PlayerAnimationHandler(this);
@@ -77,10 +78,9 @@ public class Player extends Creature {
 				velY = TERMINAL_VELOCITY;
 		}
 
-		long now = System.currentTimeMillis();
-		if (invulnerable && (now - lastInvulnerableTimer >= invulnerabilityDuration))
+		if (invulnerable && invulnerableDurationTracker.hasDurationElapsed())
 			invulnerable = false;
-		if (!canInteract && (now - lastInteractTimer >= interactCooldownMillis))
+		if (!canInteract && interactDurationTracker.hasDurationElapsed())
 			canInteract = true;
 
 		if (!falling && velY > 0 && !landing) {
@@ -134,11 +134,11 @@ public class Player extends Creature {
 		}
 
 		// Dodging
-		if (!dodging && keyInput.isDodgeKeyPressed() && (System.currentTimeMillis() - lastDodgeTimer) >= dodgeCooldownMillis) {
+		if (!dodging && keyInput.isDodgeKeyPressed() && dodgeDurationTracker.hasDurationElapsed()) {
 			if (!falling) {
 				dodging = true;
 				velX = dodgingSpeed * direction;
-				lastDodgeTimer = System.currentTimeMillis();
+				dodgeDurationTracker.start();
 			}
 		}
 		// Reset the dodge if the animation is over
@@ -187,8 +187,8 @@ public class Player extends Creature {
 			return;
 
 		if (invulnerabilityDuration != 0) {
-			this.invulnerabilityDuration = invulnerabilityDuration; 
-			lastInvulnerableTimer = System.currentTimeMillis();
+			invulnerableDurationTracker.setDuration(invulnerabilityDuration);
+			invulnerableDurationTracker.start();
 			invulnerable = true;
 		}
 
@@ -240,7 +240,7 @@ public class Player extends Creature {
 						((Item) other).pickupItem();
 
 					canInteract = false;
-					lastInteractTimer = System.currentTimeMillis();
+					interactDurationTracker.start();
 				}
 			}
 

@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.util.List;
 
 import framework.Animation;
+import framework.DurationTracker;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -32,8 +33,7 @@ public abstract class Creature extends GameObject {
 	protected float health;
 
 	public final int DEFAULT_INVULNERABILITY_DURATION = 700;
-	protected int invulnerabilityDuration = 700;
-	protected long lastInvulnerableTimer = 0;
+	protected DurationTracker invulnerableDurationTracker;
 
 	protected CreatureAnimationManager animationManager;
 	protected CreatureHealthBar healthBar;
@@ -56,6 +56,8 @@ public abstract class Creature extends GameObject {
 		this.damage = damage;
 		health = this.maxHealth = maxHealth;
 
+		invulnerableDurationTracker = new DurationTracker(DEFAULT_INVULNERABILITY_DURATION);
+		
 		animationManager = new CreatureAnimationManager();
 		spawnAnimation = new Animation(TextureLoader.getInstance().getTextures(TextureName.EnemySpawnEffect), 10, true);
 		animationManager.addAnimation(AnimationType.Spawn, new Animation[] {spawnAnimation, spawnAnimation});

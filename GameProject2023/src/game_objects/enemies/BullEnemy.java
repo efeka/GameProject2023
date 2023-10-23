@@ -65,7 +65,7 @@ public class BullEnemy extends Creature {
 			}
 		}
 		
-		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerabilityDuration))
+		if (invulnerable && invulnerableDurationTracker.hasDurationElapsed())
 			invulnerable = false;
 		
 		if (!stunnedByWall)
@@ -135,9 +135,9 @@ public class BullEnemy extends Creature {
 		if (invulnerable)
 			return;
 		 
-		this.invulnerabilityDuration = invulnerabilityDuration;
 		if (invulnerabilityDuration != 0) {
-			lastInvulnerableTimer = System.currentTimeMillis();
+			invulnerableDurationTracker.setDuration(invulnerabilityDuration);
+			invulnerableDurationTracker.start();
 			invulnerable = true;
 		}
 		

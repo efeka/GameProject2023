@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import abstracts.Creature;
 import framework.Animation;
+import framework.DurationTracker;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -24,8 +25,7 @@ public class ArcherEnemy extends Creature {
 
 	private ObjectHandler objectHandler;
 
-	private final int shootCooldown = 2000;
-	private long lastShotTimer = shootCooldown;
+	private DurationTracker shootDurationTracker;
 	private boolean isShotReady = false, didShoot = false;
 
 	private float shootVelX, shootVelY;
@@ -36,6 +36,8 @@ public class ArcherEnemy extends Creature {
 		super(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 25, 100, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
+		shootDurationTracker = new DurationTracker(2000);
+		
 		setupAnimations();
 		texture = TextureLoader.getInstance().getTextures(TextureName.ArcherEnemyIdle)[0];
 	}
@@ -57,13 +59,12 @@ public class ArcherEnemy extends Creature {
 				velY = TERMINAL_VELOCITY;
 		}
 
-		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerabilityDuration))
+		if (invulnerable && invulnerableDurationTracker.hasDurationElapsed())
 			invulnerable = false;
 
 		takeAim(8f);
 
-		if (System.currentTimeMillis() - lastShotTimer >= shootCooldown)
-			isShotReady = true;
+		isShotReady = shootDurationTracker.hasDurationElapsed();
 		if (isShotReady) {
 			int animationFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack1);
 			if (!didShoot && animationFrame == 7) {
@@ -91,10 +92,10 @@ public class ArcherEnemy extends Creature {
 	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
 		if (invulnerable)
 			return;
-		 
-		this.invulnerabilityDuration = invulnerabilityDuration;
+		
 		if (invulnerabilityDuration != 0) {
-			lastInvulnerableTimer = System.currentTimeMillis();
+			invulnerableDurationTracker.setDuration(invulnerabilityDuration);
+			invulnerableDurationTracker.start();
 			invulnerable = true;
 		}
 
@@ -179,7 +180,7 @@ public class ArcherEnemy extends Creature {
 	}
 
 	private void drawAnimations(Graphics g) {
-		int directionIndex = getIndexFromDirection();
+		int directionIndex = direction == 1 ? 0 : 1;
 
 		final int x = (int) this.x - width / 2;
 		final int y = (int) this.y - height / 2;
@@ -252,13 +253,9 @@ public class ArcherEnemy extends Creature {
 
 	private void resetShootingSystem() {
 		isShotReady = didShoot = false;
-		lastShotTimer = System.currentTimeMillis();
+		shootDurationTracker.start();
 
 		animationManager.resetAnimation(AnimationType.Attack1);
-	}
-
-	public int getIndexFromDirection() {
-		return (-direction + 1) / 2;
 	}
 
 	@Override

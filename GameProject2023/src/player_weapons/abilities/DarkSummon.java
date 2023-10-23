@@ -11,6 +11,7 @@ import java.util.List;
 import abstracts.Creature;
 import abstracts.GameObject;
 import framework.Animation;
+import framework.DurationTracker;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -19,8 +20,8 @@ import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.CreatureAnimationManager;
-import game_objects.Explosion;
 import game_objects.CreatureAnimationManager.AnimationType;
+import game_objects.Explosion;
 import ui.CreatureHealthBar;
 import visual_effects.DamageNumberPopup;
 import visual_effects.OneTimeAnimation;
@@ -37,9 +38,9 @@ public class DarkSummon extends Creature {
 	private float jumpingSpeed = -4.5f;
 
 	private HashSet<GameObject> enemiesHit;
+	
+	private DurationTracker attackDurationTracker;
 	private boolean attacking = false;
-	private int attackCooldown = 1000;
-	private long lastAttackTimer = 0;
 
 	public DarkSummon(int x, int y, int direction, int damage, int explosionDamage, int maxHealth, ObjectHandler objectHandler) {
 		super(x, y, TILE_SIZE, TILE_SIZE, damage, maxHealth, objectHandler, new ObjectId(Category.FriendlySummon, Name.Missing));
@@ -47,6 +48,8 @@ public class DarkSummon extends Creature {
 		this.explosionDamage = explosionDamage;
 		enemiesHit = new HashSet<>();
 
+		attackDurationTracker = new DurationTracker(1000);
+		
 		animationManager = new CreatureAnimationManager();
 		setupAnimations();
 	}
@@ -84,7 +87,7 @@ public class DarkSummon extends Creature {
 				velY = TERMINAL_VELOCITY;
 		}
 
-		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerabilityDuration))
+		if (invulnerable && invulnerableDurationTracker.hasDurationElapsed())
 			invulnerable = false;
 		
 		handleCollisions();
@@ -132,7 +135,7 @@ public class DarkSummon extends Creature {
 					else if (x < other.getX())
 						direction = 1;
 
-					if (isAttackReady()) {
+					if (attackDurationTracker.hasDurationElapsed()) {
 						int currentAnimFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack1);
 						if (!enemiesHit.contains(other) && attacking && currentAnimFrame == 3) {
 							((Creature) other).takeDamage(damage, 1);
@@ -197,9 +200,9 @@ public class DarkSummon extends Creature {
 		if (invulnerable)
 			return;
 
-		this.invulnerabilityDuration = invulnerabilityDuration; 
 		if (invulnerabilityDuration != 0) {
-			lastInvulnerableTimer = System.currentTimeMillis();
+			invulnerableDurationTracker.setDuration(invulnerabilityDuration);
+			invulnerableDurationTracker.start();
 			invulnerable = true;
 		}
 
@@ -291,13 +294,10 @@ public class DarkSummon extends Creature {
 			animationManager.runAnimation(AnimationType.Attack1);
 	}
 
-	private boolean isAttackReady() {
-		return System.currentTimeMillis() - lastAttackTimer >= attackCooldown;
-	}
-
 	private void resetAnimations() {
 		attacking = false;
-		lastAttackTimer = System.currentTimeMillis();
+		attackDurationTracker.start();
+
 		enemiesHit.clear();
 		animationManager.resetAnimation(AnimationType.Attack1);
 		animationManager.resetAnimation(AnimationType.Run);

@@ -11,6 +11,7 @@ import java.util.List;
 
 import abstracts.Creature;
 import abstracts.GameObject;
+import framework.DurationTracker;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
@@ -31,8 +32,7 @@ public class SwordIceAttack extends GameObject {
 	private float angleIncrement;
 	private float[] swordAngles;
 	
-	private int durationMillis;
-	private long startTime;
+	private DurationTracker swordDurationTracker;
 	
 	// Enemies hit by each sword is stored in this list.
 	// This is for preventing an enemy to get hit twice by the same sword in the same rotation.
@@ -58,12 +58,12 @@ public class SwordIceAttack extends GameObject {
 		this.centerObject = centerObject;
 		this.swordCount = swordCount;
 		this.damage = damage;
-		this.durationMillis = durationMillis;
 		this.radius = radius;
 		this.angleIncrement = angleIncrement;
 		this.objectHandler = objectHandler;
 		
-		startTime = System.currentTimeMillis();
+		swordDurationTracker = new DurationTracker(durationMillis);
+		swordDurationTracker.start();
 		
 		enemiesHit = new ArrayList<>();
 		for (int i = 0; i < swordCount; i++)
@@ -78,7 +78,7 @@ public class SwordIceAttack extends GameObject {
 
 	@Override
 	public void tick() {
-		if (System.currentTimeMillis() - startTime >= durationMillis) {
+		if (swordDurationTracker.hasDurationElapsed()) {
 			objectHandler.removeObject(this);
 			return;
 		}

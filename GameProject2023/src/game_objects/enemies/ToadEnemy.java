@@ -12,6 +12,7 @@ import java.util.List;
 import abstracts.Creature;
 import abstracts.GameObject;
 import framework.Animation;
+import framework.DurationTracker;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -36,15 +37,14 @@ public class ToadEnemy extends Creature {
 
 	private boolean attacking = false;
 	private boolean startedAttackAnim = false;
-	private int attackCooldown = 2000;
-	private long lastAttackTimer = attackCooldown;
+	private DurationTracker attackDurationTracker;
 
 	// This creature slowly patrols around by slowly walking in 
 	// random directions while it does not have a target in its vision
 	private Creature targetInVision = null;
-	private int maxPatrolTime = 1500, patrolTimer;
+	private DurationTracker patrolDurationTracker;
 	private boolean patrolling = false;
-	private long patrolStartTimer;
+	private int maxPatrolTime = 1500;
 
 	private float walkingSpeed = 0.5f;
 
@@ -55,8 +55,10 @@ public class ToadEnemy extends Creature {
 		super(x, y, (int) (TILE_SIZE * 1.5f), (int) (TILE_SIZE * 1.5f), 25, 100, objectHandler, new ObjectId(ObjectId.Category.Enemy, ObjectId.Name.BasicEnemy));		
 		this.objectHandler = objectHandler;
 
+		attackDurationTracker = new DurationTracker(2000);
+		patrolDurationTracker = new DurationTracker(maxPatrolTime);
+		
 		texture = TextureLoader.getInstance().getTextures(TextureName.BasicEnemyIdle)[0];
-
 		setupAnimations();
 	}
 
@@ -87,7 +89,7 @@ public class ToadEnemy extends Creature {
 
 		calculateDirection();
 
-		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerabilityDuration))
+		if (invulnerable && invulnerableDurationTracker.hasDurationElapsed())
 			invulnerable = false;
 
 		if (staggered && animationManager.isAnimationPlayedOnce(AnimationType.Hurt))
@@ -151,8 +153,9 @@ public class ToadEnemy extends Creature {
 		else {
 			if (!patrolling) {
 				patrolling = true;
-				patrolTimer = (int) (Math.random() * maxPatrolTime);
-				patrolStartTimer = System.currentTimeMillis();
+				int patrolTimer = (int) (Math.random() * maxPatrolTime);
+				patrolDurationTracker.setDuration(patrolTimer);
+				patrolDurationTracker.start();
 
 				// Select a random direction to walk towards
 				// Staying put is more probable than walking
@@ -164,7 +167,7 @@ public class ToadEnemy extends Creature {
 				else
 					velX = -walkingSpeed;
 			}
-			if (System.currentTimeMillis() - patrolStartTimer > patrolTimer)
+			if (patrolDurationTracker.hasDurationElapsed())
 				patrolling = false;
 		}
 	}
@@ -183,11 +186,11 @@ public class ToadEnemy extends Creature {
 			Creature otherCreature = summonsList.get(i);
 
 			if (getGroundAttackBounds().intersects(otherCreature.getBounds())) {
-				if (System.currentTimeMillis() - lastAttackTimer >= attackCooldown) {
-					velX = 0;
+				if (attackDurationTracker.hasDurationElapsed()) {
+					attackDurationTracker.start();
 					animationManager.resetAnimation(AnimationType.Attack1);
+					velX = 0;
 					startedAttackAnim = true;
-					lastAttackTimer = System.currentTimeMillis();
 				}
 
 				// Damage the player
@@ -247,9 +250,9 @@ public class ToadEnemy extends Creature {
 		if (invulnerable || dead)
 			return;
 
-		this.invulnerabilityDuration = invulnerabilityDuration; 
 		if (invulnerabilityDuration != 0) {
-			lastInvulnerableTimer = System.currentTimeMillis();
+			invulnerableDurationTracker.setDuration(invulnerabilityDuration);
+			invulnerableDurationTracker.start();
 			invulnerable = true;
 		}
 
@@ -334,7 +337,7 @@ public class ToadEnemy extends Creature {
 		};
 		animationManager.addAnimation(AnimationType.Run, runAnimation);
 
-		final int attackDelay = 30;
+		final int attackDelay = 8;
 		Animation[] attackAnimation = new Animation[] {
 				new Animation(textureLoader.getTexturesByDirection(TextureName.BasicEnemyAttack, 1),
 						attackDelay, true),
