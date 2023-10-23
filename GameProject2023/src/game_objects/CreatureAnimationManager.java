@@ -1,8 +1,13 @@
-package framework;
+package game_objects;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+
+import framework.Animation;
+import framework.BufferedImageUtil;
 
 public class CreatureAnimationManager {
 
@@ -11,6 +16,7 @@ public class CreatureAnimationManager {
 		Run,
 		Attack1,
 		Attack2,
+		Jump,
 		Hurt,
 		Death,
 		Dodge,
@@ -19,8 +25,14 @@ public class CreatureAnimationManager {
 		Stun,
 	}
 	
+	// Each animation type is mapped to an animation array.
 	// The animation array stores the left and right direction variations of the same animation.
 	private Map<AnimationType, Animation[]> animationMap;
+
+	// Invulnerability state causes the enemy to periodically flash white
+	private boolean flashWhiteToggle;
+	private long flashWhiteToggleTimer;
+	private int flashWhiteToggleCooldownMillis = 100; 
 	
 	/**
 	 * Stores this creature's animations and handles necessary logic.
@@ -52,18 +64,29 @@ public class CreatureAnimationManager {
 	/**
 	 * Draws the animations with the given type.
 	 * 
-	 * @param type		The type of the animation.
-	 * @param g			Reference to the Graphics object.
-	 * @param direction The direction of the animation to draw.
-	 * @param x			The x coordinate of the animation's location.
-	 * @param y			The y coordinate of the animation's location.
-	 * @param width		The width scaling of the animation.
-	 * @param height	The height scaling of the animation.
+	 * @param type			The type of the animation.
+	 * @param g				Reference to the Graphics object.
+	 * @param direction 	The direction of the animation to draw.
+	 * @param invulnerable	The invulnerability state of the creature.
+	 * @param x				The x coordinate of the animation's location.
+	 * @param y				The y coordinate of the animation's location.
+	 * @param width			The width scaling of the animation.
+	 * @param height		The height scaling of the animation.
 	 */
-	public void drawAnimation(AnimationType type, Graphics g, int direction, int x, int y, int width, int height) {
+	public void drawAnimation(AnimationType type, Graphics g, int direction, boolean invulnerable, 
+			int x, int y, int width, int height) {
 		Animation[] animations = animationMap.get(type);
 		int directionIndex = direction == 1 ? 0 : 1;
-		animations[directionIndex].drawAnimation(g, x, y, width, height);
+
+		if (System.currentTimeMillis() - flashWhiteToggleTimer >= flashWhiteToggleCooldownMillis) {
+			flashWhiteToggle = !flashWhiteToggle;
+			flashWhiteToggleTimer = System.currentTimeMillis();
+		}
+		
+		BufferedImage currentImage = animations[directionIndex].getCurrentImage();
+		if (invulnerable && flashWhiteToggle) 
+			currentImage = BufferedImageUtil.getImageInWhite((Graphics2D) g, currentImage);
+		g.drawImage(currentImage, x, y, width, height, null);
 	}
 	
 	/**

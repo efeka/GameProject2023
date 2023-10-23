@@ -15,8 +15,8 @@ import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.ObjectId.Category;
 import framework.TextureLoader;
-import framework.CreatureAnimationManager.AnimationType;
 import framework.TextureLoader.TextureName;
+import game_objects.CreatureAnimationManager.AnimationType;
 import main.Game;
 import ui.CreatureHealthBar;
 import visual_effects.DamageNumberPopup;
@@ -65,7 +65,7 @@ public class BullEnemy extends Creature {
 			}
 		}
 		
-		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
+		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerabilityDuration))
 			invulnerable = false;
 		
 		if (!stunnedByWall)
@@ -134,9 +134,9 @@ public class BullEnemy extends Creature {
 	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
 		if (invulnerable)
 			return;
-		invulnerableDuration = invulnerabilityDuration; 
-		
-		if (invulnerableDuration != 0) {
+		 
+		this.invulnerabilityDuration = invulnerabilityDuration;
+		if (invulnerabilityDuration != 0) {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}
@@ -202,9 +202,11 @@ public class BullEnemy extends Creature {
 		
 		if (animationManager.getCurrentAnimationFrame(AnimationType.Spawn) >= 13) {
 			if (!stunnedByWall)
-				animationManager.drawAnimation(AnimationType.Run, g, direction, x, y, width, height);
+				animationManager.drawAnimation(AnimationType.Run, g, direction, invulnerable,
+						 x, y, width, height);
 			else
-				animationManager.drawAnimation(AnimationType.Stun, g, direction, x, y, width, height);
+				animationManager.drawAnimation(AnimationType.Stun, g, direction, invulnerable,
+						 x, y, width, height);
 		}
 		
 		if (!animationManager.isAnimationPlayedOnce(AnimationType.Spawn)) {
@@ -212,8 +214,8 @@ public class BullEnemy extends Creature {
 			int spawnHeight = (int) (height * 0.8f);
 			int spawnX = (int) (x + (width - spawnWidth) / 2);
 			int spawnY = (int) (y + (height - spawnHeight) / 2); 
-			animationManager.drawAnimation(AnimationType.Spawn, g, 1, 
-					spawnX, spawnY, spawnWidth, spawnHeight);
+			animationManager.drawAnimation(AnimationType.Spawn, g, 1, invulnerable,
+					 spawnX, spawnY, spawnWidth, spawnHeight);
 		}
 	}
 

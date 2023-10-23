@@ -4,8 +4,6 @@ import java.awt.Rectangle;
 import java.util.List;
 
 import framework.Animation;
-import framework.CreatureAnimationManager;
-import framework.CreatureAnimationManager.AnimationType;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
@@ -13,6 +11,8 @@ import framework.ObjectId.Category;
 import framework.ObjectId.Name;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
+import game_objects.CreatureAnimationManager;
+import game_objects.CreatureAnimationManager.AnimationType;
 import ui.CreatureHealthBar;
 
 public abstract class Creature extends GameObject {
@@ -32,7 +32,7 @@ public abstract class Creature extends GameObject {
 	protected float health;
 
 	public final int DEFAULT_INVULNERABILITY_DURATION = 700;
-	protected int invulnerableDuration = 700;
+	protected int invulnerabilityDuration = 700;
 	protected long lastInvulnerableTimer = 0;
 
 	protected CreatureAnimationManager animationManager;

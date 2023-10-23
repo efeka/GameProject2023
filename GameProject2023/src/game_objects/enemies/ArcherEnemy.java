@@ -10,13 +10,13 @@ import java.util.ArrayList;
 
 import abstracts.Creature;
 import framework.Animation;
-import framework.CreatureAnimationManager.AnimationType;
 import framework.GameConstants;
 import framework.ObjectHandler;
 import framework.ObjectId;
 import framework.TextureLoader;
 import framework.TextureLoader.TextureName;
 import game_objects.ArrowProjectile;
+import game_objects.CreatureAnimationManager.AnimationType;
 import ui.CreatureHealthBar;
 import visual_effects.DamageNumberPopup;
 
@@ -57,7 +57,7 @@ public class ArcherEnemy extends Creature {
 				velY = TERMINAL_VELOCITY;
 		}
 
-		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerableDuration))
+		if (invulnerable && (System.currentTimeMillis() - lastInvulnerableTimer >= invulnerabilityDuration))
 			invulnerable = false;
 
 		takeAim(8f);
@@ -91,9 +91,9 @@ public class ArcherEnemy extends Creature {
 	public void takeDamage(int damageAmount, int invulnerabilityDuration) {
 		if (invulnerable)
 			return;
-		invulnerableDuration = invulnerabilityDuration; 
-
-		if (invulnerableDuration != 0) {
+		 
+		this.invulnerabilityDuration = invulnerabilityDuration;
+		if (invulnerabilityDuration != 0) {
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}
@@ -204,11 +204,13 @@ public class ArcherEnemy extends Creature {
 				// Rotate the torso
 				Graphics2D g2d = (Graphics2D) g;
 				g2d.rotate(rotationAngle, centerX, centerY);
-				animationManager.drawAnimation(AnimationType.Attack1, g, direction, x, y, width, height);
+				animationManager.drawAnimation(AnimationType.Attack1, g, direction, invulnerable,
+						 x, y, width, height);
 				g2d.rotate(-rotationAngle, centerX, centerY);
 			}
 			else
-				animationManager.drawAnimation(AnimationType.Idle, g, direction, x, y, width, height);
+				animationManager.drawAnimation(AnimationType.Idle, g, direction, invulnerable,
+						 x, y, width, height);
 		}
 		
 		if (!animationManager.isAnimationPlayedOnce(AnimationType.Spawn)) {
@@ -216,7 +218,7 @@ public class ArcherEnemy extends Creature {
 			int spawnHeight = (int) (height * 0.8f);
 			int spawnX = (int) (x + (width - spawnWidth) / 2);
 			int spawnY = (int) (y + (height - spawnHeight) / 2); 
-			animationManager.drawAnimation(AnimationType.Spawn, g, 1, 
+			animationManager.drawAnimation(AnimationType.Spawn, g, 1, invulnerable, 
 					spawnX, spawnY, spawnWidth, spawnHeight);
 		}
 	}

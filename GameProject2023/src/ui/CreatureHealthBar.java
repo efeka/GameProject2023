@@ -29,7 +29,7 @@ public class CreatureHealthBar extends GameObject {
 		this.parentObject = parentObject;
 		this.yOffset = yOffset;
 		
-		float unitHealthWidth = TILE_SIZE / 75f;
+		float unitHealthWidth = TILE_SIZE / 90f;
 		width = (int) (unitHealthWidth * parentObject.getMaxHealth());
 		height = (int) (TILE_SIZE * 0.12f);
 		

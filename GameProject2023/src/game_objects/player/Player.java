@@ -61,8 +61,6 @@ public class Player extends Creature {
 
 		weapon = new FistWeapon(objectHandler, keyInput, mouseInput);
 
-		invulnerableDuration = 700;
-
 		animationHandler = new PlayerAnimationHandler(this);
 		texture = TextureLoader.getInstance().getTextures(TextureName.PlayerIdle)[0];
 	}
@@ -80,7 +78,7 @@ public class Player extends Creature {
 		}
 
 		long now = System.currentTimeMillis();
-		if (invulnerable && (now - lastInvulnerableTimer >= invulnerableDuration))
+		if (invulnerable && (now - lastInvulnerableTimer >= invulnerabilityDuration))
 			invulnerable = false;
 		if (!canInteract && (now - lastInteractTimer >= interactCooldownMillis))
 			canInteract = true;
@@ -189,7 +187,7 @@ public class Player extends Creature {
 			return;
 
 		if (invulnerabilityDuration != 0) {
-			invulnerableDuration = invulnerabilityDuration; 
+			this.invulnerabilityDuration = invulnerabilityDuration; 
 			lastInvulnerableTimer = System.currentTimeMillis();
 			invulnerable = true;
 		}
