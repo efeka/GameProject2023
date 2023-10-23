@@ -29,9 +29,9 @@ public class CreatureHealthBar extends GameObject {
 		this.parentObject = parentObject;
 		this.yOffset = yOffset;
 		
-		float unitHealthWidth = TILE_SIZE / 70f;
+		float unitHealthWidth = TILE_SIZE / 75f;
 		width = (int) (unitHealthWidth * parentObject.getMaxHealth());
-		height = (int) (TILE_SIZE * 0.15f);
+		height = (int) (TILE_SIZE * 0.12f);
 		
 		textures = TextureLoader.getInstance().getTextures(TextureName.CreatureHealthBar);
 	}
