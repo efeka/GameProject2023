@@ -120,11 +120,11 @@ public class ArcherEnemy extends Creature {
 	 * @param speedX the horizontal speed of the arrow
 	 */
 	private void takeAim(float speedX) {
-		shootVelX = speedX;
 		Creature target = getClosestTarget();
-		float distanceX = (float) target.getBounds().getCenterX() - x;
-		float distanceY = (float) target.getBounds().getCenterY() - y;
+		float distanceX = (float) (target.getBounds().getCenterX() - getBounds().getCenterX());
+		float distanceY = (float) (target.getBounds().getCenterY() - getBounds().getCenterY());
 
+		shootVelX = speedX;
 		if (distanceX < 0)
 			shootVelX = Math.abs(shootVelX) * -1;
 
@@ -135,10 +135,16 @@ public class ArcherEnemy extends Creature {
 
 		float divByZeroCheck = 0.001f; 
 		if (shootVelX < -divByZeroCheck || shootVelX > divByZeroCheck) {
-			float timeToTargetX = distanceX / shootVelX;
+			float timeToTargetX = (distanceX) / shootVelX;
 			if (timeToTargetX < -divByZeroCheck || timeToTargetX > divByZeroCheck) {
 				shootVelX = distanceX / timeToTargetX;
 				shootVelY = (distanceY - 0.5f * GRAVITY * timeToTargetX * timeToTargetX) / timeToTargetX;
+				
+				int shootHorizontalDirection = shootVelX < 0 ? -1 : 1;
+				int shootVerticalDirection = shootVelY < 0 ? -1 : 1;
+				final float maxShotSpeed = 10f;
+				shootVelX = Math.min(Math.abs(shootVelX), maxShotSpeed) * shootHorizontalDirection;
+				shootVelY = Math.min(Math.abs(shootVelY), maxShotSpeed) * shootVerticalDirection;
 			}
 		}
 	}
