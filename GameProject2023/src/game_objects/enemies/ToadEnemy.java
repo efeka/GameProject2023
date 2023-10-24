@@ -175,7 +175,7 @@ public class ToadEnemy extends Creature {
 	private void handleAttacking(Creature target) {
 		if (startedAttackAnim) {
 			int currentFrame = animationManager.getCurrentAnimationFrame(AnimationType.Attack1);
-			attacking = (currentFrame == 3 || currentFrame == 4);
+			attacking = (currentFrame == 5 || currentFrame == 6);
 		}
 		if (animationManager.isAnimationPlayedOnce(AnimationType.Attack1))
 			startedAttackAnim = attacking = false;

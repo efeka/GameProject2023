@@ -279,7 +279,7 @@ public class TextureLoader {
 			fillArrayWithFlippedImages(textures);
 			break;
 		case BasicEnemyAttack:
-			textures = new BufferedImage[16];
+			textures = new BufferedImage[20];
 			for (int i = 0; i < textures.length / 2; i++) 
 				textures[i] = enemySheet.getSubimage(66 + i * 65, 131, 64, 64);
 			fillArrayWithFlippedImages(textures);
