@@ -30,6 +30,8 @@ public class Game extends Canvas implements Runnable {
 	 * The Game class is responsible for setting up and running the game, serving as the entry point of the application.
 	 */
 	public Game() {
+		setFocusTraversalKeysEnabled(false);
+		
 		keyInput = new KeyInput();
 		MouseInput mouseInput = new MouseInput();
 		addKeyListener(keyInput);

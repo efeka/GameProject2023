@@ -65,7 +65,7 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_SHIFT:
 			dodgeKeyPressed = true;
 			break;
-		case KeyEvent.VK_I:
+		case KeyEvent.VK_TAB:
 			if (inventoryKeyToggled && !inventoryToggleFlag)
 				inventoryKeyToggled = false;
 			else if (!inventoryKeyToggled && inventoryToggleFlag)
@@ -127,7 +127,7 @@ public class KeyInput extends KeyAdapter {
 		case KeyEvent.VK_SHIFT:
 			dodgeKeyPressed = false;
 			break;
-		case KeyEvent.VK_I:
+		case KeyEvent.VK_TAB:
 			inventoryToggleFlag = !inventoryToggleFlag;
 			break;
 		case KeyEvent.VK_1:

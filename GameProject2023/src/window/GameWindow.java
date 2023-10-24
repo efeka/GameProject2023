@@ -32,6 +32,7 @@ public class GameWindow extends JFrame implements MouseInputObserver {
 			setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
 		setResizable(false);
+		setFocusTraversalKeysEnabled(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(GameConstants.ScaleConstants.GAME_WIDTH, GameConstants.ScaleConstants.GAME_HEIGHT);
 		setTitle("Game Project 2023");
